@@ -662,6 +662,7 @@ function om(id){
   const pN=Math.min(100,Math.max(0,((NOW-(w.df-1))/ts)*100)).toFixed(1);
   const inD=NOW>=w.df&&NOW<=w.du;
   const vTag=w.type==="white"?"tag-vw":w.type==="sparkling"?"tag-vs":"tag-v";
+  const src=ph(w.id);
 
   // 모바일 상단 이미지
   document.getElementById('mPhoto').innerHTML=`
