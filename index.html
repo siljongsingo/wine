@@ -45,45 +45,52 @@ body { font-family:var(--font); background:var(--bg); color:var(--text); font-we
 
 /* ── NAV ── */
 .nav-wrap { position:sticky; top:0; z-index:100; background:var(--nav); backdrop-filter:saturate(180%) blur(20px); -webkit-backdrop-filter:saturate(180%) blur(20px); border-bottom:1px solid var(--sep); }
-.nav-row { max-width:1320px; margin:0 auto; padding:0 16px; display:flex; align-items:center; gap:4px; height:48px; overflow-x:auto; scrollbar-width:none; }
-.nav-row::-webkit-scrollbar { display:none; }
-.nav-row + .nav-row { border-top:1px solid var(--sep2); }
-.nav-tab { padding:5px 14px; font-size:13px; font-family:var(--font); font-weight:500; color:var(--sub); border:none; background:none; border-radius:20px; cursor:pointer; transition:all .18s ease; white-space:nowrap; flex-shrink:0; }
+
+/* Row 1: 종류탭 + 정렬 — 두 줄 허용 */
+.nav-row { max-width:1320px; margin:0 auto; padding:6px 16px; display:flex; align-items:center; gap:4px; flex-wrap:wrap; min-height:48px; }
+.nav-row + .nav-row { border-top:1px solid var(--sep2); padding:4px 16px; }
+
+/* 나라 행은 스크롤 */
+#countryNav { flex-wrap:nowrap; overflow-x:auto; scrollbar-width:none; min-height:40px; padding:4px 16px; }
+#countryNav::-webkit-scrollbar { display:none; }
+
+.nav-tab { padding:5px 13px; font-size:13px; font-family:var(--font); font-weight:500; color:var(--sub); border:none; background:none; border-radius:20px; cursor:pointer; transition:all .18s ease; white-space:nowrap; flex-shrink:0; }
 .nav-tab:hover { background:rgba(0,0,0,0.05); color:var(--text); }
 .nav-tab.on { background:var(--text); color:#fff; }
 .nav-tab.on-country { background:#1a5c8c; color:#fff; }
-.nav-tab.on-tasted { background:#1a7a3c; color:#fff; }
 .nav-count { font-size:10px; opacity:.5; margin-left:2px; }
-.nav-divider { width:1px; height:18px; background:var(--sep); flex-shrink:0; margin:0 4px; }
 .nav-sort { margin-left:auto; flex-shrink:0; padding:6px 26px 6px 12px; font-size:12px; font-family:var(--font); font-weight:500; color:var(--text); background:var(--bg); border:1px solid var(--sep); border-radius:20px; cursor:pointer; outline:none; appearance:none; -webkit-appearance:none; background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='7' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23aeaeb2' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E"); background-repeat:no-repeat; background-position:right 9px center; }
+
+/* 나라 탭: 기본=국기+텍스트, 모바일=국기만 */
+.flag-text { display:inline; }
 
 /* ── TASTED ── */
 .card.tasted { opacity:0.75; }
 .card.tasted .card-photo::after { content:''; position:absolute; inset:0; background:rgba(26,122,60,0.06); pointer-events:none; }
-.tasted-ribbon { position:absolute; bottom:0; left:0; right:0; padding:7px 12px; background:linear-gradient(transparent,rgba(26,122,60,0.82)); display:flex; align-items:center; gap:5px; }
+.tasted-ribbon { position:absolute; bottom:0; left:0; right:0; padding:7px 12px; background:linear-gradient(transparent,rgba(26,122,60,0.82)); display:flex; align-items:center; gap:5px; z-index:2; }
 .tasted-ribbon-text { font-size:11px; font-weight:600; color:#fff; }
 .tasted-ribbon-date { font-size:10px; color:rgba(255,255,255,0.82); margin-left:auto; }
 
 /* 마신 와인 섹션 */
-.tasted-section { max-width:1320px; margin:0 auto; padding:0 20px 12px; }
+.tasted-section { max-width:1320px; margin:0 auto; padding:0 20px 40px; }
 .tasted-section-header { display:flex; align-items:center; gap:10px; padding:20px 0 14px; border-top:2px solid #e8f5ee; }
 .tasted-section-title { font-size:16px; font-weight:700; color:#1a7a3c; letter-spacing:-.01em; }
 .tasted-section-count { font-size:12px; color:#6e6e73; font-weight:500; }
 .tasted-list { display:flex; flex-direction:column; gap:10px; }
-.tasted-item { background:#fff; border:1px solid #e0f0e8; border-radius:12px; display:flex; align-items:center; gap:0; overflow:hidden; cursor:pointer; transition:box-shadow .18s,transform .18s; }
+.tasted-item { background:#fff; border:1px solid #e0f0e8; border-radius:12px; display:flex; align-items:center; overflow:hidden; cursor:pointer; transition:box-shadow .18s,transform .18s; }
 .tasted-item:hover { box-shadow:0 4px 16px rgba(26,122,60,.12); transform:translateY(-1px); }
-.tasted-item-photo { width:72px; height:90px; flex-shrink:0; overflow:hidden; background:#f5f5f7; }
-.tasted-item-photo img { width:100%; height:100%; object-fit:contain; object-position:center; padding:4px; background:#f8f4f0; }
+.tasted-item-photo { width:72px; height:90px; flex-shrink:0; overflow:hidden; background:#f8f4f0; display:flex; align-items:center; justify-content:center; }
+.tasted-item-photo img { width:auto; height:100%; max-width:72px; object-fit:contain; padding:4px; }
 .tasted-item-body { padding:12px 16px; flex:1; }
 .tasted-item-name { font-size:14px; font-weight:600; color:#1d1d1f; margin-bottom:2px; letter-spacing:-.01em; }
-.tasted-item-en { font-size:11px; color:#aeaeb2; margin-bottom:6px; }
+.tasted-item-en { font-size:11px; color:#aeaeb2; margin-bottom:6px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
 .tasted-item-tags { display:flex; gap:5px; flex-wrap:wrap; }
 .tasted-item-date { margin-left:auto; padding:0 14px; text-align:right; flex-shrink:0; }
 .tasted-date-label { font-size:10px; color:#aeaeb2; }
-.tasted-date-val { font-size:13px; font-weight:600; color:#1a7a3c; margin-top:2px; }
+.tasted-date-val { font-size:13px; font-weight:600; color:#1a7a3c; margin-top:2px; white-space:nowrap; }
 
 /* ── GRID ── */
-.container { max-width:1320px; margin:0 auto; padding:28px 20px 16px; }
+.container { max-width:1320px; margin:0 auto; padding:24px 20px 16px; }
 .grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(280px,1fr)); gap:20px; }
 
 /* ── CARD ── */
@@ -91,7 +98,6 @@ body { font-family:var(--font); background:var(--bg); color:var(--text); font-we
 .card:hover { box-shadow:var(--shadow-lg); transform:translateY(-3px); }
 .card:active { transform:translateY(-1px); }
 
-/* 사진: contain + blur bg 방식으로 세로 병 사진 깨지지 않게 */
 .card-photo { position:relative; height:240px; overflow:hidden; background:#f0ece8; display:flex; align-items:center; justify-content:center; }
 .card-photo-bg { position:absolute; inset:-10px; background-size:cover; background-position:center; filter:blur(18px) brightness(0.88) saturate(0.7); z-index:0; transform:scale(1.15); }
 .card-photo img.main-img { position:relative; z-index:1; width:auto; height:100%; max-width:100%; max-height:240px; object-fit:contain; transition:transform .4s ease; display:block; }
@@ -132,17 +138,41 @@ body { font-family:var(--font); background:var(--bg); color:var(--text); font-we
 /* ── MODAL ── */
 .overlay { position:fixed; inset:0; background:rgba(0,0,0,0.4); backdrop-filter:blur(8px); -webkit-backdrop-filter:blur(8px); z-index:200; display:none; align-items:flex-end; justify-content:center; }
 .overlay.open { display:flex; }
-@media(min-width:640px){ .overlay { align-items:center; padding:24px; } }
-.modal { background:var(--card); border-radius:20px 20px 0 0; width:100%; max-width:680px; max-height:92vh; overflow-y:auto; box-shadow:var(--shadow-lg); overscroll-behavior:contain; scrollbar-width:thin; scrollbar-color:var(--sep) transparent; }
-@media(min-width:640px){ .modal { border-radius:20px; } }
+@media(min-width:700px){ .overlay { align-items:center; padding:20px; } }
 
-.modal-photo { width:100%; height:300px; position:relative; overflow:hidden; background:#f5f5f7; display:flex; align-items:center; justify-content:center; border-radius:20px 20px 0 0; }
-.modal-photo img { width:100%; height:100%; object-fit:cover; object-position:center top; }
-.modal-photo-ph { display:flex; flex-direction:column; align-items:center; opacity:.3; }
-.modal-close { position:absolute; top:14px; right:14px; width:32px; height:32px; border-radius:50%; background:rgba(255,255,255,0.9); backdrop-filter:blur(8px); border:none; font-size:16px; color:var(--sub); cursor:pointer; display:flex; align-items:center; justify-content:center; box-shadow:0 2px 8px rgba(0,0,0,0.12); z-index:1; transition:all .15s; }
-.modal-close:hover { background:#fff; color:var(--text); }
+/* 모달: 데스크탑 2열 (이미지 우측), 모바일 1열 */
+.modal { background:var(--card); border-radius:20px 20px 0 0; width:100%; max-width:860px; max-height:92vh; overflow-y:auto; box-shadow:var(--shadow-lg); overscroll-behavior:contain; scrollbar-width:thin; scrollbar-color:var(--sep) transparent; }
+@media(min-width:700px){ .modal { border-radius:20px; } }
+.modal::-webkit-scrollbar { width:4px; }
+.modal::-webkit-scrollbar-track { background:transparent; }
+.modal::-webkit-scrollbar-thumb { background:var(--sep); border-radius:2px; }
 
-.mc { padding:24px; }
+/* 모달 내부 2열 레이아웃 */
+.modal-layout { display:flex; flex-direction:column; }
+@media(min-width:700px){
+  .modal-layout { flex-direction:row; align-items:flex-start; }
+  .modal-right-photo { width:240px; flex-shrink:0; position:sticky; top:0; padding:24px 20px 24px 0; }
+  .modal-right-photo img { width:100%; border-radius:14px; object-fit:contain; max-height:380px; background:#f0ece8; display:block; }
+  .modal-right-photo .modal-photo-ph-inline { width:100%; height:280px; background:#f0ece8; border-radius:14px; display:flex; align-items:center; justify-content:center; opacity:.3; }
+  .mc { flex:1; padding:24px 24px 24px 24px; min-width:0; }
+}
+
+/* 모바일: 상단 가로 이미지 없이 mc만 */
+.modal-top-photo { display:block; width:100%; height:220px; position:relative; overflow:hidden; background:#f0ece8; border-radius:20px 20px 0 0; }
+.modal-top-photo .photo-bg { position:absolute; inset:-10px; background-size:cover; background-position:center; filter:blur(16px) brightness(.85) saturate(.7); transform:scale(1.1); }
+.modal-top-photo img.modal-main-img { position:relative; z-index:1; height:100%; width:auto; max-width:100%; object-fit:contain; display:block; margin:0 auto; }
+.modal-top-photo .modal-photo-ph { display:flex; align-items:center; justify-content:center; height:100%; opacity:.3; position:relative; z-index:1; }
+@media(min-width:700px){ .modal-top-photo { display:none; } }
+
+.modal-close-btn { position:absolute; top:12px; right:12px; width:32px; height:32px; border-radius:50%; background:rgba(255,255,255,0.9); backdrop-filter:blur(8px); border:none; font-size:16px; color:var(--sub); cursor:pointer; display:flex; align-items:center; justify-content:center; box-shadow:0 2px 8px rgba(0,0,0,0.12); z-index:10; transition:all .15s; font-family:var(--font); }
+.modal-close-btn:hover { background:#fff; color:var(--text); }
+
+/* 모달 상단 닫기 (헤더 영역) */
+.modal-close-bar { display:flex; align-items:center; justify-content:space-between; padding:14px 20px; border-bottom:1px solid var(--sep2); }
+@media(min-width:700px){ .modal-close-bar { border-radius:20px 20px 0 0; } }
+.modal-close-bar-title { font-size:13px; font-weight:600; color:var(--sub); letter-spacing:.04em; }
+
+.mc { padding:20px 24px 28px; }
 .mc-type-row { display:flex; align-items:center; gap:8px; margin-bottom:10px; flex-wrap:wrap; }
 .mc-chip { padding:4px 10px; border-radius:20px; font-size:11px; font-weight:600; letter-spacing:.04em; }
 .chip-r { background:var(--wine-bg); color:var(--wine); }
@@ -151,29 +181,29 @@ body { font-family:var(--font); background:var(--bg); color:var(--text); font-we
 .mc-rank { padding:4px 10px; border-radius:20px; font-size:11px; font-weight:600; background:var(--bg); color:var(--sub); }
 .mc-rank.top { background:var(--wine); color:#fff; }
 
-.mc-title { font-size:26px; font-weight:700; letter-spacing:-.02em; color:var(--text); line-height:1.2; margin-bottom:4px; }
-.mc-title-en { font-size:14px; color:var(--hint); margin-bottom:22px; }
+.mc-title { font-size:22px; font-weight:700; letter-spacing:-.02em; color:var(--text); line-height:1.2; margin-bottom:4px; }
+.mc-title-en { font-size:13px; color:var(--hint); margin-bottom:18px; }
 
-.mc-vivino { display:flex; align-items:center; gap:12px; padding:14px 16px; background:#fff5f7; border:1px solid rgba(140,26,49,.1); border-radius:12px; margin-bottom:24px; }
-.v-logo-md { width:28px; height:28px; border-radius:50%; background:#a61a30; display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:800; color:#fff; flex-shrink:0; }
-.mc-v-score { font-size:24px; font-weight:700; color:#a61a30; letter-spacing:-.03em; }
-.mc-v-label { font-size:12px; color:var(--sub); }
+.mc-vivino { display:flex; align-items:center; gap:12px; padding:12px 14px; background:#fff5f7; border:1px solid rgba(140,26,49,.1); border-radius:12px; margin-bottom:20px; }
+.v-logo-md { width:26px; height:26px; border-radius:50%; background:#a61a30; display:flex; align-items:center; justify-content:center; font-size:10px; font-weight:800; color:#fff; flex-shrink:0; }
+.mc-v-score { font-size:22px; font-weight:700; color:#a61a30; letter-spacing:-.03em; }
+.mc-v-label { font-size:11px; color:var(--sub); }
 .mc-v-link { margin-left:auto; font-size:12px; color:var(--wine); text-decoration:none; font-weight:500; }
 .mc-v-link:hover { text-decoration:underline; }
 
-.msec { margin-bottom:26px; }
+.msec { margin-bottom:22px; }
 .msec-title { font-size:11px; font-weight:600; letter-spacing:.08em; text-transform:uppercase; color:var(--hint); margin-bottom:10px; padding-bottom:8px; border-bottom:1px solid var(--sep2); }
-.msec-text { font-size:15px; line-height:1.78; color:var(--text); }
+.msec-text { font-size:14px; line-height:1.78; color:var(--text); }
 
 .info-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
 .info-cell { padding:12px 14px; background:var(--bg); border-radius:var(--r-sm); }
 .info-label { font-size:11px; color:var(--hint); font-weight:500; margin-bottom:3px; }
 .info-value { font-size:14px; color:var(--text); font-weight:600; }
 
-.dw-meta { display:flex; gap:10px; margin-bottom:14px; flex-wrap:wrap; }
-.dw-item { padding:10px 14px; background:var(--bg); border-radius:var(--r-sm); flex:1; min-width:80px; }
+.dw-meta { display:flex; gap:8px; margin-bottom:14px; flex-wrap:wrap; }
+.dw-item { padding:10px 12px; background:var(--bg); border-radius:var(--r-sm); flex:1; min-width:72px; }
 .dw-item-label { font-size:10px; color:var(--hint); font-weight:500; letter-spacing:.04em; margin-bottom:3px; }
-.dw-item-value { font-size:15px; font-weight:700; color:var(--text); letter-spacing:-.02em; }
+.dw-item-value { font-size:14px; font-weight:700; color:var(--text); letter-spacing:-.02em; }
 .dw-item-value.peak { color:var(--green); }
 .dw-item-value.cur  { color:var(--wine); }
 
@@ -183,64 +213,68 @@ body { font-family:var(--font); background:var(--bg); color:var(--text); font-we
 .dw-now  { position:absolute; top:50%; transform:translate(-50%,-50%); width:18px; height:18px; background:var(--wine); border:3px solid #fff; border-radius:50%; box-shadow:0 2px 6px rgba(140,26,49,.4); }
 .dw-labels { display:flex; justify-content:space-between; font-size:11px; color:var(--hint); }
 
-.food-tags { display:flex; flex-wrap:wrap; gap:8px; margin-top:4px; }
-.food-tag { padding:8px 14px; background:var(--bg); border-radius:20px; font-size:13px; color:var(--text); font-weight:500; transition:background .15s; }
+.food-tags { display:flex; flex-wrap:wrap; gap:6px; margin-top:4px; }
+.food-tag { padding:6px 12px; background:var(--bg); border-radius:20px; font-size:12px; color:var(--text); font-weight:500; transition:background .15s; }
 .food-tag:hover { background:var(--wine-bg); color:var(--wine); }
 
-.collect-row { display:flex; align-items:center; gap:16px; padding:16px; background:var(--bg); border-radius:var(--r-sm); }
-.collect-num { font-size:48px; font-weight:700; letter-spacing:-.04em; color:var(--wine); line-height:1; min-width:64px; }
-.collect-stars { font-size:16px; color:var(--wine); margin-bottom:3px; }
-.collect-tier  { font-size:14px; font-weight:600; color:var(--text); }
-.collect-desc  { font-size:12px; color:var(--sub); margin-top:2px; }
+.collect-row { display:flex; align-items:center; gap:16px; padding:14px; background:var(--bg); border-radius:var(--r-sm); }
+.collect-num { font-size:44px; font-weight:700; letter-spacing:-.04em; color:var(--wine); line-height:1; min-width:58px; }
+.collect-stars { font-size:15px; color:var(--wine); margin-bottom:3px; }
+.collect-tier  { font-size:13px; font-weight:600; color:var(--text); }
+.collect-desc  { font-size:11px; color:var(--sub); margin-top:2px; }
 
 /* ── TASTING ── */
-.tasting-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:14px; }
-.tasting-cell { padding:12px 14px; background:var(--bg); border-radius:var(--r-sm); }
+.tasting-grid { display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:12px; }
+.tasting-cell { padding:10px 12px; background:var(--bg); border-radius:var(--r-sm); }
 .tasting-label { font-size:10px; color:var(--hint); font-weight:600; letter-spacing:.08em; text-transform:uppercase; margin-bottom:6px; }
 .tasting-pills { display:flex; flex-wrap:wrap; gap:4px; }
-.tasting-pill { padding:3px 9px; border-radius:20px; font-size:11px; font-weight:500; }
+.tasting-pill { padding:3px 8px; border-radius:20px; font-size:10px; font-weight:500; }
 .pill-color  { background:#fff0f3; color:#8c1a31; border:1px solid rgba(140,26,49,.12); }
 .pill-aroma  { background:#f0f7ff; color:#1a5c8c; border:1px solid rgba(26,92,140,.12); }
 .pill-taste  { background:#f0faf4; color:#1a7a3c; border:1px solid rgba(26,122,60,.12); }
 .pill-finish { background:#fef8ed; color:#7a5c14; border:1px solid rgba(122,92,20,.12); }
-.tasting-structure { display:grid; grid-template-columns:repeat(3,1fr); gap:8px; }
-.str-item { padding:10px 8px; background:var(--bg); border-radius:var(--r-sm); text-align:center; }
+.tasting-structure { display:grid; grid-template-columns:repeat(4,1fr); gap:6px; }
+@media(max-width:699px){ .tasting-structure { grid-template-columns:repeat(2,1fr); } }
+.str-item { padding:8px; background:var(--bg); border-radius:var(--r-sm); text-align:center; }
 .str-label { font-size:10px; color:var(--hint); font-weight:500; letter-spacing:.04em; margin-bottom:6px; }
 .str-bar-wrap { height:5px; background:rgba(0,0,0,0.07); border-radius:3px; overflow:hidden; margin-bottom:4px; }
 .str-bar { height:100%; border-radius:3px; }
 .str-val { font-size:11px; font-weight:600; color:var(--sub); }
 
 /* ── RESPONSIVE ── */
+@media(max-width:700px){
+  /* 나라 탭: 국기만 */
+  .flag-text { display:none; }
+  #countryNav .nav-tab { padding:5px 8px; font-size:16px; }
+}
 @media(max-width:768px){
-  .header { padding:36px 16px 32px; }
-  .header-title { font-size:26px; }
-  .header-update { font-size:11px; }
+  .header { padding:32px 16px 28px; }
+  .header-title { font-size:24px; }
+  .header-update { font-size:11px; margin-bottom:24px; }
   .header-stats { width:100%; }
-  .stat { flex:1; min-width:64px; padding:12px 8px; }
+  .stat { flex:1; min-width:60px; padding:12px 8px; }
   .stat-value { font-size:20px; }
   .stat-label { font-size:9px; }
   .grid { grid-template-columns:1fr 1fr; gap:10px; }
-  .container { padding:16px 12px 48px; }
-  .modal-photo { height:200px; }
-  .mc-title { font-size:19px; }
-  .info-grid { grid-template-columns:1fr; }
-  .tasting-grid { grid-template-columns:1fr; }
-  .tasting-structure { grid-template-columns:repeat(3,1fr); }
-  .mc-type-row { flex-wrap:wrap; gap:6px; }
+  .container { padding:16px 12px 16px; }
+  .tasted-section { padding:0 12px 32px; }
+  .mc-title { font-size:18px; }
+  .info-grid { grid-template-columns:1fr 1fr; }
+  .tasting-grid { grid-template-columns:1fr 1fr; }
   .mc-type-row button { font-size:11px !important; padding:4px 10px !important; }
 }
 @media(max-width:480px){
-  .header-title { font-size:22px; }
-  .header-stats { border-radius:10px; }
+  .header-title { font-size:20px; }
   .grid { grid-template-columns:1fr 1fr; gap:8px; }
   .card-photo { height:180px; }
   .card-name-kr { font-size:13px; }
-  .card-body { padding:12px 14px; }
-  .nav-tab { font-size:12px; padding:5px 10px; }
+  .card-body { padding:10px 12px; }
+  .nav-tab { font-size:12px; padding:5px 9px; }
+  .info-grid { grid-template-columns:1fr; }
 }
 @media(max-width:360px){
   .grid { grid-template-columns:1fr; }
-  .header-title { font-size:20px; }
+  .header-title { font-size:18px; }
 }
 
 /* ── ANIMATION ── */
@@ -276,18 +310,18 @@ body { font-family:var(--font); background:var(--bg); color:var(--text); font-we
       <option value="region">생산지역순</option>
     </select>
   </div>
-  <!-- Row 2: 나라 필터 -->
+  <!-- Row 2: 나라 필터 (모바일=국기만) -->
   <div class="nav-row" id="countryNav">
-    <button class="nav-tab on-country" data-c="all" id="cAll">🌍 전체</button>
-    <button class="nav-tab" data-c="USA">🇺🇸 미국</button>
-    <button class="nav-tab" data-c="France">🇫🇷 프랑스</button>
-    <button class="nav-tab" data-c="Italy">🇮🇹 이탈리아</button>
-    <button class="nav-tab" data-c="Japan">🇯🇵 일본</button>
-    <button class="nav-tab" data-c="Argentina">🇦🇷 아르헨티나</button>
-    <button class="nav-tab" data-c="Chile">🇨🇱 칠레</button>
-    <button class="nav-tab" data-c="SouthAfrica">🇿🇦 남아공</button>
-    <button class="nav-tab" data-c="NewZealand">🇳🇿 뉴질랜드</button>
-    <button class="nav-tab" data-c="Australia">🇦🇺 호주</button>
+    <button class="nav-tab on-country" data-c="all">🌍 <span class="flag-text">전체</span></button>
+    <button class="nav-tab" data-c="USA">🇺🇸 <span class="flag-text">미국</span></button>
+    <button class="nav-tab" data-c="France">🇫🇷 <span class="flag-text">프랑스</span></button>
+    <button class="nav-tab" data-c="Italy">🇮🇹 <span class="flag-text">이탈리아</span></button>
+    <button class="nav-tab" data-c="Japan">🇯🇵 <span class="flag-text">일본</span></button>
+    <button class="nav-tab" data-c="Argentina">🇦🇷 <span class="flag-text">아르헨티나</span></button>
+    <button class="nav-tab" data-c="Chile">🇨🇱 <span class="flag-text">칠레</span></button>
+    <button class="nav-tab" data-c="SouthAfrica">🇿🇦 <span class="flag-text">남아공</span></button>
+    <button class="nav-tab" data-c="NewZealand">🇳🇿 <span class="flag-text">뉴질랜드</span></button>
+    <button class="nav-tab" data-c="Australia">🇦🇺 <span class="flag-text">호주</span></button>
   </div>
 </div>
 
@@ -305,8 +339,15 @@ body { font-family:var(--font); background:var(--bg); color:var(--text); font-we
 
 <div class="overlay" id="overlay" onclick="ocl(event)">
   <div class="modal" id="modal">
-    <div class="modal-photo" id="mPhoto"><button class="modal-close" onclick="close()">✕</button></div>
-    <div class="mc" id="mContent"></div>
+    <div class="modal-close-bar">
+      <span class="modal-close-bar-title">WINE DETAIL</span>
+      <button class="modal-close-btn" onclick="cl()">✕</button>
+    </div>
+    <div class="modal-layout">
+      <div class="modal-top-photo" id="mPhoto"></div>
+      <div class="modal-right-photo" id="mPhotoDesktop"></div>
+      <div class="mc" id="mContent"></div>
+    </div>
   </div>
 </div>
 
@@ -427,6 +468,29 @@ const TL={red:"레드",white:"화이트",sparkling:"스파클링"};
 const TB={red:"badge-red",white:"badge-white",sparkling:"badge-sparkling"};
 const CC={red:"chip-r",white:"chip-w",sparkling:"chip-s"};
 
+// ── TASTED: localStorage ──
+function getTasted(){
+  try{ return JSON.parse(localStorage.getItem('wineTasted')||'{}'); }
+  catch(e){ return {}; }
+}
+function setTasted(obj){
+  try{ localStorage.setItem('wineTasted', JSON.stringify(obj)); }
+  catch(e){}
+}
+function toggleTasted(id, e){
+  e.stopPropagation();
+  const data=getTasted();
+  if(data[id]){ delete data[id]; }
+  else{ data[id]=new Date().toISOString().slice(0,10); }
+  setTasted(data);
+  rg(); updateCounts();
+}
+function formatDate(iso){
+  if(!iso) return '';
+  const [y,m,d]=iso.split('-');
+  return `${y}.${m}.${d}`;
+}
+
 function ph(id){return`wines/${id}.jpg`;}
 
 function ds(w){
@@ -456,12 +520,17 @@ function rc(w,i){
   const d=ds(w); const top=w.rank<=5;
   const pct=((w.vivino/5)*100).toFixed(0);
   const vTag=w.type==="white"?"tag-vw":w.type==="sparkling"?"tag-vs":"tag-v";
-  return`<div class="card" style="animation-delay:${i*.04}s" onclick="om(${w.id})">
+  const tasted=getTasted();
+  const isTasted=!!tasted[w.id]; const tDate=tasted[w.id]||'';
+  const src=ph(w.id);
+  return`<div class="card${isTasted?' tasted':''}" style="animation-delay:${i*.04}s" onclick="om(${w.id})">
   <div class="card-photo">
-    <img src="${ph(w.id)}" alt="${w.name_kr}" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+    <div class="card-photo-bg" style="background-image:url('${src}')"></div>
+    <img class="main-img" src="${src}" alt="${w.name_kr}" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
     <div class="photo-ph" style="display:none">${bsvg(w.type)}</div>
-    <span class="card-type-badge ${TB[w.type]}">${TL[w.type]}</span>
-    <div class="card-rank${top?' top':''}">${top?'★':'#'}${w.rank}</div>
+    <span class="card-type-badge ${TB[w.type]}" style="z-index:2">${TL[w.type]}</span>
+    <div class="card-rank${top?' top':''}" style="z-index:2">${top?'★':'#'}${w.rank}</div>
+    ${isTasted?`<div class="tasted-ribbon"><span style="font-size:13px">✅</span><span class="tasted-ribbon-text">마셨어요</span><span class="tasted-ribbon-date">${formatDate(tDate)}</span></div>`:''}
   </div>
   <div class="card-body">
     <div class="card-name-kr">${w.name_kr}</div>
@@ -484,133 +553,7 @@ function rc(w,i){
 </div>`;
 }
 
-// RENDER MODAL
-function rm(w){
-  const d=ds(w); const top=w.rank<=5;
-  const ts=w.du-w.df+2;
-  const pF=(((w.df-(w.df-1))/ts)*100).toFixed(1);
-  const pW=(((w.du-w.df)/ts)*100).toFixed(1);
-  const pP=(((w.dps-(w.df-1))/ts)*100).toFixed(1);
-  const pPW=(((w.dpe-w.dps)/ts)*100).toFixed(1);
-  const pN=Math.min(100,Math.max(0,((NOW-(w.df-1))/ts)*100)).toFixed(1);
-  const inD=NOW>=w.df&&NOW<=w.du;
-  const vTag=w.type==="white"?"tag-vw":w.type==="sparkling"?"tag-vs":"tag-v";
-
-  document.getElementById('mPhoto').innerHTML=`
-    <button class="modal-close" onclick="cl()">✕</button>
-    <img src="${ph(w.id)}" alt="${w.name_kr}" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
-    <div class="modal-photo-ph" style="display:none">${bsvg_lg(w.type)}</div>`;
-
-  document.getElementById('mContent').innerHTML=`
-    <div class="mc-type-row">
-      <span class="mc-chip ${CC[w.type]}">${TL[w.type]}</span>
-      ${w.vintage?`<span class="tag ${vTag}">${w.vintage}</span>`:`<span class="tag ${vTag}">NV</span>`}
-      <span class="mc-rank${top?' top':''}">${top?'★ ':''}#${w.rank} 소장가치</span>
-    </div>
-    <h2 class="mc-title">${w.name_kr}</h2>
-    <p class="mc-title-en">${w.name_en}</p>
-
-    <div class="mc-vivino">
-      <div class="v-logo-md">V</div>
-      <div><div class="mc-v-score">${w.vivino.toFixed(1)}</div><div class="mc-v-label">Vivino 커뮤니티 평점 / 5.0</div></div>
-      <a href="${w.vu}" target="_blank" rel="noopener" class="mc-v-link">Vivino →</a>
-    </div>
-
-    <div class="msec">
-      <div class="msec-title">생산 정보</div>
-      <div class="info-grid">
-        <div class="info-cell"><div class="info-label">생산지역</div><div class="info-value">${w.region}</div></div>
-        <div class="info-cell"><div class="info-label">포도 품종</div><div class="info-value">${w.grape}</div></div>
-      </div>
-    </div>
-
-    <div class="msec">
-      <div class="msec-title">와인 스토리</div>
-      <p class="msec-text">${w.story}</p>
-    </div>
-
-    ${w.tasting ? `
-    <div class="msec">
-      <div class="msec-title">테이스팅 노트</div>
-      <div class="tasting-grid">
-        <div class="tasting-cell">
-          <div class="tasting-label">🎨 색상</div>
-          <div class="tasting-pills">${w.tasting.color.map(x=>`<span class="tasting-pill pill-color">${x}</span>`).join('')}</div>
-        </div>
-        <div class="tasting-cell">
-          <div class="tasting-label">👃 향 · 아로마</div>
-          <div class="tasting-pills">${w.tasting.aroma.map(x=>`<span class="tasting-pill pill-aroma">${x}</span>`).join('')}</div>
-        </div>
-        <div class="tasting-cell">
-          <div class="tasting-label">👅 맛 · 팔라트</div>
-          <div class="tasting-pills">${w.tasting.taste.map(x=>`<span class="tasting-pill pill-taste">${x}</span>`).join('')}</div>
-        </div>
-        <div class="tasting-cell">
-          <div class="tasting-label">✨ 피니시 · 여운</div>
-          <div class="tasting-pills">${w.tasting.finish.map(x=>`<span class="tasting-pill pill-finish">${x}</span>`).join('')}</div>
-        </div>
-      </div>
-      <div class="tasting-structure">
-        ${[
-          {label:'바디',val:w.tasting.body,color:'#8c1a31'},
-          {label:w.type==='sparkling'?'산도':'탄닌',val:w.type==='sparkling'?w.tasting.acidity:w.tasting.tannin,color:'#5a3e8c'},
-          {label:'산도',val:w.tasting.acidity,color:'#1a5c8c'},
-          {label:'알코올',val:w.tasting.alcohol,color:'#7a5c14'},
-        ].filter((_,i)=>!(w.type==='sparkling'&&i===1)).map(s=>`
-          <div class="str-item">
-            <div class="str-label">${s.label}</div>
-            <div class="str-bar-wrap"><div class="str-bar" style="width:${s.val}%;background:${s.color}22;border:1px solid ${s.color}44;background:linear-gradient(90deg,${s.color}33,${s.color}88);"></div></div>
-            <div class="str-val">${s.val>=80?'강함':s.val>=55?'중간':'가벼움'}</div>
-          </div>`).join('')}
-      </div>
-    </div>` : ''}
-
-    <div class="msec">
-      <div class="msec-title">음용 시기</div>
-      <div class="dw-meta">
-        <div class="dw-item"><div class="dw-item-label">현재 상태</div><div class="dw-item-value ${d.c==='peak'?'cur':''}">${d.t}</div></div>
-        <div class="dw-item"><div class="dw-item-label">음용 가능</div><div class="dw-item-value">${w.df} – ${w.du}</div></div>
-        <div class="dw-item"><div class="dw-item-label">최적 피크</div><div class="dw-item-value peak">${w.dps} – ${w.dpe}</div></div>
-      </div>
-      <div class="dw-track">
-        <div class="dw-fill" style="left:${pF}%;width:${pW}%"></div>
-        <div class="dw-peak" style="left:${pP}%;width:${pPW}%"></div>
-        ${inD?`<div class="dw-now" style="left:${pN}%"></div>`:''}
-      </div>
-      <div class="dw-labels"><span>${w.df}</span><span>${w.dps}–${w.dpe} 피크</span><span>${w.du}</span></div>
-    </div>
-
-    <div class="msec">
-      <div class="msec-title">어울리는 음식</div>
-      <div class="food-tags">${w.food.map(f=>`<span class="food-tag">${f}</span>`).join('')}</div>
-    </div>
-
-    <div class="msec">
-      <div class="msec-title">소장 가치</div>
-      <div class="collect-row">
-        <div class="collect-num">${w.rank}</div>
-        <div><div class="collect-stars">${w.ct}</div><div class="collect-tier">컬렉션 ${w.rank}위 / 24병</div><div class="collect-desc">${w.cd}</div></div>
-      </div>
-    </div>`;
-}
-
-// ── TASTED: localStorage ──
-function getTasted(){try{return JSON.parse(localStorage.getItem('wineTasted')||'{}');}catch(e){return {};}}
-function setTasted(obj){try{localStorage.setItem('wineTasted',JSON.stringify(obj));}catch(e){}}
-function toggleTasted(id,e){
-  e.stopPropagation();
-  const data=getTasted();
-  if(data[id]){delete data[id];}
-  else{data[id]=new Date().toISOString().slice(0,10);}
-  setTasted(data);
-  rg(); updateCounts();
-}
-function formatDate(iso){if(!iso)return'';const[y,m,d]=iso.split('-');return`${y}.${m}.${d}`;}
-
-// 나라 분류
-const COUNTRY_MAP={1:"USA",2:"USA",3:"USA",4:"USA",5:"France",6:"Argentina",7:"France",8:"France",9:"Japan",10:"Japan",11:"USA",12:"Italy",13:"Chile",14:"France",15:"USA",16:"USA",17:"Italy",18:"France",19:"SouthAfrica",20:"Italy",21:"Italy",22:"NewZealand",23:"Australia",24:"SouthAfrica",25:"SouthAfrica",26:"Italy"};
-
-// ── FILTER STATE ──
+// FILTER STATE
 let af='all', ac='all';
 
 function gl(){
@@ -630,42 +573,7 @@ function gl(){
 }
 
 function rg(){
-  const tasted=getTasted();
-  document.getElementById('grid').innerHTML=gl().map((w,i)=>{
-    const d=ds(w); const top=w.rank<=5;
-    const pct=((w.vivino/5)*100).toFixed(0);
-    const vTag=w.type==="white"?"tag-vw":w.type==="sparkling"?"tag-vs":"tag-v";
-    const isTasted=!!tasted[w.id]; const tDate=tasted[w.id]||'';
-    const src=ph(w.id);
-    return`<div class="card${isTasted?' tasted':''}" style="animation-delay:${i*.04}s" onclick="om(${w.id})">
-  <div class="card-photo">
-    <div class="card-photo-bg" style="background-image:url('${src}')"></div>
-    <img class="main-img" src="${src}" alt="${w.name_kr}" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
-    <div class="photo-ph" style="display:none">${bsvg(w.type)}</div>
-    <span class="card-type-badge ${TB[w.type]}" style="z-index:2">${TL[w.type]}</span>
-    <div class="card-rank${top?' top':''}" style="z-index:2">${top?'★':'#'}${w.rank}</div>
-    ${isTasted?`<div class="tasted-ribbon" style="z-index:2"><span style="font-size:13px">✅</span><span class="tasted-ribbon-text">마셨어요</span><span class="tasted-ribbon-date">${formatDate(tDate)}</span></div>`:''}
-  </div>
-  <div class="card-body">
-    <div class="card-name-kr">${w.name_kr}</div>
-    <div class="card-name-en">${w.name_en}</div>
-    <div class="card-tags">
-      ${w.vintage?`<span class="tag ${vTag}">${w.vintage}</span>`:`<span class="tag ${vTag}">NV</span>`}
-      <span class="tag">${w.region.split('·')[0].trim()}</span>
-      <span class="tag">${w.grape.split(',')[0].split('&')[0].trim()}</span>
-    </div>
-    <div class="card-vivino">
-      <div class="v-logo-sm">V</div>
-      <div class="v-bar"><div class="v-bar-fill" style="width:${pct}%"></div></div>
-      <span class="v-score-sm">${w.vivino.toFixed(1)}</span>
-    </div>
-  </div>
-  <div class="card-footer">
-    <span class="ds ${d.c}">${d.t}</span>
-    <span class="card-arrow">›</span>
-  </div>
-</div>`;
-  }).join('');
+  document.getElementById('grid').innerHTML=gl().map((w,i)=>rc(w,i)).join('');
   renderTastedSection();
 }
 
@@ -755,11 +663,17 @@ function om(id){
   const inD=NOW>=w.df&&NOW<=w.du;
   const vTag=w.type==="white"?"tag-vw":w.type==="sparkling"?"tag-vs":"tag-v";
 
+  // 모바일 상단 이미지
   document.getElementById('mPhoto').innerHTML=`
-    <button class="modal-close" onclick="cl()">✕</button>
-    <img src="${ph(w.id)}" alt="${w.name_kr}" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+    <div class="photo-bg" style="background-image:url('${src}')"></div>
+    <img class="modal-main-img" src="${src}" alt="${w.name_kr}" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
     <div class="modal-photo-ph" style="display:none">${bsvg_lg(w.type)}</div>`;
 
+  // 데스크탑 우측 이미지
+  document.getElementById('mPhotoDesktop').innerHTML=`
+    <img src="${src}" alt="${w.name_kr}" style="width:100%;border-radius:14px;object-fit:contain;max-height:420px;background:#f0ece8;display:block;box-shadow:0 4px 20px rgba(0,0,0,0.1);" onerror="this.style.opacity=0">`;
+
+  const totalWines = WINES.length;
   document.getElementById('mContent').innerHTML=`
     <div class="mc-type-row">
       <span class="mc-chip ${CC[w.type]}">${TL[w.type]}</span>
@@ -769,7 +683,7 @@ function om(id){
     </div>
     <h2 class="mc-title">${w.name_kr}</h2>
     <p class="mc-title-en">${w.name_en}</p>
-    ${isTasted?`<div style="padding:10px 14px;background:#f0faf4;border:1px solid rgba(26,122,60,.15);border-radius:10px;margin-bottom:18px;font-size:13px;color:#1a7a3c;font-weight:500">✅ ${formatDate(tasted[w.id])} 에 음용했습니다</div>`:''}
+    ${isTasted?`<div style="padding:9px 13px;background:#f0faf4;border:1px solid rgba(26,122,60,.15);border-radius:10px;margin-bottom:16px;font-size:13px;color:#1a7a3c;font-weight:500">✅ ${formatDate(tasted[w.id])} 음용</div>`:''}
     <div class="mc-vivino">
       <div class="v-logo-md">V</div>
       <div><div class="mc-v-score">${w.vivino.toFixed(1)}</div><div class="mc-v-label">Vivino 커뮤니티 평점 / 5.0</div></div>
@@ -820,7 +734,7 @@ function om(id){
       <div class="msec-title">소장 가치</div>
       <div class="collect-row">
         <div class="collect-num">${w.rank}</div>
-        <div><div class="collect-stars">${w.ct}</div><div class="collect-tier">컬렉션 ${w.rank}위 / 24병</div><div class="collect-desc">${w.cd}</div></div>
+        <div><div class="collect-stars">${w.ct}</div><div class="collect-tier">컬렉션 ${w.rank}위 / ${totalWines}병</div><div class="collect-desc">${w.cd}</div></div>
       </div>
     </div>`;
   document.getElementById('overlay').classList.add('open');
