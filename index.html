@@ -142,6 +142,22 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);-webkit-font
   .card-body{padding:10px 12px;}.nav-tab{font-size:12px;padding:5px 9px;}
 }
 @media(max-width:360px){.grid{grid-template-columns:1fr;}.header-title{font-size:17px;}}
+
+/* ── FILTER-STAT 통합 버튼 ── */
+.filter-stat-row{display:flex;gap:8px;padding:0 14px 12px;}
+.fs-btn{flex:1;padding:10px 4px 10px;border-radius:13px;background:var(--bg);border:1.5px solid var(--sep);text-align:center;cursor:pointer;transition:all .18s;font-family:var(--font);}
+.fs-btn.on{background:var(--text);border-color:var(--text);box-shadow:0 2px 8px rgba(0,0,0,0.15);}
+.fs-btn.on-r{background:var(--wine);border-color:var(--wine);box-shadow:0 2px 8px rgba(140,26,49,0.25);}
+.fs-btn.on-w{background:var(--gold);border-color:var(--gold);box-shadow:0 2px 8px rgba(122,92,20,0.25);}
+.fs-btn.on-s{background:var(--blue);border-color:var(--blue);box-shadow:0 2px 8px rgba(26,92,140,0.25);}
+.fs-num{font-size:22px;font-weight:700;color:var(--text);letter-spacing:-.03em;line-height:1.1;}
+.fs-btn.on .fs-num,.fs-btn.on-r .fs-num,.fs-btn.on-w .fs-num,.fs-btn.on-s .fs-num{color:#fff;}
+.fs-label{font-size:9px;font-weight:500;color:var(--hint);letter-spacing:.05em;text-transform:uppercase;margin-top:2px;}
+.fs-btn.on .fs-label,.fs-btn.on-r .fs-label,.fs-btn.on-w .fs-label,.fs-btn.on-s .fs-label{color:rgba(255,255,255,0.75);}
+
+/* 날짜 + 정렬 한 줄 */
+.date-sort-row{display:flex;align-items:center;padding:4px 14px 6px;border-top:1px solid var(--sep2);}
+.date-sort-bar{font-size:10px;color:var(--hint);letter-spacing:.04em;flex:1;}
 @keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
 @keyframes spin{to{transform:rotate(360deg)}}
 </style>
@@ -155,22 +171,28 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);-webkit-font
     <h1 class="header-title">Raina's Home Wine Cellar</h1>
     <a href="admin.html" class="admin-link" title="관리자">⚙️</a>
   </div>
-  <!-- 통계 행 -->
-  <div class="header-stats">
-    <div class="stat"><div class="stat-value" id="sTotal">—</div><div class="stat-label">Bottles</div></div>
-    <div class="stat"><div class="stat-value" id="sRed">—</div><div class="stat-label">Red</div></div>
-    <div class="stat"><div class="stat-value" id="sWhite">—</div><div class="stat-label">White</div></div>
-    <div class="stat"><div class="stat-value" id="sSpark">—</div><div class="stat-label">Sparkling</div></div>
+  <!-- 통합 필터-통계 버튼 -->
+  <div class="filter-stat-row">
+    <button class="fs-btn on" data-f="all">
+      <div class="fs-num" id="sTotal">—</div>
+      <div class="fs-label">Bottles</div>
+    </button>
+    <button class="fs-btn" data-f="red">
+      <div class="fs-num" id="sRed">—</div>
+      <div class="fs-label">Red</div>
+    </button>
+    <button class="fs-btn" data-f="white">
+      <div class="fs-num" id="sWhite">—</div>
+      <div class="fs-label">White</div>
+    </button>
+    <button class="fs-btn" data-f="sparkling">
+      <div class="fs-num" id="sSpark">—</div>
+      <div class="fs-label">Sparkling</div>
+    </button>
   </div>
-  <!-- 날짜 -->
-  <div class="nav-date-bar">업데이트 기준일 · 2026.05.17</div>
-  <!-- 필터 -->
-  <div class="nav-wrap">
-  <div class="nav-row" id="typeNav">
-    <button class="nav-tab on" data-f="all">전체 <span class="nav-count" id="cAll"></span></button>
-    <button class="nav-tab" data-f="red">레드 <span class="nav-count" id="cRed"></span></button>
-    <button class="nav-tab" data-f="white">화이트 <span class="nav-count" id="cWhite"></span></button>
-    <button class="nav-tab" data-f="sparkling">스파클링 <span class="nav-count" id="cSpark"></span></button>
+  <!-- 날짜 + 정렬 한 줄 -->
+  <div class="date-sort-row">
+    <span class="date-sort-bar">업데이트 기준일 · 2026.05.17</span>
     <select class="nav-sort" id="sortSel">
       <option value="rank">소장가치순</option>
       <option value="vivino">Vivino 평점순</option>
@@ -180,6 +202,8 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);-webkit-font
       <option value="region">생산지역순</option>
     </select>
   </div>
+  <!-- 국가 필터 -->
+  <div class="nav-wrap">
   <div class="nav-row" id="countryNav">
     <button class="nav-tab on-c" data-c="all">🌍 <span class="flag-text">전체</span></button>
     <button class="nav-tab" data-c="USA">🇺🇸 <span class="flag-text">미국</span></button>
@@ -325,16 +349,12 @@ function renderTasted(){
 }
 
 function updateStats(){
-  const c={red:0,white:0,sparkling:0};
-  WINES.forEach(w=>c[w.type]++);
+  const cnt={red:0,white:0,sparkling:0};
+  WINES.forEach(w=>cnt[w.type]++);
   document.getElementById('sTotal').textContent=WINES.length;
-  document.getElementById('sRed').textContent=c.red;
-  document.getElementById('sWhite').textContent=c.white;
-  document.getElementById('sSpark').textContent=c.sparkling;
-  document.getElementById('cAll').textContent=WINES.length;
-  document.getElementById('cRed').textContent=c.red;
-  document.getElementById('cWhite').textContent=c.white;
-  document.getElementById('cSpark').textContent=c.sparkling;
+  document.getElementById('sRed').textContent=cnt.red;
+  document.getElementById('sWhite').textContent=cnt.white;
+  document.getElementById('sSpark').textContent=cnt.sparkling;
 }
 
 function render(){
@@ -342,10 +362,18 @@ function render(){
   renderTasted();
 }
 
-document.querySelectorAll('#typeNav .nav-tab').forEach(btn=>{
+document.querySelectorAll('.fs-btn').forEach(btn=>{
   btn.addEventListener('click',()=>{
-    document.querySelectorAll('#typeNav .nav-tab').forEach(b=>b.classList.remove('on'));
-    btn.classList.add('on');af=btn.dataset.f;render();
+    document.querySelectorAll('.fs-btn').forEach(b=>{
+      b.classList.remove('on','on-r','on-w','on-s');
+    });
+    const f=btn.dataset.f;
+    af=f;
+    if(f==='all')    btn.classList.add('on');
+    else if(f==='red')       btn.classList.add('on-r');
+    else if(f==='white')     btn.classList.add('on-w');
+    else if(f==='sparkling') btn.classList.add('on-s');
+    render();
   });
 });
 document.querySelectorAll('#countryNav .nav-tab').forEach(btn=>{
