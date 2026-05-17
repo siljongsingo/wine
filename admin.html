@@ -1,0 +1,799 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>관리자 · Raina's Cellar</title>
+<style>
+@import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/variable/pretendardvariable-dynamic-subset.min.css');
+:root {
+  --bg:#f2f2f7; --card:#fff; --text:#1d1d1f; --sub:#6e6e73; --hint:#aeaeb2;
+  --sep:rgba(0,0,0,0.08); --sep2:rgba(0,0,0,0.05);
+  --wine:#8c1a31; --wine-bg:#fdf0f2; --gold:#7a5c14; --gold-bg:#fef8ed;
+  --blue:#1a5c8c; --blue-bg:#edf4fb; --green:#1a7a3c; --green-bg:#f0faf4;
+  --r:14px; --r-sm:10px;
+  --shadow:0 2px 12px rgba(0,0,0,0.07),0 1px 3px rgba(0,0,0,0.04);
+  --shadow-lg:0 8px 40px rgba(0,0,0,0.12);
+  --font:'Pretendard Variable','Pretendard',-apple-system,BlinkMacSystemFont,'SF Pro Display','Helvetica Neue','Malgun Gothic',Arial,sans-serif;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:var(--font);background:var(--bg);color:var(--text);-webkit-font-smoothing:antialiased;min-height:100vh;}
+
+/* ── LOGIN ── */
+#loginScreen{position:fixed;inset:0;background:var(--bg);display:flex;align-items:center;justify-content:center;z-index:999;}
+.login-card{background:var(--card);border-radius:20px;padding:40px 36px;width:100%;max-width:340px;box-shadow:var(--shadow-lg);text-align:center;}
+.login-icon{font-size:40px;margin-bottom:16px;}
+.login-title{font-size:22px;font-weight:700;color:var(--text);margin-bottom:6px;letter-spacing:-.02em;}
+.login-sub{font-size:13px;color:var(--hint);margin-bottom:28px;}
+.pin-row{display:flex;gap:10px;justify-content:center;margin-bottom:10px;}
+.pin-dot{width:14px;height:14px;border-radius:50%;background:var(--sep);transition:background .15s;}
+.pin-dot.filled{background:var(--wine);}
+.keypad{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:20px;}
+.key{background:var(--bg);border:none;border-radius:12px;height:52px;font-size:20px;font-weight:500;color:var(--text);cursor:pointer;font-family:var(--font);transition:all .12s;}
+.key:hover{background:#e5e5ea;}
+.key:active{transform:scale(.94);}
+.key.del{font-size:16px;color:var(--sub);}
+.login-error{font-size:13px;color:var(--wine);margin-top:8px;min-height:18px;}
+
+/* ── APP ── */
+#app{display:none;}
+
+/* TOPBAR */
+.topbar{background:rgba(255,255,255,0.88);backdrop-filter:saturate(180%) blur(20px);-webkit-backdrop-filter:saturate(180%) blur(20px);border-bottom:1px solid var(--sep);padding:0 20px;height:52px;display:flex;align-items:center;gap:12px;position:sticky;top:0;z-index:100;}
+.topbar-back{display:flex;align-items:center;gap:6px;font-size:14px;font-weight:500;color:var(--wine);text-decoration:none;transition:opacity .15s;}
+.topbar-back:hover{opacity:.7;}
+.topbar-title{font-size:15px;font-weight:700;color:var(--text);}
+.topbar-badge{margin-left:8px;padding:3px 10px;background:var(--wine-bg);color:var(--wine);border-radius:20px;font-size:11px;font-weight:600;}
+.topbar-logout{margin-left:auto;padding:5px 14px;border-radius:20px;background:var(--bg);border:1px solid var(--sep);font-size:12px;color:var(--sub);cursor:pointer;font-family:var(--font);}
+
+/* PAGE */
+.page{max-width:1200px;margin:0 auto;padding:24px 20px 60px;}
+
+/* SHEETS CONFIG */
+.config-card{background:var(--card);border-radius:var(--r);padding:18px 20px;margin-bottom:24px;border:2px solid rgba(26,92,140,.15);display:flex;align-items:center;gap:12px;flex-wrap:wrap;}
+.config-icon{font-size:24px;flex-shrink:0;}
+.config-body{flex:1;min-width:0;}
+.config-label{font-size:12px;font-weight:600;color:var(--blue);letter-spacing:.04em;text-transform:uppercase;margin-bottom:6px;}
+.config-input{width:100%;padding:8px 12px;border:1px solid var(--sep);border-radius:8px;font-size:13px;font-family:var(--font);color:var(--text);background:var(--bg);outline:none;}
+.config-input:focus{border-color:var(--blue);background:#fff;}
+.config-hint{font-size:11px;color:var(--hint);margin-top:4px;}
+.config-save-btn{padding:8px 16px;background:var(--blue);color:#fff;border:none;border-radius:10px;font-size:13px;font-weight:600;cursor:pointer;font-family:var(--font);flex-shrink:0;transition:opacity .15s;}
+.config-save-btn:hover{opacity:.85;}
+.config-status{font-size:11px;padding:3px 10px;border-radius:20px;font-weight:600;}
+.config-status.ok{background:var(--green-bg);color:var(--green);}
+.config-status.no{background:var(--wine-bg);color:var(--wine);}
+
+/* SECTION HEADER */
+.sec-header{display:flex;align-items:center;gap:10px;margin-bottom:16px;}
+.sec-title{font-size:18px;font-weight:700;color:var(--text);letter-spacing:-.02em;}
+.sec-count{font-size:13px;color:var(--hint);}
+.sec-btn{margin-left:auto;padding:7px 16px;border-radius:20px;font-size:13px;font-weight:600;border:none;cursor:pointer;font-family:var(--font);display:flex;align-items:center;gap:6px;transition:all .15s;}
+.btn-sync{background:var(--green-bg);color:var(--green);border:1px solid rgba(26,122,60,.2);}
+.btn-sync:hover{background:#d4edda;}
+.btn-add{background:var(--wine);color:#fff;}
+.btn-add:hover{opacity:.88;}
+
+/* TABS */
+.tabs{display:flex;gap:4px;margin-bottom:20px;background:var(--bg);padding:4px;border-radius:12px;width:fit-content;}
+.tab-btn{padding:6px 18px;border-radius:9px;border:none;background:transparent;font-size:13px;font-weight:500;color:var(--sub);cursor:pointer;font-family:var(--font);transition:all .15s;}
+.tab-btn.on{background:var(--card);color:var(--text);font-weight:600;box-shadow:0 1px 4px rgba(0,0,0,0.1);}
+
+/* TABLE */
+.table-wrap{background:var(--card);border-radius:var(--r);box-shadow:var(--shadow);overflow:hidden;overflow-x:auto;}
+table{width:100%;border-collapse:collapse;min-width:720px;}
+thead tr{background:var(--text);}
+th{padding:11px 14px;text-align:left;font-size:11px;font-weight:600;color:rgba(255,255,255,0.8);letter-spacing:.06em;text-transform:uppercase;white-space:nowrap;}
+tbody tr{border-bottom:1px solid var(--sep2);}
+tbody tr:last-child{border-bottom:none;}
+tbody tr:hover{background:#fafafa;}
+td{padding:10px 14px;font-size:13px;color:var(--text);vertical-align:middle;}
+.td-name{font-weight:600;max-width:180px;}
+.td-name small{display:block;font-size:11px;color:var(--hint);font-weight:400;margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.type-badge{padding:3px 8px;border-radius:6px;font-size:10px;font-weight:600;}
+.tb-r{background:var(--wine-bg);color:var(--wine);}
+.tb-w{background:var(--gold-bg);color:var(--gold);}
+.tb-s{background:var(--blue-bg);color:var(--blue);}
+.td-input{width:100%;padding:6px 10px;border:1px solid var(--sep);border-radius:8px;font-size:13px;font-family:var(--font);color:var(--text);background:var(--bg);outline:none;min-width:90px;}
+.td-input:focus{border-color:var(--wine);background:#fff;}
+.td-input.price{min-width:100px;text-align:right;}
+.save-row-btn{padding:5px 12px;background:var(--wine-bg);color:var(--wine);border:1px solid rgba(140,26,49,.15);border-radius:8px;font-size:11px;font-weight:600;cursor:pointer;font-family:var(--font);white-space:nowrap;transition:all .15s;}
+.save-row-btn:hover{background:var(--wine);color:#fff;}
+.save-row-btn.saved{background:var(--green-bg);color:var(--green);border-color:rgba(26,122,60,.15);}
+
+/* TASTED TABLE */
+.tasted-tag{padding:3px 9px;border-radius:20px;font-size:11px;font-weight:500;background:var(--green-bg);color:var(--green);}
+.untaste-btn{padding:4px 10px;border-radius:8px;font-size:11px;border:1px solid var(--sep);background:#fff;color:var(--sub);cursor:pointer;font-family:var(--font);}
+.untaste-btn:hover{border-color:#dc2626;color:#dc2626;}
+
+/* SYNC STATUS */
+.sync-bar{padding:10px 16px;border-radius:10px;font-size:13px;font-weight:500;margin-bottom:16px;display:none;align-items:center;gap:8px;}
+.sync-bar.loading{background:#edf4fb;color:var(--blue);display:flex;}
+.sync-bar.ok{background:var(--green-bg);color:var(--green);display:flex;}
+.sync-bar.err{background:var(--wine-bg);color:var(--wine);display:flex;}
+
+/* TOTAL */
+.total-card{background:var(--card);border-radius:var(--r);padding:16px 20px;box-shadow:var(--shadow);display:flex;gap:0;overflow:hidden;border:1px solid var(--sep);margin-bottom:20px;}
+.total-item{flex:1;text-align:center;padding:8px 12px;border-right:1px solid var(--sep2);}
+.total-item:last-child{border-right:none;}
+.total-value{font-size:22px;font-weight:700;color:var(--text);letter-spacing:-.02em;}
+.total-value.highlight{color:var(--wine);}
+.total-label{font-size:10px;color:var(--hint);font-weight:500;text-transform:uppercase;letter-spacing:.05em;margin-top:3px;}
+
+/* SPINNER */
+@keyframes spin{to{transform:rotate(360deg)}}
+.spinner{width:14px;height:14px;border:2px solid currentColor;border-top-color:transparent;border-radius:50%;animation:spin .6s linear infinite;display:inline-block;}
+
+/* RESPONSIVE */
+@media(max-width:600px){
+  .page{padding:16px 12px 48px;}
+  .config-card{flex-direction:column;align-items:stretch;}
+}
+</style>
+</head>
+<body>
+
+<!-- ══ LOGIN SCREEN ══ -->
+<div id="loginScreen">
+  <div class="login-card">
+    <div class="login-icon">🔐</div>
+    <div class="login-title">관리자 로그인</div>
+    <div class="login-sub">4자리 PIN을 입력하세요</div>
+    <div class="pin-row">
+      <div class="pin-dot" id="p0"></div>
+      <div class="pin-dot" id="p1"></div>
+      <div class="pin-dot" id="p2"></div>
+      <div class="pin-dot" id="p3"></div>
+    </div>
+    <div class="login-error" id="loginErr"></div>
+    <div class="keypad">
+      <button class="key" onclick="keyPress('1')">1</button>
+      <button class="key" onclick="keyPress('2')">2</button>
+      <button class="key" onclick="keyPress('3')">3</button>
+      <button class="key" onclick="keyPress('4')">4</button>
+      <button class="key" onclick="keyPress('5')">5</button>
+      <button class="key" onclick="keyPress('6')">6</button>
+      <button class="key" onclick="keyPress('7')">7</button>
+      <button class="key" onclick="keyPress('8')">8</button>
+      <button class="key" onclick="keyPress('9')">9</button>
+      <button class="key" onclick="keyPress('')"></button>
+      <button class="key" onclick="keyPress('0')">0</button>
+      <button class="key del" onclick="keyDel()">⌫</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ APP ══ -->
+<div id="app">
+  <div class="topbar">
+    <a class="topbar-back" href="index.html">
+      <svg width="8" height="14" viewBox="0 0 8 14" fill="none"><path d="M7 1L1 7L7 13" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      목록
+    </a>
+    <span class="topbar-title">관리자 페이지</span>
+    <span class="topbar-badge">Admin</span>
+    <button class="topbar-logout" onclick="logout()">로그아웃</button>
+  </div>
+
+  <div class="page">
+
+    <!-- Google Sheets 연동 설정 -->
+    <div class="config-card">
+      <div class="config-icon">📊</div>
+      <div class="config-body">
+        <div class="config-label">Google Apps Script URL</div>
+        <input class="config-input" id="scriptUrl" type="url"
+          placeholder="https://script.google.com/macros/s/.../exec"
+          oninput="saveScriptUrl()">
+        <div class="config-hint">Apps Script 웹 앱 배포 URL · 아래 설정 가이드 탭 참고</div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:6px;flex-shrink:0;">
+        <button class="config-save-btn" onclick="testConnection()">🔌 연결 테스트</button>
+        <span class="config-status" id="urlStatus">미설정</span>
+      </div>
+    </div>
+    <div class="sync-bar" id="testBar" style="margin-top:-16px;margin-bottom:20px;border-radius:10px;"></div>
+
+    <!-- 요약 카드 -->
+    <div class="total-card">
+      <div class="total-item"><div class="total-value" id="tTotal">—</div><div class="total-label">총 보틀</div></div>
+      <div class="total-item"><div class="total-value highlight" id="tSpend">—</div><div class="total-label">총 구매금액</div></div>
+      <div class="total-item"><div class="total-value" id="tEntered">—</div><div class="total-label">금액 입력</div></div>
+      <div class="total-item"><div class="total-value" id="tTasted">—</div><div class="total-label">마신 와인</div></div>
+    </div>
+
+    <!-- 탭 -->
+    <div class="tabs">
+      <button class="tab-btn on" onclick="switchTab('purchase')">🛒 구매 관리</button>
+      <button class="tab-btn" onclick="switchTab('tasted')">🍷 음용 기록</button>
+      <button class="tab-btn" onclick="switchTab('guide')">📋 설정 가이드</button>
+    </div>
+
+    <!-- ── 구매 관리 탭 ── -->
+    <div id="tabPurchase">
+      <div class="sec-header">
+        <span class="sec-title">구매 정보 관리</span>
+        <span class="sec-count" id="purchaseCount"></span>
+        <button class="sec-btn btn-sync" onclick="syncPurchase()">
+          <span>↑↓</span> Google Sheets 동기화
+        </button>
+      </div>
+      <div class="sync-bar" id="purchaseSyncBar"></div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>와인명</th>
+              <th>종류</th>
+              <th>빈티지</th>
+              <th>구매처</th>
+              <th>구매일</th>
+              <th>구매금액 (원)</th>
+              <th>저장</th>
+            </tr>
+          </thead>
+          <tbody id="purchaseBody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ── 음용 기록 탭 ── -->
+    <div id="tabTasted" style="display:none">
+      <div class="sec-header">
+        <span class="sec-title">마신 와인 기록</span>
+        <span class="sec-count" id="tastedRecordCount"></span>
+        <button class="sec-btn btn-sync" onclick="syncTasted()">
+          <span>↑↓</span> Google Sheets 동기화
+        </button>
+      </div>
+      <div class="sync-bar" id="tastedSyncBar"></div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>와인명</th>
+              <th>종류</th>
+              <th>빈티지</th>
+              <th>음용일</th>
+              <th>상태</th>
+            </tr>
+          </thead>
+          <tbody id="tastedBody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ── 설정 가이드 탭 ── -->
+    <div id="tabGuide" style="display:none">
+      <div style="background:var(--card);border-radius:var(--r);padding:24px;box-shadow:var(--shadow);">
+        <h2 style="font-size:18px;font-weight:700;margin-bottom:20px;color:var(--text)">📋 Google Sheets 연동 설정 가이드</h2>
+
+        <div style="display:flex;flex-direction:column;gap:20px;">
+          <div>
+            <div style="font-size:13px;font-weight:700;color:var(--wine);margin-bottom:8px">STEP 1 — Google Sheets 만들기</div>
+            <div style="font-size:13px;color:var(--text);line-height:1.7;background:var(--bg);padding:12px 14px;border-radius:8px;">
+              1. <a href="https://sheets.google.com" target="_blank" style="color:var(--blue)">sheets.google.com</a> 에서 새 스프레드시트 만들기<br>
+              2. 스프레드시트 이름: <strong>Raina's Wine Cellar</strong><br>
+              3. 시트1 이름을 <strong>Purchase</strong> 로 변경<br>
+              4. 1행에 헤더 입력: <code style="background:#fff;padding:2px 6px;border-radius:4px;font-size:12px">id | name_kr | type | vintage | store | date | price | memo</code><br>
+              5. 시트 추가 → 이름 <strong>Tasted</strong> 로 설정<br>
+              6. Tasted 1행: <code style="background:#fff;padding:2px 6px;border-radius:4px;font-size:12px">id | name_kr | type | vintage | tasted_date</code>
+            </div>
+          </div>
+
+          <div>
+            <div style="font-size:13px;font-weight:700;color:var(--wine);margin-bottom:8px">STEP 2 — Apps Script 만들기</div>
+            <div style="font-size:13px;color:var(--text);line-height:1.7;background:var(--bg);padding:12px 14px;border-radius:8px;">
+              1. 스프레드시트에서 <strong>확장 프로그램 → Apps Script</strong> 클릭<br>
+              2. 기존 코드 전체 삭제 후 아래 코드 붙여넣기<br>
+              3. <strong>저장(💾)</strong> 클릭
+            </div>
+            <div style="margin-top:10px;background:#1d1d1f;border-radius:10px;padding:16px;overflow-x:auto;">
+              <pre id="scriptCode" style="font-size:11px;color:#f8f8f2;line-height:1.6;white-space:pre;font-family:'Courier New',monospace;"></pre>
+            </div>
+            <button onclick="copyScript()" style="margin-top:8px;padding:8px 16px;background:var(--text);color:#fff;border:none;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;font-family:var(--font)">📋 코드 복사</button>
+          </div>
+
+          <div>
+            <div style="font-size:13px;font-weight:700;color:var(--wine);margin-bottom:8px">STEP 3 — 웹 앱으로 배포 (⚠️ 권한 설정 중요)</div>
+            <div style="font-size:13px;color:var(--text);line-height:1.7;background:var(--bg);padding:12px 14px;border-radius:8px;">
+              1. Apps Script 편집기 상단 <strong>배포 → 새 배포</strong> 클릭<br>
+              2. ⚙️ 아이콘 클릭 → <strong>웹 앱</strong> 선택<br>
+              3. 설명: <code style="background:#fff;padding:2px 6px;border-radius:4px">Wine Cellar API</code><br>
+              4. 다음 사용자로 실행: <strong>나 (내 Google 계정)</strong><br>
+              5. 액세스 권한: <strong style="color:#8c1a31">모든 사용자 (Anyone)</strong> ← 반드시 이것!<br>
+              6. <strong>배포</strong> → Google 계정 권한 허용 → <strong>웹 앱 URL 복사</strong><br><br>
+              <strong style="color:#8c1a31">⚠️ 403 오류가 나는 경우:</strong><br>
+              배포 → 배포 관리 → 연필 아이콘 → 액세스를 <strong>모든 사용자</strong>로 변경 → <strong>새 버전으로 재배포</strong>
+            </div>
+          </div>
+
+          <div>
+            <div style="font-size:13px;font-weight:700;color:var(--wine);margin-bottom:8px">STEP 4 — URL 입력</div>
+            <div style="font-size:13px;color:var(--text);line-height:1.7;background:var(--bg);padding:12px 14px;border-radius:8px;">
+              복사한 URL을 이 페이지 상단의 <strong>Google Apps Script URL</strong> 칸에 붙여넣기 → <strong>저장</strong>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+// ══════════════════════════════════════
+//  APPS SCRIPT CODE (가이드용)
+// ══════════════════════════════════════
+const APPS_SCRIPT_CODE = `// ══ Raina's Wine Cellar - Apps Script ══
+// 스프레드시트 시트명 설정
+const SHEET_PURCHASE = 'Purchase';
+const SHEET_TASTED   = 'Tasted';
+
+// CORS 허용 헤더
+function setCORS(output) {
+  return output
+    .setMimeType(ContentService.MimeType.JSON);
+}
+
+function doGet(e) {
+  try {
+    const action = e.parameter.action;
+    const ss = SpreadsheetApp.getActiveSpreadsheet();
+
+    if (action === 'getPurchase') {
+      return setCORS(getData(ss, SHEET_PURCHASE));
+    }
+    if (action === 'getTasted') {
+      return setCORS(getData(ss, SHEET_TASTED));
+    }
+    return setCORS(ContentService.createTextOutput(JSON.stringify({ok:true, msg:'Wine Cellar API Ready'})));
+  } catch(e) {
+    return ContentService.createTextOutput(JSON.stringify({error: e.message}))
+      .setMimeType(ContentService.MimeType.JSON);
+  }
+}
+
+function getData(ss, sheetName) {
+  const sheet = ss.getSheetByName(sheetName);
+  if (!sheet) return ContentService.createTextOutput(JSON.stringify([])).setMimeType(ContentService.MimeType.JSON);
+  const rows = sheet.getDataRange().getValues();
+  if (rows.length <= 1) return ContentService.createTextOutput(JSON.stringify([])).setMimeType(ContentService.MimeType.JSON);
+  const headers = rows[0].map(h => String(h).trim());
+  const data = rows.slice(1).map(r => {
+    const obj = {};
+    headers.forEach((h, i) => obj[h] = r[i]);
+    return obj;
+  }).filter(row => row[headers[0]]);
+  return ContentService.createTextOutput(JSON.stringify(data)).setMimeType(ContentService.MimeType.JSON);
+}
+
+function doPost(e) {
+  try {
+    const body   = JSON.parse(e.postData.contents);
+    const action = body.action;
+    const ss     = SpreadsheetApp.getActiveSpreadsheet();
+
+    if (action === 'savePurchase') {
+      upsertRow(ss, SHEET_PURCHASE,
+        [body.data.id, body.data.name_kr, body.data.type, body.data.vintage,
+         body.data.store, body.data.date, body.data.price, body.data.memo || ''],
+        8);
+      return ok();
+    }
+
+    if (action === 'saveTasted') {
+      upsertRow(ss, SHEET_TASTED,
+        [body.data.id, body.data.name_kr, body.data.type, body.data.vintage, body.data.tasted_date],
+        5);
+      return ok();
+    }
+
+    if (action === 'deleteTasted') {
+      deleteRow(ss, SHEET_TASTED, body.id);
+      return ok();
+    }
+
+    return ContentService.createTextOutput(JSON.stringify({error:'Unknown action'}))
+      .setMimeType(ContentService.MimeType.JSON);
+  } catch(e) {
+    return ContentService.createTextOutput(JSON.stringify({error: e.message}))
+      .setMimeType(ContentService.MimeType.JSON);
+  }
+}
+
+function upsertRow(ss, sheetName, values, colCount) {
+  const sheet = ss.getSheetByName(sheetName);
+  const rows  = sheet.getDataRange().getValues();
+  const id    = String(values[0]);
+  for (let i = 1; i < rows.length; i++) {
+    if (String(rows[i][0]) === id) {
+      sheet.getRange(i + 1, 1, 1, colCount).setValues([values]);
+      return;
+    }
+  }
+  sheet.appendRow(values);
+}
+
+function deleteRow(ss, sheetName, id) {
+  const sheet = ss.getSheetByName(sheetName);
+  const rows  = sheet.getDataRange().getValues();
+  for (let i = 1; i < rows.length; i++) {
+    if (String(rows[i][0]) === String(id)) {
+      sheet.deleteRow(i + 1);
+      return;
+    }
+  }
+}
+
+function ok() {
+  return ContentService.createTextOutput(JSON.stringify({ok: true}))
+    .setMimeType(ContentService.MimeType.JSON);
+}`;
+
+// ══════════════════════════════════════
+//  PIN LOGIN
+// ══════════════════════════════════════
+const CORRECT_PIN = '0630';
+let pinInput = '';
+
+function keyPress(num){
+  if(!num) return;
+  if(pinInput.length >= 4) return;
+  pinInput += num;
+  updatePinUI();
+  if(pinInput.length === 4) setTimeout(checkPin, 150);
+}
+function keyDel(){
+  pinInput = pinInput.slice(0, -1);
+  updatePinUI();
+  document.getElementById('loginErr').textContent = '';
+}
+function updatePinUI(){
+  for(let i=0;i<4;i++){
+    document.getElementById('p'+i).className = 'pin-dot' + (i < pinInput.length ? ' filled' : '');
+  }
+}
+function checkPin(){
+  if(pinInput === CORRECT_PIN){
+    sessionStorage.setItem('wineAdmin','1');
+    document.getElementById('loginScreen').style.display = 'none';
+    document.getElementById('app').style.display = 'block';
+    initApp();
+  } else {
+    document.getElementById('loginErr').textContent = '비밀번호가 틀렸습니다';
+    pinInput = '';
+    updatePinUI();
+  }
+}
+function logout(){
+  sessionStorage.removeItem('wineAdmin');
+  document.getElementById('app').style.display = 'none';
+  document.getElementById('loginScreen').style.display = 'flex';
+  pinInput = ''; updatePinUI();
+  document.getElementById('loginErr').textContent = '';
+}
+
+// Auto-login if session exists
+if(sessionStorage.getItem('wineAdmin') === '1'){
+  document.getElementById('loginScreen').style.display = 'none';
+  document.getElementById('app').style.display = 'block';
+}
+
+// ══════════════════════════════════════
+//  APP STATE
+// ══════════════════════════════════════
+let WINES = [];
+let purchaseData = {}; // {id: {store, date, price, memo}}
+let activeTab = 'purchase';
+
+// Script code display
+document.getElementById('scriptCode').textContent = APPS_SCRIPT_CODE;
+
+// ── localStorage helpers ──
+function getTasted(){ try{return JSON.parse(localStorage.getItem('wineTasted')||'{}')}catch(e){return{}} }
+function setTasted(obj){ try{localStorage.setItem('wineTasted',JSON.stringify(obj))}catch(e){} }
+function getPurchaseLocal(){ try{return JSON.parse(localStorage.getItem('winePurchase')||'{}')}catch(e){return{}} }
+function setPurchaseLocal(obj){ try{localStorage.setItem('winePurchase',JSON.stringify(obj))}catch(e){} }
+
+// ── Script URL ──
+const DEFAULT_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzHk7Zfvn8u1J9tm66SBOKsQ-_u4RUY1v1AswybW0hbsjC2ZUKFbogQi5uNaCFLdvX_zA/exec';
+function getScriptUrl(){ return localStorage.getItem('wineScriptUrl') || DEFAULT_SCRIPT_URL; }
+async function testConnection(){
+  const url = getScriptUrl();
+  if(!url || !url.includes('script.google.com')){
+    showSyncBar('testBar','err','URL을 먼저 입력해주세요'); return;
+  }
+  showSyncBar('testBar','loading','연결 테스트 중...');
+  try{
+    const res = await fetch(url, {method:'GET'});
+    if(res.status === 403){
+      showSyncBar('testBar','err','❌ 403 Forbidden — Apps Script 배포 설정에서 액세스를 "모든 사용자"로 변경 후 재배포 필요');
+      document.getElementById('urlStatus').textContent='⚠ 권한 오류';
+      document.getElementById('urlStatus').className='config-status no';
+      return;
+    }
+    const data = await res.json();
+    if(data.ok || Array.isArray(data)){
+      showSyncBar('testBar','ok','✅ 연결 성공! Google Sheets와 정상 연동되었습니다');
+      document.getElementById('urlStatus').textContent='✅ 연결됨';
+      document.getElementById('urlStatus').className='config-status ok';
+    } else if(data.error){
+      showSyncBar('testBar','err','⚠️ 스크립트 오류: '+data.error);
+    } else {
+      showSyncBar('testBar','ok','✅ 응답 수신 완료');
+    }
+  }catch(e){
+    showSyncBar('testBar','err','❌ 연결 실패: '+e.message+' — CORS 또는 배포 권한 확인 필요');
+    document.getElementById('urlStatus').textContent='❌ 연결 실패';
+    document.getElementById('urlStatus').className='config-status no';
+  }
+}
+
+function saveScriptUrl(){
+  const url = document.getElementById('scriptUrl').value.trim();
+  localStorage.setItem('wineScriptUrl', url);
+  updateUrlStatus(url);
+}
+function updateUrlStatus(url){
+  const el = document.getElementById('urlStatus');
+  if(url && url.includes('script.google.com')){
+    el.textContent = '✅ 설정됨'; el.className = 'config-status ok';
+  } else {
+    el.textContent = '⚠ 미설정'; el.className = 'config-status no';
+  }
+}
+
+// ── Format helpers ──
+function typeName(t){ return {red:'레드',white:'화이트',sparkling:'스파클링'}[t]||t; }
+function typeBadge(t){ return {red:'tb-r',white:'tb-w',sparkling:'tb-s'}[t]||''; }
+function formatPrice(n){ if(!n) return ''; return parseInt(n).toLocaleString()+'원'; }
+function formatDate(iso){ if(!iso) return ''; const[y,m,d]=String(iso).split('-'); return `${y}.${m}.${d}`; }
+
+// ══════════════════════════════════════
+//  INIT
+// ══════════════════════════════════════
+function initApp(){
+  // Restore URL input — use saved or default
+  const url = getScriptUrl();
+  document.getElementById('scriptUrl').value = url;
+  updateUrlStatus(url);
+
+  // Load purchase from localStorage
+  purchaseData = getPurchaseLocal();
+
+  // Load wines.json
+  fetch('wines.json')
+    .then(r=>r.json())
+    .then(data=>{
+      WINES = data;
+      renderPurchaseTable();
+      renderTastedTable();
+      updateSummary();
+    })
+    .catch(()=>{
+      // Fallback: try parent dir
+      fetch('../wines.json').then(r=>r.json()).then(data=>{
+        WINES=data; renderPurchaseTable(); renderTastedTable(); updateSummary();
+      }).catch(()=>{
+        document.getElementById('purchaseBody').innerHTML =
+          '<tr><td colspan="8" style="text-align:center;padding:24px;color:#aeaeb2">wines.json을 찾을 수 없습니다</td></tr>';
+      });
+    });
+}
+
+if(sessionStorage.getItem('wineAdmin') === '1') initApp();
+
+// ══════════════════════════════════════
+//  PURCHASE TABLE
+// ══════════════════════════════════════
+function renderPurchaseTable(){
+  const tbody = document.getElementById('purchaseBody');
+  document.getElementById('purchaseCount').textContent = `총 ${WINES.length}병`;
+
+  tbody.innerHTML = WINES.map(w => {
+    const p = purchaseData[w.id] || {};
+    return `<tr id="row-${w.id}">
+      <td style="color:var(--hint);font-size:12px">${w.id}</td>
+      <td class="td-name">${w.name_kr}<small>${w.name_en}</small></td>
+      <td><span class="type-badge ${typeBadge(w.type)}">${typeName(w.type)}</span></td>
+      <td style="color:var(--sub)">${w.vintage||'NV'}</td>
+      <td><input class="td-input" id="store-${w.id}" type="text" placeholder="구매처" value="${p.store||''}" onchange="markDirty(${w.id})"></td>
+      <td><input class="td-input" id="date-${w.id}" type="date" value="${p.date||''}" onchange="markDirty(${w.id})"></td>
+      <td><input class="td-input price" id="price-${w.id}" type="number" placeholder="0" value="${p.price||''}" onchange="markDirty(${w.id})"></td>
+      <td><button class="save-row-btn${p.store||p.date||p.price?' saved':''}" id="savebtn-${w.id}" onclick="saveRow(${w.id})">저장</button></td>
+    </tr>`;
+  }).join('');
+}
+
+function markDirty(id){
+  const btn = document.getElementById('savebtn-'+id);
+  btn.textContent = '저장'; btn.className = 'save-row-btn';
+}
+
+function saveRow(id){
+  const w = WINES.find(x=>x.id===id);
+  const store = document.getElementById('store-'+id).value.trim();
+  const date  = document.getElementById('date-'+id).value;
+  const price = document.getElementById('price-'+id).value;
+
+  // Save to localStorage
+  purchaseData[id] = {store, date, price};
+  setPurchaseLocal(purchaseData);
+
+  // Update button
+  const btn = document.getElementById('savebtn-'+id);
+  btn.textContent = '✅ 저장됨'; btn.className = 'save-row-btn saved';
+
+  updateSummary();
+
+  // Auto-sync to Sheets if URL set
+  const url = getScriptUrl();
+  if(url && url.includes('script.google.com')){
+    const payload = {
+      action: 'savePurchase',
+      data: {id, name_kr:w.name_kr, type:w.type, vintage:w.vintage||'NV', store, date, price, memo:''}
+    };
+    fetch(url, {method:'POST', body:JSON.stringify(payload)})
+      .then(r=>r.json())
+      .then(res=>{ if(res.ok) console.log('Synced:', id); })
+      .catch(e=>console.warn('Sync error:', e));
+  }
+}
+
+// ══════════════════════════════════════
+//  TASTED TABLE
+// ══════════════════════════════════════
+function renderTastedTable(){
+  const tasted = getTasted();
+  const ids = Object.keys(tasted).map(Number).filter(id=>WINES.find(w=>w.id===id));
+  document.getElementById('tastedRecordCount').textContent = `총 ${ids.length}병`;
+
+  const tbody = document.getElementById('tastedBody');
+  if(!ids.length){
+    tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:24px;color:#aeaeb2">아직 마신 와인이 없습니다</td></tr>';
+    return;
+  }
+  const sorted = ids.sort((a,b)=>(tasted[b]||'').localeCompare(tasted[a]||''));
+  tbody.innerHTML = sorted.map(id=>{
+    const w = WINES.find(x=>x.id===id);
+    if(!w) return '';
+    const date = tasted[id];
+    return `<tr>
+      <td style="color:var(--hint);font-size:12px">${w.id}</td>
+      <td class="td-name">${w.name_kr}<small>${w.name_en}</small></td>
+      <td><span class="type-badge ${typeBadge(w.type)}">${typeName(w.type)}</span></td>
+      <td style="color:var(--sub)">${w.vintage||'NV'}</td>
+      <td><span class="tasted-tag">${formatDate(date)}</span></td>
+      <td><button class="untaste-btn" onclick="removeTasted(${id})">취소</button></td>
+    </tr>`;
+  }).join('');
+}
+
+function removeTasted(id){
+  if(!confirm('음용 기록을 삭제할까요?')) return;
+  const data = getTasted();
+  delete data[id];
+  setTasted(data);
+  renderTastedTable();
+  updateSummary();
+
+  const url = getScriptUrl();
+  if(url && url.includes('script.google.com')){
+    fetch(url, {method:'POST', body:JSON.stringify({action:'deleteTasted', id})})
+      .catch(e=>console.warn(e));
+  }
+}
+
+// ══════════════════════════════════════
+//  SUMMARY
+// ══════════════════════════════════════
+function updateSummary(){
+  document.getElementById('tTotal').textContent = WINES.length;
+  const tasted = getTasted();
+  document.getElementById('tTasted').textContent = Object.keys(tasted).length;
+  const entered = Object.values(purchaseData).filter(p=>p.price).length;
+  document.getElementById('tEntered').textContent = entered;
+  const total = Object.values(purchaseData).reduce((sum,p)=>sum+(parseInt(p.price)||0), 0);
+  document.getElementById('tSpend').textContent = total ? total.toLocaleString()+'원' : '—';
+}
+
+// ══════════════════════════════════════
+//  GOOGLE SHEETS SYNC
+// ══════════════════════════════════════
+function showSyncBar(barId, type, msg){
+  const bar = document.getElementById(barId);
+  bar.className = 'sync-bar '+type;
+  bar.innerHTML = (type==='loading'?'<span class="spinner"></span>':type==='ok'?'✅':'⚠️') + ' ' + msg;
+}
+
+async function syncPurchase(){
+  const url = getScriptUrl();
+  if(!url || !url.includes('script.google.com')){
+    showSyncBar('purchaseSyncBar','err','Apps Script URL을 먼저 설정해주세요'); return;
+  }
+  showSyncBar('purchaseSyncBar','loading','Google Sheets에서 데이터 불러오는 중...');
+  try{
+    const res = await fetch(url+'?action=getPurchase');
+    if(res.status === 403){
+      showSyncBar('purchaseSyncBar','err','❌ 403 오류: Apps Script 배포 설정에서 액세스 권한을 "모든 사용자"로 변경 후 재배포해주세요');
+      return;
+    }
+    const data = await res.json();
+    if(Array.isArray(data)){
+      data.forEach(row=>{
+        if(row.id){ purchaseData[row.id]={store:row.store||'',date:row.date||'',price:row.price||''}; }
+      });
+      setPurchaseLocal(purchaseData);
+      renderPurchaseTable();
+      updateSummary();
+      showSyncBar('purchaseSyncBar','ok',`✅ ${data.length}건 Google Sheets에서 불러오기 완료`);
+    } else {
+      showSyncBar('purchaseSyncBar','err','데이터 형식 오류: '+JSON.stringify(data).slice(0,80));
+    }
+  }catch(e){
+    showSyncBar('purchaseSyncBar','err','연결 실패: '+e.message+' — Apps Script 배포 권한을 확인해주세요');
+  }
+}
+
+async function syncTasted(){
+  const url = getScriptUrl();
+  if(!url || !url.includes('script.google.com')){
+    showSyncBar('tastedSyncBar','err','Apps Script URL을 먼저 설정해주세요'); return;
+  }
+  showSyncBar('tastedSyncBar','loading','마신 와인 기록 Google Sheets에 저장 중...');
+  const tasted = getTasted();
+  const ids = Object.keys(tasted).map(Number);
+  if(!ids.length){ showSyncBar('tastedSyncBar','ok','동기화할 기록이 없습니다'); return; }
+  try{
+    let count=0;
+    for(const id of ids){
+      const w = WINES.find(x=>x.id===id);
+      if(!w) continue;
+      const res = await fetch(url, {
+        method:'POST',
+        body:JSON.stringify({
+          action:'saveTasted',
+          data:{id, name_kr:w.name_kr, type:w.type, vintage:w.vintage||'NV', tasted_date:tasted[id]}
+        })
+      });
+      if(res.status === 403){
+        showSyncBar('tastedSyncBar','err','❌ 403 오류: Apps Script 배포 권한을 "모든 사용자"로 변경 후 재배포해주세요');
+        return;
+      }
+      count++;
+    }
+    showSyncBar('tastedSyncBar','ok',`✅ ${count}건 Google Sheets에 저장 완료`);
+  }catch(e){
+    showSyncBar('tastedSyncBar','err','저장 실패: '+e.message);
+  }
+}
+
+// ══════════════════════════════════════
+//  TAB / MISC
+// ══════════════════════════════════════
+function switchTab(tab){
+  activeTab = tab;
+  document.querySelectorAll('.tab-btn').forEach((b,i)=>{
+    const tabs=['purchase','tasted','guide'];
+    b.className='tab-btn'+(tabs[i]===tab?' on':'');
+  });
+  document.getElementById('tabPurchase').style.display = tab==='purchase'?'block':'none';
+  document.getElementById('tabTasted').style.display   = tab==='tasted'?'block':'none';
+  document.getElementById('tabGuide').style.display    = tab==='guide'?'block':'none';
+  if(tab==='tasted') renderTastedTable();
+}
+
+function copyScript(){
+  navigator.clipboard.writeText(APPS_SCRIPT_CODE).then(()=>{
+    alert('코드가 복사되었습니다! Apps Script 편집기에 붙여넣기 하세요.');
+  }).catch(()=>{
+    const el=document.getElementById('scriptCode');
+    const sel=window.getSelection(); const range=document.createRange();
+    range.selectNodeContents(el); sel.removeAllRanges(); sel.addRange(range);
+  });
+}
+</script>
+</body>
+</html>
