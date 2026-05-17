@@ -23,6 +23,8 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);-webkit-font
 .header{background:#fff;border-bottom:1px solid var(--sep);padding:48px 20px 40px;text-align:center;}
 .header-title{font-size:30px;font-weight:700;letter-spacing:-.025em;color:var(--text);line-height:1.1;margin-bottom:10px;}
 .header-update{font-size:12px;color:var(--hint);margin-bottom:28px;}
+.admin-link{display:inline-flex;align-items:center;gap:6px;margin-top:16px;padding:7px 16px;background:var(--bg);border:1px solid var(--sep);border-radius:20px;font-size:12px;font-weight:500;color:var(--sub);text-decoration:none;transition:all .18s;}
+.admin-link:hover{background:var(--wine-bg);color:var(--wine);border-color:rgba(140,26,49,.2);}
 .header-stats{display:inline-flex;background:var(--bg);border-radius:14px;overflow:hidden;border:1px solid var(--sep);max-width:100%;}
 .stat{padding:14px 22px;text-align:center;border-right:1px solid var(--sep);flex:1;}
 .stat:last-child{border-right:none;}
@@ -132,6 +134,7 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);-webkit-font
     <div class="stat"><div class="stat-value" id="sWhite">—</div><div class="stat-label">White</div></div>
     <div class="stat"><div class="stat-value" id="sSpark">—</div><div class="stat-label">Sparkling</div></div>
   </div>
+  <a href="admin.html" class="admin-link">⚙️ 관리자</a>
 </div>
 
 <div class="nav-wrap">
