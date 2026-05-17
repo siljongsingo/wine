@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Wine Detail · Raina's Cellar</title>
+<style>
+@import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/variable/pretendardvariable-dynamic-subset.min.css');
+:root {
+  --bg:#f2f2f7;--card:#fff;--text:#1d1d1f;--sub:#6e6e73;--hint:#aeaeb2;
+  --sep:rgba(0,0,0,0.08);--sep2:rgba(0,0,0,0.05);
+  --wine:#8c1a31;--wine-bg:#fdf0f2;--gold:#7a5c14;--gold-bg:#fef8ed;
+  --blue:#1a5c8c;--blue-bg:#edf4fb;--green:#1a7a3c;
+  --r:16px;--r-sm:10px;
+  --shadow:0 2px 12px rgba(0,0,0,0.07),0 1px 3px rgba(0,0,0,0.04);
+  --shadow-lg:0 8px 40px rgba(0,0,0,0.13),0 2px 8px rgba(0,0,0,0.06);
+  --font:'Pretendard Variable','Pretendard',-apple-system,BlinkMacSystemFont,'SF Pro Display','Helvetica Neue','Malgun Gothic',Arial,sans-serif;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:var(--font);background:var(--bg);color:var(--text);-webkit-font-smoothing:antialiased;min-height:100vh;}
+
+/* TOP BAR */
+.topbar{position:sticky;top:0;z-index:100;background:rgba(255,255,255,0.88);backdrop-filter:saturate(180%) blur(20px);-webkit-backdrop-filter:saturate(180%) blur(20px);border-bottom:1px solid var(--sep);padding:0 20px;height:52px;display:flex;align-items:center;gap:12px;}
+.back-btn{display:flex;align-items:center;gap:6px;font-size:14px;font-weight:500;color:var(--wine);text-decoration:none;padding:6px 0;transition:opacity .15s;}
+.back-btn:hover{opacity:.7;}
+.topbar-title{font-size:15px;font-weight:600;color:var(--text);letter-spacing:-.01em;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1;}
+
+/* LAYOUT */
+.page{max-width:860px;margin:0 auto;padding:24px 20px 60px;}
+
+/* 2-col on desktop */
+.detail-layout{display:flex;flex-direction:column;gap:24px;}
+@media(min-width:700px){
+  .detail-layout{flex-direction:row;align-items:flex-start;gap:32px;}
+  .detail-photo-col{width:280px;flex-shrink:0;position:sticky;top:76px;}
+  .detail-content{flex:1;min-width:0;}
+}
+
+/* PHOTO */
+.detail-photo{border-radius:18px;overflow:hidden;background:#f0ece8;position:relative;height:340px;display:flex;align-items:center;justify-content:center;}
+.photo-bg{position:absolute;inset:-10px;background-size:cover;background-position:center;filter:blur(18px) brightness(.88) saturate(.7);transform:scale(1.1);}
+.detail-photo img.main-img{position:relative;z-index:1;height:100%;width:auto;max-width:100%;object-fit:contain;display:block;border-radius:8px;}
+.photo-ph{display:flex;align-items:center;justify-content:center;height:100%;opacity:.3;position:relative;z-index:1;}
+@media(max-width:699px){.detail-photo{height:260px;border-radius:14px;}}
+
+/* TASTED BANNER */
+.tasted-banner{padding:10px 16px;background:#f0faf4;border:1px solid rgba(26,122,60,.15);border-radius:12px;margin-bottom:20px;font-size:13px;color:#1a7a3c;font-weight:500;display:flex;align-items:center;gap:8px;}
+
+/* TYPE ROW */
+.type-row{display:flex;align-items:center;gap:8px;margin-bottom:10px;flex-wrap:wrap;}
+.chip{padding:4px 10px;border-radius:20px;font-size:11px;font-weight:600;letter-spacing:.04em;}
+.chip-r{background:var(--wine-bg);color:var(--wine);}
+.chip-w{background:var(--gold-bg);color:var(--gold);}
+.chip-s{background:var(--blue-bg);color:var(--blue);}
+.rank-chip{padding:4px 10px;border-radius:20px;font-size:11px;font-weight:600;background:var(--bg);color:var(--sub);}
+.rank-chip.top{background:var(--wine);color:#fff;}
+.tag{padding:3px 9px;border-radius:6px;font-size:11px;font-weight:500;background:var(--bg);color:var(--sub);}
+.tag-r{background:var(--wine-bg);color:var(--wine);font-weight:600;}
+.tag-w{background:var(--gold-bg);color:var(--gold);font-weight:600;}
+.tag-s{background:var(--blue-bg);color:var(--blue);font-weight:600;}
+
+.wine-title{font-size:26px;font-weight:700;letter-spacing:-.02em;color:var(--text);line-height:1.2;margin-bottom:4px;}
+.wine-title-en{font-size:14px;color:var(--hint);margin-bottom:20px;}
+@media(max-width:699px){.wine-title{font-size:21px;}}
+
+/* TASTED BUTTON */
+.tasted-btn{display:flex;align-items:center;gap:8px;padding:10px 18px;border-radius:20px;font-size:13px;font-weight:600;border:2px solid var(--sep);background:var(--card);color:var(--sub);cursor:pointer;font-family:var(--font);transition:all .18s;margin-bottom:20px;width:fit-content;}
+.tasted-btn.done{border-color:#1a7a3c;background:#f0faf4;color:#1a7a3c;}
+.tasted-btn:hover{border-color:var(--wine);color:var(--wine);}
+.tasted-btn.done:hover{border-color:#dc2626;background:#fef2f2;color:#dc2626;}
+
+/* VIVINO */
+.vivino-card{display:flex;align-items:center;gap:12px;padding:13px 15px;background:#fff5f7;border:1px solid rgba(140,26,49,.1);border-radius:12px;margin-bottom:22px;}
+.v-logo-md{width:26px;height:26px;border-radius:50%;background:#a61a30;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:800;color:#fff;flex-shrink:0;}
+.v-score{font-size:22px;font-weight:700;color:#a61a30;letter-spacing:-.03em;}
+.v-label{font-size:11px;color:var(--sub);}
+.v-link{margin-left:auto;font-size:12px;color:var(--wine);text-decoration:none;font-weight:500;}
+.v-link:hover{text-decoration:underline;}
+
+/* SECTIONS */
+.sec{margin-bottom:22px;}
+.sec-title{font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--hint);margin-bottom:10px;padding-bottom:8px;border-bottom:1px solid var(--sep2);}
+.sec-text{font-size:14px;line-height:1.8;color:var(--text);}
+
+.info-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.info-cell{padding:12px 14px;background:var(--bg);border-radius:var(--r-sm);}
+.info-label{font-size:11px;color:var(--hint);font-weight:500;margin-bottom:3px;}
+.info-value{font-size:14px;color:var(--text);font-weight:600;}
+
+/* TASTING */
+.tasting-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px;}
+.tasting-cell{padding:10px 12px;background:var(--bg);border-radius:var(--r-sm);}
+.tasting-label{font-size:10px;color:var(--hint);font-weight:600;letter-spacing:.08em;text-transform:uppercase;margin-bottom:6px;}
+.tasting-pills{display:flex;flex-wrap:wrap;gap:4px;}
+.pill{padding:3px 8px;border-radius:20px;font-size:10px;font-weight:500;}
+.pill-color{background:#fff0f3;color:#8c1a31;border:1px solid rgba(140,26,49,.12);}
+.pill-aroma{background:#f0f7ff;color:#1a5c8c;border:1px solid rgba(26,92,140,.12);}
+.pill-taste{background:#f0faf4;color:#1a7a3c;border:1px solid rgba(26,122,60,.12);}
+.pill-finish{background:#fef8ed;color:#7a5c14;border:1px solid rgba(122,92,20,.12);}
+.str-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;}
+@media(max-width:499px){.str-grid{grid-template-columns:repeat(2,1fr);}}
+.str-item{padding:8px;background:var(--bg);border-radius:var(--r-sm);text-align:center;}
+.str-label{font-size:10px;color:var(--hint);font-weight:500;margin-bottom:6px;}
+.str-bar-wrap{height:5px;background:rgba(0,0,0,0.07);border-radius:3px;overflow:hidden;margin-bottom:4px;}
+.str-bar{height:100%;border-radius:3px;}
+.str-val{font-size:11px;font-weight:600;color:var(--sub);}
+
+/* DRINK WINDOW */
+.dw-meta{display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap;}
+.dw-item{padding:10px 12px;background:var(--bg);border-radius:var(--r-sm);flex:1;min-width:72px;}
+.dw-item-label{font-size:10px;color:var(--hint);font-weight:500;letter-spacing:.04em;margin-bottom:3px;}
+.dw-item-value{font-size:14px;font-weight:700;color:var(--text);letter-spacing:-.02em;}
+.dw-item-value.peak{color:var(--green);}
+.dw-item-value.cur{color:var(--wine);}
+.dw-track{height:10px;background:rgba(0,0,0,0.07);border-radius:5px;position:relative;overflow:visible;margin-bottom:8px;}
+.dw-fill{height:100%;background:linear-gradient(90deg,#e8d5da,#8c1a31);border-radius:5px;position:absolute;opacity:.25;}
+.dw-peak{height:100%;background:#8c1a31;border-radius:5px;position:absolute;opacity:.7;}
+.dw-now{position:absolute;top:50%;transform:translate(-50%,-50%);width:18px;height:18px;background:var(--wine);border:3px solid #fff;border-radius:50%;box-shadow:0 2px 6px rgba(140,26,49,.4);}
+.dw-labels{display:flex;justify-content:space-between;font-size:11px;color:var(--hint);}
+
+/* FOOD */
+.food-tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:4px;}
+.food-tag{padding:6px 12px;background:var(--bg);border-radius:20px;font-size:12px;color:var(--text);font-weight:500;transition:background .15s;}
+.food-tag:hover{background:var(--wine-bg);color:var(--wine);}
+
+/* COLLECT */
+.collect-row{display:flex;align-items:center;gap:16px;padding:14px;background:var(--bg);border-radius:var(--r-sm);}
+.collect-num{font-size:44px;font-weight:700;letter-spacing:-.04em;color:var(--wine);line-height:1;min-width:58px;}
+.collect-stars{font-size:15px;color:var(--wine);margin-bottom:3px;}
+.collect-tier{font-size:13px;font-weight:600;color:var(--text);}
+.collect-desc{font-size:11px;color:var(--sub);margin-top:2px;}
+
+/* LOADING / ERROR */
+.state-box{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:80px 20px;gap:16px;}
+.spinner{width:32px;height:32px;border:3px solid var(--sep);border-top-color:var(--wine);border-radius:50%;animation:spin .7s linear infinite;}
+
+@media(max-width:480px){
+  .page{padding:16px 12px 48px;}
+  .wine-title{font-size:19px;}
+  .info-grid{grid-template-columns:1fr;}
+  .tasting-grid{grid-template-columns:1fr;}
+}
+@keyframes spin{to{transform:rotate(360deg)}}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <a class="back-btn" href="index.html">
+    <svg width="8" height="14" viewBox="0 0 8 14" fill="none"><path d="M7 1L1 7L7 13" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    목록
+  </a>
+  <span class="topbar-title" id="topbarTitle">Wine Detail</span>
+</div>
+
+<div id="stateBox" class="state-box">
+  <div class="spinner"></div>
+</div>
+
+<div class="page" id="page" style="display:none">
+  <div class="detail-layout">
+    <div class="detail-photo-col">
+      <div class="detail-photo" id="detailPhoto"></div>
+    </div>
+    <div class="detail-content" id="detailContent"></div>
+  </div>
+</div>
+
+<script>
+const NOW=new Date().getFullYear();
+let WINE=null,ALL_WINES=[];
+
+function getTasted(){try{return JSON.parse(localStorage.getItem('wineTasted')||'{}')}catch(e){return{}}}
+function setTasted(obj){try{localStorage.setItem('wineTasted',JSON.stringify(obj))}catch(e){}}
+function formatDate(iso){if(!iso)return'';const[y,m,d]=iso.split('-');return`${y}.${m}.${d}`}
+
+function typeName(t){return{red:'레드',white:'화이트',sparkling:'스파클링'}[t]||t}
+function vTag(t){return t==='white'?'tag-w':t==='sparkling'?'tag-s':'tag-r'}
+function chipCls(t){return t==='white'?'chip-w':t==='sparkling'?'chip-s':'chip-r'}
+function ph(id){return`wines/${id}.jpg`}
+
+function drinkStatus(w){
+  if(NOW<w.df)return{t:`${w.df}년부터`,c:'wait'};
+  if(NOW>w.du)return{t:'음용기 경과',c:'expired'};
+  if(NOW>=w.dps&&NOW<=w.dpe)return{t:'지금 최적 🟢',c:'peak'};
+  return{t:`피크: ${w.dps}–${w.dpe}`,c:''}
+}
+
+function bsvg_lg(type){
+  const p={red:{b:'#e2c4cb',l:'#8c1a31'},white:{b:'#dfd7b0',l:'#7a5c14'},sparkling:{b:'#b0c4d8',l:'#1a5c8c'}}[type]||{b:'#ccc',l:'#666'};
+  return`<svg width="80" height="200" viewBox="0 0 40 100"><rect x="16" y="0" width="8" height="6" rx="2" fill="${p.l}" opacity=".5"/><rect x="15" y="5" width="10" height="20" rx="3" fill="${p.b}" opacity=".6"/><path d="M13 25 Q8 32 8 42 L8 82 Q8 92 20 92 Q32 92 32 82 L32 42 Q32 32 27 25 Z" fill="${p.b}" opacity=".55"/><rect x="12" y="50" width="16" height="20" rx="2" fill="${p.l}" opacity=".2"/></svg>`
+}
+
+function toggleTasted(){
+  const data=getTasted();
+  if(data[WINE.id]){delete data[WINE.id]}else{data[WINE.id]=new Date().toISOString().slice(0,10)}
+  setTasted(data);renderDetail();
+}
+
+function renderPhoto(){
+  const w=WINE;const src=ph(w.id);
+  document.getElementById('detailPhoto').innerHTML=`
+    <div class="photo-bg" style="background-image:url('${src}')"></div>
+    <img class="main-img" src="${src}" alt="${w.name_kr}" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+    <div class="photo-ph" style="display:none">${bsvg_lg(w.type)}</div>`;
+}
+
+function renderDetail(){
+  const w=WINE;
+  const tasted=getTasted();const isTasted=!!tasted[w.id];const tDate=tasted[w.id]||'';
+  const d=drinkStatus(w);const top=w.rank<=5;
+  const ts=w.du-w.df+2;
+  const pF=(((w.df-(w.df-1))/ts)*100).toFixed(1);
+  const pW=(((w.du-w.df)/ts)*100).toFixed(1);
+  const pP=(((w.dps-(w.df-1))/ts)*100).toFixed(1);
+  const pPW=(((w.dpe-w.dps)/ts)*100).toFixed(1);
+  const pN=Math.min(100,Math.max(0,((NOW-(w.df-1))/ts)*100)).toFixed(1);
+  const inD=NOW>=w.df&&NOW<=w.du;
+
+  // Update tasted btn text
+  const btn=document.getElementById('tastedBtn');
+  if(btn){
+    btn.className=`tasted-btn${isTasted?' done':''}`;
+    btn.innerHTML=isTasted?'✅ 마셨어요 (취소하기)':'🍷 마셨어요 체크';
+  }
+
+  // Update tasted banner
+  const banner=document.getElementById('tastedBanner');
+  if(banner){
+    banner.style.display=isTasted?'flex':'none';
+    banner.textContent=`✅ ${formatDate(tDate)} 음용`;
+  }
+
+  // Tasting notes HTML
+  const tastingHtml=w.tasting?`
+  <div class="sec">
+    <div class="sec-title">테이스팅 노트</div>
+    <div class="tasting-grid">
+      <div class="tasting-cell"><div class="tasting-label">🎨 색상</div><div class="tasting-pills">${w.tasting.color.map(x=>`<span class="pill pill-color">${x}</span>`).join('')}</div></div>
+      <div class="tasting-cell"><div class="tasting-label">👃 향 · 아로마</div><div class="tasting-pills">${w.tasting.aroma.map(x=>`<span class="pill pill-aroma">${x}</span>`).join('')}</div></div>
+      <div class="tasting-cell"><div class="tasting-label">👅 맛 · 팔라트</div><div class="tasting-pills">${w.tasting.taste.map(x=>`<span class="pill pill-taste">${x}</span>`).join('')}</div></div>
+      <div class="tasting-cell"><div class="tasting-label">✨ 피니시 · 여운</div><div class="tasting-pills">${w.tasting.finish.map(x=>`<span class="pill pill-finish">${x}</span>`).join('')}</div></div>
+    </div>
+    <div class="str-grid">
+      ${[{label:'바디',val:w.tasting.body,color:'#8c1a31'},{label:w.type==='sparkling'?'산도':'탄닌',val:w.type==='sparkling'?w.tasting.acidity:w.tasting.tannin,color:'#5a3e8c'},{label:'산도',val:w.tasting.acidity,color:'#1a5c8c'},{label:'알코올',val:w.tasting.alcohol,color:'#7a5c14'}]
+        .filter((_,i)=>!(w.type==='sparkling'&&i===1))
+        .map(s=>`<div class="str-item"><div class="str-label">${s.label}</div><div class="str-bar-wrap"><div class="str-bar" style="width:${s.val}%;background:linear-gradient(90deg,${s.color}33,${s.color}88)"></div></div><div class="str-val">${s.val>=80?'강함':s.val>=55?'중간':'가벼움'}</div></div>`).join('')}
+    </div>
+  </div>`:'';
+
+  document.getElementById('detailContent').innerHTML=`
+    <div class="type-row">
+      <span class="chip ${chipCls(w.type)}">${typeName(w.type)}</span>
+      <span class="tag ${vTag(w.type)}">${w.vintage||'NV'}</span>
+      <span class="rank-chip${top?' top':''}">${top?'★ ':''}#${w.rank} 소장가치</span>
+    </div>
+    <h1 class="wine-title">${w.name_kr}</h1>
+    <p class="wine-title-en">${w.name_en}</p>
+
+    <div class="tasted-banner" id="tastedBanner" style="display:${isTasted?'flex':'none'}">✅ ${formatDate(tDate)} 음용</div>
+
+    <button class="tasted-btn${isTasted?' done':''}" id="tastedBtn" onclick="toggleTasted()">
+      ${isTasted?'✅ 마셨어요 (취소하기)':'🍷 마셨어요 체크'}
+    </button>
+
+    <div class="vivino-card">
+      <div class="v-logo-md">V</div>
+      <div><div class="v-score">${w.vivino.toFixed(1)}</div><div class="v-label">Vivino 커뮤니티 평점 / 5.0</div></div>
+      <a href="${w.vu}" target="_blank" rel="noopener" class="v-link">Vivino →</a>
+    </div>
+
+    <div class="sec">
+      <div class="sec-title">생산 정보</div>
+      <div class="info-grid">
+        <div class="info-cell"><div class="info-label">생산지역</div><div class="info-value">${w.region}</div></div>
+        <div class="info-cell"><div class="info-label">포도 품종</div><div class="info-value">${w.grape}</div></div>
+      </div>
+    </div>
+
+    <div class="sec">
+      <div class="sec-title">와인 스토리</div>
+      <p class="sec-text">${w.story}</p>
+    </div>
+
+    ${tastingHtml}
+
+    <div class="sec">
+      <div class="sec-title">음용 시기</div>
+      <div class="dw-meta">
+        <div class="dw-item"><div class="dw-item-label">현재 상태</div><div class="dw-item-value ${d.c==='peak'?'cur':''}">${d.t}</div></div>
+        <div class="dw-item"><div class="dw-item-label">음용 가능</div><div class="dw-item-value">${w.df} – ${w.du}</div></div>
+        <div class="dw-item"><div class="dw-item-label">최적 피크</div><div class="dw-item-value peak">${w.dps} – ${w.dpe}</div></div>
+      </div>
+      <div class="dw-track">
+        <div class="dw-fill" style="left:${pF}%;width:${pW}%"></div>
+        <div class="dw-peak" style="left:${pP}%;width:${pPW}%"></div>
+        ${inD?`<div class="dw-now" style="left:${pN}%"></div>`:''}
+      </div>
+      <div class="dw-labels"><span>${w.df}</span><span>${w.dps}–${w.dpe} 피크</span><span>${w.du}</span></div>
+    </div>
+
+    <div class="sec">
+      <div class="sec-title">어울리는 음식</div>
+      <div class="food-tags">${w.food.map(f=>`<span class="food-tag">${f}</span>`).join('')}</div>
+    </div>
+
+    <div class="sec">
+      <div class="sec-title">소장 가치</div>
+      <div class="collect-row">
+        <div class="collect-num">${w.rank}</div>
+        <div>
+          <div class="collect-stars">${w.ct}</div>
+          <div class="collect-tier">컬렉션 ${w.rank}위 / ${ALL_WINES.length}병</div>
+          <div class="collect-desc">${w.cd}</div>
+        </div>
+      </div>
+    </div>`;
+}
+
+// INIT
+const params=new URLSearchParams(location.search);
+const wineId=parseInt(params.get('id'));
+
+if(!wineId){
+  document.getElementById('stateBox').innerHTML=`<div style="color:#8c1a31;font-size:14px;text-align:center">⚠️ 와인 ID가 없습니다.<br><a href="index.html" style="color:var(--wine)">목록으로 돌아가기</a></div>`;
+}else{
+  fetch('wines.json')
+    .then(r=>r.json())
+    .then(data=>{
+      ALL_WINES=data;
+      WINE=data.find(w=>w.id===wineId);
+      if(!WINE){
+        document.getElementById('stateBox').innerHTML=`<div style="color:#8c1a31;font-size:14px;text-align:center">⚠️ 와인을 찾을 수 없습니다 (id=${wineId}).<br><a href="index.html" style="color:var(--wine)">목록으로 돌아가기</a></div>`;
+        return;
+      }
+      document.title=`${WINE.name_kr} · Raina's Cellar`;
+      document.getElementById('topbarTitle').textContent=WINE.name_kr;
+      document.getElementById('stateBox').style.display='none';
+      document.getElementById('page').style.display='block';
+      renderPhoto();
+      renderDetail();
+    })
+    .catch(err=>{
+      document.getElementById('stateBox').innerHTML=`<div style="color:#8c1a31;font-size:14px;text-align:center">⚠️ 데이터를 불러올 수 없습니다.<br><small style="color:#aeaeb2">${err.message}</small></div>`;
+    });
+}
+</script>
+</body>
+</html>
