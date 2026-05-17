@@ -3,287 +3,122 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>My Wine Cellar</title>
+<title>Raina's Home Wine Cellar</title>
 <style>
 @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/variable/pretendardvariable-dynamic-subset.min.css');
-
 :root {
-  --bg:       #f2f2f7;
-  --card:     #ffffff;
-  --nav:      rgba(255,255,255,0.82);
-  --text:     #1d1d1f;
-  --sub:      #6e6e73;
-  --hint:     #aeaeb2;
-  --sep:      rgba(0,0,0,0.08);
-  --sep2:     rgba(0,0,0,0.05);
-  --wine:     #8c1a31;
-  --wine-bg:  #fdf0f2;
-  --gold:     #7a5c14;
-  --gold-bg:  #fef8ed;
-  --blue:     #1a5c8c;
-  --blue-bg:  #edf4fb;
-  --green:    #1a7a3c;
-  --r: 16px;
-  --r-sm: 10px;
-  --shadow: 0 2px 12px rgba(0,0,0,0.07), 0 1px 3px rgba(0,0,0,0.04);
-  --shadow-lg: 0 8px 40px rgba(0,0,0,0.13), 0 2px 8px rgba(0,0,0,0.06);
-  --font: 'Pretendard Variable','Pretendard',-apple-system,BlinkMacSystemFont,'SF Pro Display','SF Pro Text','Helvetica Neue','Malgun Gothic','맑은 고딕',Arial,sans-serif;
+  --bg:#f2f2f7;--card:#fff;--nav:rgba(255,255,255,0.85);
+  --text:#1d1d1f;--sub:#6e6e73;--hint:#aeaeb2;--sep:rgba(0,0,0,0.08);--sep2:rgba(0,0,0,0.05);
+  --wine:#8c1a31;--wine-bg:#fdf0f2;--gold:#7a5c14;--gold-bg:#fef8ed;
+  --blue:#1a5c8c;--blue-bg:#edf4fb;--green:#1a7a3c;
+  --r:16px;--r-sm:10px;
+  --shadow:0 2px 12px rgba(0,0,0,0.07),0 1px 3px rgba(0,0,0,0.04);
+  --shadow-lg:0 8px 40px rgba(0,0,0,0.13),0 2px 8px rgba(0,0,0,0.06);
+  --font:'Pretendard Variable','Pretendard',-apple-system,BlinkMacSystemFont,'SF Pro Display','Helvetica Neue','Malgun Gothic',Arial,sans-serif;
 }
-*,*::before,*::after { box-sizing:border-box; margin:0; padding:0; }
-html { scroll-behavior:smooth; }
-body { font-family:var(--font); background:var(--bg); color:var(--text); font-weight:400; min-height:100vh; -webkit-font-smoothing:antialiased; }
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html{scroll-behavior:smooth;}
+body{font-family:var(--font);background:var(--bg);color:var(--text);-webkit-font-smoothing:antialiased;}
 
-/* ── HEADER ── */
-.header { background:#fff; border-bottom:1px solid var(--sep); padding:48px 20px 40px; text-align:center; }
-.header-title { font-size:32px; font-weight:700; letter-spacing:-.025em; color:var(--text); line-height:1.1; margin-bottom:10px; }
-.header-update { font-size:12px; color:var(--hint); font-weight:400; letter-spacing:.04em; margin-bottom:32px; }
-.header-stats { display:inline-flex; background:var(--bg); border-radius:14px; overflow:hidden; border:1px solid var(--sep); max-width:100%; }
-.stat { padding:16px 24px; text-align:center; border-right:1px solid var(--sep); flex:1; }
-.stat:last-child { border-right:none; }
-.stat-value { font-size:26px; font-weight:700; color:var(--text); letter-spacing:-.03em; line-height:1; }
-.stat-label { font-size:10px; color:var(--hint); font-weight:500; letter-spacing:.06em; text-transform:uppercase; margin-top:4px; }
+.header{background:#fff;border-bottom:1px solid var(--sep);padding:48px 20px 40px;text-align:center;}
+.header-title{font-size:30px;font-weight:700;letter-spacing:-.025em;color:var(--text);line-height:1.1;margin-bottom:10px;}
+.header-update{font-size:12px;color:var(--hint);margin-bottom:28px;}
+.header-stats{display:inline-flex;background:var(--bg);border-radius:14px;overflow:hidden;border:1px solid var(--sep);max-width:100%;}
+.stat{padding:14px 22px;text-align:center;border-right:1px solid var(--sep);flex:1;}
+.stat:last-child{border-right:none;}
+.stat-value{font-size:24px;font-weight:700;color:var(--text);letter-spacing:-.03em;line-height:1;}
+.stat-label{font-size:10px;color:var(--hint);font-weight:500;letter-spacing:.06em;text-transform:uppercase;margin-top:4px;}
 
-/* ── NAV ── */
-.nav-wrap { position:sticky; top:0; z-index:100; background:var(--nav); backdrop-filter:saturate(180%) blur(20px); -webkit-backdrop-filter:saturate(180%) blur(20px); border-bottom:1px solid var(--sep); }
+.nav-wrap{position:sticky;top:0;z-index:100;background:var(--nav);backdrop-filter:saturate(180%) blur(20px);-webkit-backdrop-filter:saturate(180%) blur(20px);border-bottom:1px solid var(--sep);}
+.nav-row{max-width:1320px;margin:0 auto;padding:6px 16px;display:flex;align-items:center;gap:4px;flex-wrap:wrap;min-height:46px;}
+#countryNav{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;min-height:40px;padding:4px 16px;}
+#countryNav::-webkit-scrollbar{display:none;}
+.nav-row+.nav-row{border-top:1px solid var(--sep2);}
+.nav-tab{padding:5px 13px;font-size:13px;font-family:var(--font);font-weight:500;color:var(--sub);border:none;background:none;border-radius:20px;cursor:pointer;transition:all .18s;white-space:nowrap;flex-shrink:0;}
+.nav-tab:hover{background:rgba(0,0,0,0.05);color:var(--text);}
+.nav-tab.on{background:var(--text);color:#fff;}
+.nav-tab.on-c{background:#1a5c8c;color:#fff;}
+.nav-count{font-size:10px;opacity:.5;margin-left:2px;}
+.flag-text{display:inline;}
+.nav-sort{margin-left:auto;flex-shrink:0;padding:6px 26px 6px 12px;font-size:12px;font-family:var(--font);font-weight:500;color:var(--text);background:var(--bg);border:1px solid var(--sep);border-radius:20px;cursor:pointer;outline:none;appearance:none;-webkit-appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='7' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23aeaeb2' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 9px center;}
 
-/* Row 1: 종류탭 + 정렬 — 두 줄 허용 */
-.nav-row { max-width:1320px; margin:0 auto; padding:6px 16px; display:flex; align-items:center; gap:4px; flex-wrap:wrap; min-height:48px; }
-.nav-row + .nav-row { border-top:1px solid var(--sep2); padding:4px 16px; }
+.container{max-width:1320px;margin:0 auto;padding:24px 20px 16px;}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:20px;}
 
-/* 나라 행은 스크롤 */
-#countryNav { flex-wrap:nowrap; overflow-x:auto; scrollbar-width:none; min-height:40px; padding:4px 16px; }
-#countryNav::-webkit-scrollbar { display:none; }
+.card{background:var(--card);border-radius:var(--r);box-shadow:var(--shadow);overflow:hidden;cursor:pointer;transition:box-shadow .22s,transform .22s;display:flex;flex-direction:column;border:1px solid rgba(0,0,0,0.04);animation:fadeUp .35s ease both;text-decoration:none;color:inherit;}
+.card:hover{box-shadow:var(--shadow-lg);transform:translateY(-3px);}
+.card.tasted{opacity:.75;}
+.card.tasted .card-photo::after{content:'';position:absolute;inset:0;background:rgba(26,122,60,0.06);pointer-events:none;}
+.card-photo{position:relative;height:240px;overflow:hidden;background:#f0ece8;display:flex;align-items:center;justify-content:center;}
+.card-photo-bg{position:absolute;inset:-10px;background-size:cover;background-position:center;filter:blur(18px) brightness(.88) saturate(.7);z-index:0;transform:scale(1.15);}
+.card-photo img.main-img{position:relative;z-index:1;width:auto;height:100%;max-width:100%;max-height:240px;object-fit:contain;transition:transform .4s;}
+.card:hover .card-photo img.main-img{transform:scale(1.04);}
+.photo-ph{display:flex;align-items:center;justify-content:center;height:100%;width:100%;position:relative;z-index:1;}
+.photo-ph svg{opacity:.3;}
+.card-type-badge{position:absolute;top:12px;left:12px;padding:4px 10px;border-radius:20px;font-size:11px;font-weight:600;letter-spacing:.04em;backdrop-filter:blur(12px);z-index:2;}
+.badge-red{background:rgba(255,255,255,0.9);color:var(--wine);}
+.badge-white{background:rgba(255,255,255,0.9);color:var(--gold);}
+.badge-sparkling{background:rgba(255,255,255,0.9);color:var(--blue);}
+.card-rank{position:absolute;top:12px;right:12px;width:30px;height:30px;border-radius:50%;background:rgba(255,255,255,0.92);backdrop-filter:blur(12px);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:var(--sub);z-index:2;}
+.card-rank.top{background:var(--wine);color:#fff;}
+.tasted-ribbon{position:absolute;bottom:0;left:0;right:0;padding:7px 12px;background:linear-gradient(transparent,rgba(26,122,60,0.82));display:flex;align-items:center;gap:5px;z-index:2;}
+.tasted-ribbon-text{font-size:11px;font-weight:600;color:#fff;}
+.tasted-ribbon-date{font-size:10px;color:rgba(255,255,255,.82);margin-left:auto;}
+.card-body{padding:16px 18px;flex:1;}
+.card-name-kr{font-size:15px;font-weight:600;color:var(--text);line-height:1.35;margin-bottom:3px;letter-spacing:-.01em;}
+.card-name-en{font-size:12px;color:var(--hint);margin-bottom:12px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.card-tags{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:12px;}
+.tag{padding:3px 9px;border-radius:6px;font-size:11px;font-weight:500;background:var(--bg);color:var(--sub);}
+.tag-r{background:var(--wine-bg);color:var(--wine);font-weight:600;}
+.tag-w{background:var(--gold-bg);color:var(--gold);font-weight:600;}
+.tag-s{background:var(--blue-bg);color:var(--blue);font-weight:600;}
+.card-vivino{display:flex;align-items:center;gap:6px;}
+.v-logo-sm{width:18px;height:18px;border-radius:50%;background:#a61a30;display:flex;align-items:center;justify-content:center;font-size:8px;font-weight:800;color:#fff;flex-shrink:0;}
+.v-bar{flex:1;height:4px;background:rgba(0,0,0,0.07);border-radius:2px;overflow:hidden;max-width:60px;}
+.v-bar-fill{height:100%;background:linear-gradient(90deg,#a61a30,#e8606a);border-radius:2px;}
+.v-score-sm{font-size:13px;font-weight:700;color:#a61a30;letter-spacing:-.02em;}
+.card-footer{padding:12px 18px;border-top:1px solid var(--sep2);display:flex;align-items:center;justify-content:space-between;}
+.ds{font-size:12px;font-weight:500;color:var(--sub);}
+.ds.peak{color:var(--green);font-weight:600;}
+.ds.wait{color:var(--gold);}
+.ds.expired{color:var(--hint);}
+.card-arrow{font-size:16px;color:var(--hint);}
 
-.nav-tab { padding:5px 13px; font-size:13px; font-family:var(--font); font-weight:500; color:var(--sub); border:none; background:none; border-radius:20px; cursor:pointer; transition:all .18s ease; white-space:nowrap; flex-shrink:0; }
-.nav-tab:hover { background:rgba(0,0,0,0.05); color:var(--text); }
-.nav-tab.on { background:var(--text); color:#fff; }
-.nav-tab.on-country { background:#1a5c8c; color:#fff; }
-.nav-count { font-size:10px; opacity:.5; margin-left:2px; }
-.nav-sort { margin-left:auto; flex-shrink:0; padding:6px 26px 6px 12px; font-size:12px; font-family:var(--font); font-weight:500; color:var(--text); background:var(--bg); border:1px solid var(--sep); border-radius:20px; cursor:pointer; outline:none; appearance:none; -webkit-appearance:none; background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='7' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23aeaeb2' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E"); background-repeat:no-repeat; background-position:right 9px center; }
+.tasted-section{max-width:1320px;margin:0 auto;padding:0 20px 48px;}
+.tasted-header{display:flex;align-items:center;gap:10px;padding:20px 0 14px;border-top:2px solid #e8f5ee;}
+.tasted-title{font-size:16px;font-weight:700;color:#1a7a3c;}
+.tasted-count{font-size:12px;color:var(--sub);}
+.tasted-list{display:flex;flex-direction:column;gap:10px;}
+.tasted-item{background:#fff;border:1px solid #e0f0e8;border-radius:12px;display:flex;align-items:center;overflow:hidden;cursor:pointer;transition:box-shadow .18s,transform .18s;text-decoration:none;color:inherit;}
+.tasted-item:hover{box-shadow:0 4px 16px rgba(26,122,60,.12);transform:translateY(-1px);}
+.tasted-item-photo{width:72px;height:90px;flex-shrink:0;background:#f8f4f0;display:flex;align-items:center;justify-content:center;overflow:hidden;}
+.tasted-item-photo img{width:auto;height:100%;max-width:72px;object-fit:contain;padding:4px;}
+.tasted-item-body{padding:12px 16px;flex:1;min-width:0;}
+.tasted-item-name{font-size:14px;font-weight:600;color:#1d1d1f;margin-bottom:2px;}
+.tasted-item-en{font-size:11px;color:#aeaeb2;margin-bottom:6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.tasted-item-tags{display:flex;gap:5px;flex-wrap:wrap;}
+.tasted-item-right{padding:0 14px;text-align:right;flex-shrink:0;}
+.tasted-date-label{font-size:10px;color:#aeaeb2;}
+.tasted-date-val{font-size:13px;font-weight:600;color:#1a7a3c;margin-top:2px;white-space:nowrap;}
+.untaste-btn{margin-top:6px;padding:3px 8px;border-radius:10px;font-size:10px;border:1px solid #e0e0e0;background:#fff;color:#6e6e73;cursor:pointer;font-family:var(--font);}
 
-/* 나라 탭: 기본=국기+텍스트, 모바일=국기만 */
-.flag-text { display:inline; }
+.loading{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:80px 20px;gap:16px;}
+.loading-spinner{width:32px;height:32px;border:3px solid var(--sep);border-top-color:var(--wine);border-radius:50%;animation:spin .7s linear infinite;}
+.loading-text{font-size:14px;color:var(--hint);}
 
-/* ── TASTED ── */
-.card.tasted { opacity:0.75; }
-.card.tasted .card-photo::after { content:''; position:absolute; inset:0; background:rgba(26,122,60,0.06); pointer-events:none; }
-.tasted-ribbon { position:absolute; bottom:0; left:0; right:0; padding:7px 12px; background:linear-gradient(transparent,rgba(26,122,60,0.82)); display:flex; align-items:center; gap:5px; z-index:2; }
-.tasted-ribbon-text { font-size:11px; font-weight:600; color:#fff; }
-.tasted-ribbon-date { font-size:10px; color:rgba(255,255,255,0.82); margin-left:auto; }
-
-/* 마신 와인 섹션 */
-.tasted-section { max-width:1320px; margin:0 auto; padding:0 20px 40px; }
-.tasted-section-header { display:flex; align-items:center; gap:10px; padding:20px 0 14px; border-top:2px solid #e8f5ee; }
-.tasted-section-title { font-size:16px; font-weight:700; color:#1a7a3c; letter-spacing:-.01em; }
-.tasted-section-count { font-size:12px; color:#6e6e73; font-weight:500; }
-.tasted-list { display:flex; flex-direction:column; gap:10px; }
-.tasted-item { background:#fff; border:1px solid #e0f0e8; border-radius:12px; display:flex; align-items:center; overflow:hidden; cursor:pointer; transition:box-shadow .18s,transform .18s; }
-.tasted-item:hover { box-shadow:0 4px 16px rgba(26,122,60,.12); transform:translateY(-1px); }
-.tasted-item-photo { width:72px; height:90px; flex-shrink:0; overflow:hidden; background:#f8f4f0; display:flex; align-items:center; justify-content:center; }
-.tasted-item-photo img { width:auto; height:100%; max-width:72px; object-fit:contain; padding:4px; }
-.tasted-item-body { padding:12px 16px; flex:1; }
-.tasted-item-name { font-size:14px; font-weight:600; color:#1d1d1f; margin-bottom:2px; letter-spacing:-.01em; }
-.tasted-item-en { font-size:11px; color:#aeaeb2; margin-bottom:6px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
-.tasted-item-tags { display:flex; gap:5px; flex-wrap:wrap; }
-.tasted-item-date { margin-left:auto; padding:0 14px; text-align:right; flex-shrink:0; }
-.tasted-date-label { font-size:10px; color:#aeaeb2; }
-.tasted-date-val { font-size:13px; font-weight:600; color:#1a7a3c; margin-top:2px; white-space:nowrap; }
-
-/* ── GRID ── */
-.container { max-width:1320px; margin:0 auto; padding:24px 20px 16px; }
-.grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(280px,1fr)); gap:20px; }
-
-/* ── CARD ── */
-.card { background:var(--card); border-radius:var(--r); box-shadow:var(--shadow); overflow:hidden; cursor:pointer; transition:box-shadow .22s ease,transform .22s ease; display:flex; flex-direction:column; border:1px solid rgba(0,0,0,0.04); animation:fadeUp .35s ease both; }
-.card:hover { box-shadow:var(--shadow-lg); transform:translateY(-3px); }
-.card:active { transform:translateY(-1px); }
-
-.card-photo { position:relative; height:240px; overflow:hidden; background:#f0ece8; display:flex; align-items:center; justify-content:center; }
-.card-photo-bg { position:absolute; inset:-10px; background-size:cover; background-position:center; filter:blur(18px) brightness(0.88) saturate(0.7); z-index:0; transform:scale(1.15); }
-.card-photo img.main-img { position:relative; z-index:1; width:auto; height:100%; max-width:100%; max-height:240px; object-fit:contain; transition:transform .4s ease; display:block; }
-.card:hover .card-photo img.main-img { transform:scale(1.04); }
-.photo-ph { display:flex; flex-direction:column; align-items:center; justify-content:center; height:100%; width:100%; position:relative; z-index:1; }
-.photo-ph svg { opacity:.3; }
-
-.card-type-badge { position:absolute; top:12px; left:12px; padding:4px 10px; border-radius:20px; font-size:11px; font-weight:600; letter-spacing:.04em; backdrop-filter:blur(12px); -webkit-backdrop-filter:blur(12px); z-index:2; }
-.badge-red     { background:rgba(255,255,255,0.9); color:var(--wine); }
-.badge-white   { background:rgba(255,255,255,0.9); color:var(--gold); }
-.badge-sparkling { background:rgba(255,255,255,0.9); color:var(--blue); }
-
-.card-rank { position:absolute; top:12px; right:12px; width:30px; height:30px; border-radius:50%; background:rgba(255,255,255,0.92); backdrop-filter:blur(12px); display:flex; align-items:center; justify-content:center; font-size:10px; font-weight:700; color:var(--sub); z-index:2; }
-.card-rank.top { background:var(--wine); color:#fff; }
-
-.card-body { padding:16px 18px; flex:1; }
-.card-name-kr { font-size:15px; font-weight:600; color:var(--text); line-height:1.35; margin-bottom:3px; letter-spacing:-.01em; }
-.card-name-en { font-size:12px; color:var(--hint); margin-bottom:12px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
-.card-tags { display:flex; gap:5px; flex-wrap:wrap; margin-bottom:12px; }
-.tag { padding:3px 9px; border-radius:6px; font-size:11px; font-weight:500; background:var(--bg); color:var(--sub); }
-.tag-v { background:var(--wine-bg); color:var(--wine); font-weight:600; }
-.tag-vw { background:var(--gold-bg); color:var(--gold); font-weight:600; }
-.tag-vs { background:var(--blue-bg); color:var(--blue); font-weight:600; }
-
-.card-vivino { display:flex; align-items:center; gap:6px; }
-.v-logo-sm { width:18px; height:18px; border-radius:50%; background:#a61a30; display:flex; align-items:center; justify-content:center; font-size:8px; font-weight:800; color:#fff; flex-shrink:0; }
-.v-bar { flex:1; height:4px; background:rgba(0,0,0,0.07); border-radius:2px; overflow:hidden; max-width:60px; }
-.v-bar-fill { height:100%; background:linear-gradient(90deg,#a61a30,#e8606a); border-radius:2px; }
-.v-score-sm { font-size:13px; font-weight:700; color:#a61a30; letter-spacing:-.02em; }
-
-.card-footer { padding:12px 18px; border-top:1px solid var(--sep2); display:flex; align-items:center; justify-content:space-between; }
-.ds { font-size:12px; font-weight:500; color:var(--sub); }
-.ds.peak { color:var(--green); font-weight:600; }
-.ds.wait { color:var(--gold); }
-.ds.expired { color:var(--hint); }
-.card-arrow { font-size:16px; color:var(--hint); }
-
-/* ── MODAL ── */
-.overlay { position:fixed; inset:0; background:rgba(0,0,0,0.4); backdrop-filter:blur(8px); -webkit-backdrop-filter:blur(8px); z-index:200; display:none; align-items:flex-end; justify-content:center; }
-.overlay.open { display:flex; }
-@media(min-width:700px){ .overlay { align-items:center; padding:20px; } }
-
-/* 모달: 데스크탑 2열 (이미지 우측), 모바일 1열 */
-.modal { background:var(--card); border-radius:20px 20px 0 0; width:100%; max-width:860px; max-height:92vh; overflow-y:auto; box-shadow:var(--shadow-lg); overscroll-behavior:contain; scrollbar-width:thin; scrollbar-color:var(--sep) transparent; }
-@media(min-width:700px){ .modal { border-radius:20px; } }
-.modal::-webkit-scrollbar { width:4px; }
-.modal::-webkit-scrollbar-track { background:transparent; }
-.modal::-webkit-scrollbar-thumb { background:var(--sep); border-radius:2px; }
-
-/* 모달 내부 2열 레이아웃 */
-.modal-layout { display:flex; flex-direction:column; }
-@media(min-width:700px){
-  .modal-layout { flex-direction:row; align-items:flex-start; }
-  .modal-right-photo { width:240px; flex-shrink:0; position:sticky; top:0; padding:24px 20px 24px 0; }
-  .modal-right-photo img { width:100%; border-radius:14px; object-fit:contain; max-height:380px; background:#f0ece8; display:block; }
-  .modal-right-photo .modal-photo-ph-inline { width:100%; height:280px; background:#f0ece8; border-radius:14px; display:flex; align-items:center; justify-content:center; opacity:.3; }
-  .mc { flex:1; padding:24px 24px 24px 24px; min-width:0; }
-}
-
-/* 모바일: 상단 가로 이미지 없이 mc만 */
-.modal-top-photo { display:block; width:100%; height:220px; position:relative; overflow:hidden; background:#f0ece8; border-radius:20px 20px 0 0; }
-.modal-top-photo .photo-bg { position:absolute; inset:-10px; background-size:cover; background-position:center; filter:blur(16px) brightness(.85) saturate(.7); transform:scale(1.1); }
-.modal-top-photo img.modal-main-img { position:relative; z-index:1; height:100%; width:auto; max-width:100%; object-fit:contain; display:block; margin:0 auto; }
-.modal-top-photo .modal-photo-ph { display:flex; align-items:center; justify-content:center; height:100%; opacity:.3; position:relative; z-index:1; }
-.modal-right-photo { display:none; }
-@media(min-width:700px){
-  .modal-top-photo { display:none; }
-  .modal-right-photo { display:block; width:240px; flex-shrink:0; position:sticky; top:0; padding:24px 20px 24px 0; }
-  .modal-right-photo img { width:100%; border-radius:14px; object-fit:contain; max-height:380px; background:#f0ece8; display:block; }
-}
-
-.modal-close-btn { position:absolute; top:12px; right:12px; width:32px; height:32px; border-radius:50%; background:rgba(255,255,255,0.9); backdrop-filter:blur(8px); border:none; font-size:16px; color:var(--sub); cursor:pointer; display:flex; align-items:center; justify-content:center; box-shadow:0 2px 8px rgba(0,0,0,0.12); z-index:10; transition:all .15s; font-family:var(--font); }
-.modal-close-btn:hover { background:#fff; color:var(--text); }
-
-/* 모달 상단 닫기 (헤더 영역) */
-.modal-close-bar { display:flex; align-items:center; justify-content:space-between; padding:14px 20px; border-bottom:1px solid var(--sep2); }
-@media(min-width:700px){ .modal-close-bar { border-radius:20px 20px 0 0; } }
-.modal-close-bar-title { font-size:13px; font-weight:600; color:var(--sub); letter-spacing:.04em; }
-
-.mc { padding:20px 24px 28px; }
-.mc-type-row { display:flex; align-items:center; gap:8px; margin-bottom:10px; flex-wrap:wrap; }
-.mc-chip { padding:4px 10px; border-radius:20px; font-size:11px; font-weight:600; letter-spacing:.04em; }
-.chip-r { background:var(--wine-bg); color:var(--wine); }
-.chip-w { background:var(--gold-bg); color:var(--gold); }
-.chip-s { background:var(--blue-bg); color:var(--blue); }
-.mc-rank { padding:4px 10px; border-radius:20px; font-size:11px; font-weight:600; background:var(--bg); color:var(--sub); }
-.mc-rank.top { background:var(--wine); color:#fff; }
-
-.mc-title { font-size:22px; font-weight:700; letter-spacing:-.02em; color:var(--text); line-height:1.2; margin-bottom:4px; }
-.mc-title-en { font-size:13px; color:var(--hint); margin-bottom:18px; }
-
-.mc-vivino { display:flex; align-items:center; gap:12px; padding:12px 14px; background:#fff5f7; border:1px solid rgba(140,26,49,.1); border-radius:12px; margin-bottom:20px; }
-.v-logo-md { width:26px; height:26px; border-radius:50%; background:#a61a30; display:flex; align-items:center; justify-content:center; font-size:10px; font-weight:800; color:#fff; flex-shrink:0; }
-.mc-v-score { font-size:22px; font-weight:700; color:#a61a30; letter-spacing:-.03em; }
-.mc-v-label { font-size:11px; color:var(--sub); }
-.mc-v-link { margin-left:auto; font-size:12px; color:var(--wine); text-decoration:none; font-weight:500; }
-.mc-v-link:hover { text-decoration:underline; }
-
-.msec { margin-bottom:22px; }
-.msec-title { font-size:11px; font-weight:600; letter-spacing:.08em; text-transform:uppercase; color:var(--hint); margin-bottom:10px; padding-bottom:8px; border-bottom:1px solid var(--sep2); }
-.msec-text { font-size:14px; line-height:1.78; color:var(--text); }
-
-.info-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
-.info-cell { padding:12px 14px; background:var(--bg); border-radius:var(--r-sm); }
-.info-label { font-size:11px; color:var(--hint); font-weight:500; margin-bottom:3px; }
-.info-value { font-size:14px; color:var(--text); font-weight:600; }
-
-.dw-meta { display:flex; gap:8px; margin-bottom:14px; flex-wrap:wrap; }
-.dw-item { padding:10px 12px; background:var(--bg); border-radius:var(--r-sm); flex:1; min-width:72px; }
-.dw-item-label { font-size:10px; color:var(--hint); font-weight:500; letter-spacing:.04em; margin-bottom:3px; }
-.dw-item-value { font-size:14px; font-weight:700; color:var(--text); letter-spacing:-.02em; }
-.dw-item-value.peak { color:var(--green); }
-.dw-item-value.cur  { color:var(--wine); }
-
-.dw-track { height:10px; background:rgba(0,0,0,0.07); border-radius:5px; position:relative; overflow:visible; margin-bottom:8px; }
-.dw-fill { height:100%; background:linear-gradient(90deg,#e8d5da,#8c1a31); border-radius:5px; position:absolute; opacity:.25; }
-.dw-peak { height:100%; background:#8c1a31; border-radius:5px; position:absolute; opacity:.7; }
-.dw-now  { position:absolute; top:50%; transform:translate(-50%,-50%); width:18px; height:18px; background:var(--wine); border:3px solid #fff; border-radius:50%; box-shadow:0 2px 6px rgba(140,26,49,.4); }
-.dw-labels { display:flex; justify-content:space-between; font-size:11px; color:var(--hint); }
-
-.food-tags { display:flex; flex-wrap:wrap; gap:6px; margin-top:4px; }
-.food-tag { padding:6px 12px; background:var(--bg); border-radius:20px; font-size:12px; color:var(--text); font-weight:500; transition:background .15s; }
-.food-tag:hover { background:var(--wine-bg); color:var(--wine); }
-
-.collect-row { display:flex; align-items:center; gap:16px; padding:14px; background:var(--bg); border-radius:var(--r-sm); }
-.collect-num { font-size:44px; font-weight:700; letter-spacing:-.04em; color:var(--wine); line-height:1; min-width:58px; }
-.collect-stars { font-size:15px; color:var(--wine); margin-bottom:3px; }
-.collect-tier  { font-size:13px; font-weight:600; color:var(--text); }
-.collect-desc  { font-size:11px; color:var(--sub); margin-top:2px; }
-
-/* ── TASTING ── */
-.tasting-grid { display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:12px; }
-.tasting-cell { padding:10px 12px; background:var(--bg); border-radius:var(--r-sm); }
-.tasting-label { font-size:10px; color:var(--hint); font-weight:600; letter-spacing:.08em; text-transform:uppercase; margin-bottom:6px; }
-.tasting-pills { display:flex; flex-wrap:wrap; gap:4px; }
-.tasting-pill { padding:3px 8px; border-radius:20px; font-size:10px; font-weight:500; }
-.pill-color  { background:#fff0f3; color:#8c1a31; border:1px solid rgba(140,26,49,.12); }
-.pill-aroma  { background:#f0f7ff; color:#1a5c8c; border:1px solid rgba(26,92,140,.12); }
-.pill-taste  { background:#f0faf4; color:#1a7a3c; border:1px solid rgba(26,122,60,.12); }
-.pill-finish { background:#fef8ed; color:#7a5c14; border:1px solid rgba(122,92,20,.12); }
-.tasting-structure { display:grid; grid-template-columns:repeat(4,1fr); gap:6px; }
-@media(max-width:699px){ .tasting-structure { grid-template-columns:repeat(2,1fr); } }
-.str-item { padding:8px; background:var(--bg); border-radius:var(--r-sm); text-align:center; }
-.str-label { font-size:10px; color:var(--hint); font-weight:500; letter-spacing:.04em; margin-bottom:6px; }
-.str-bar-wrap { height:5px; background:rgba(0,0,0,0.07); border-radius:3px; overflow:hidden; margin-bottom:4px; }
-.str-bar { height:100%; border-radius:3px; }
-.str-val { font-size:11px; font-weight:600; color:var(--sub); }
-
-/* ── RESPONSIVE ── */
-@media(max-width:700px){
-  /* 나라 탭: 국기만 */
-  .flag-text { display:none; }
-  #countryNav .nav-tab { padding:5px 8px; font-size:16px; }
-}
+@media(max-width:700px){.flag-text{display:none;}#countryNav .nav-tab{padding:5px 8px;font-size:16px;}}
 @media(max-width:768px){
-  .header { padding:32px 16px 28px; }
-  .header-title { font-size:24px; }
-  .header-update { font-size:11px; margin-bottom:24px; }
-  .header-stats { width:100%; }
-  .stat { flex:1; min-width:60px; padding:12px 8px; }
-  .stat-value { font-size:20px; }
-  .stat-label { font-size:9px; }
-  .grid { grid-template-columns:1fr 1fr; gap:10px; }
-  .container { padding:16px 12px 16px; }
-  .tasted-section { padding:0 12px 32px; }
-  .mc-title { font-size:18px; }
-  .info-grid { grid-template-columns:1fr 1fr; }
-  .tasting-grid { grid-template-columns:1fr 1fr; }
-  .mc-type-row button { font-size:11px !important; padding:4px 10px !important; }
+  .header{padding:32px 16px 28px;}.header-title{font-size:22px;}.header-update{font-size:11px;margin-bottom:20px;}
+  .header-stats{width:100%;}.stat{flex:1;min-width:60px;padding:12px 8px;}.stat-value{font-size:20px;}.stat-label{font-size:9px;}
+  .grid{grid-template-columns:1fr 1fr;gap:10px;}.container{padding:16px 12px 16px;}.tasted-section{padding:0 12px 32px;}
 }
 @media(max-width:480px){
-  .header-title { font-size:20px; }
-  .grid { grid-template-columns:1fr 1fr; gap:8px; }
-  .card-photo { height:180px; }
-  .card-name-kr { font-size:13px; }
-  .card-body { padding:10px 12px; }
-  .nav-tab { font-size:12px; padding:5px 9px; }
-  .info-grid { grid-template-columns:1fr; }
+  .grid{grid-template-columns:1fr 1fr;gap:8px;}.card-photo{height:180px;}.card-name-kr{font-size:13px;}
+  .card-body{padding:10px 12px;}.nav-tab{font-size:12px;padding:5px 9px;}.header-title{font-size:19px;}
 }
-@media(max-width:360px){
-  .grid { grid-template-columns:1fr; }
-  .header-title { font-size:18px; }
-}
-
-/* ── ANIMATION ── */
-@keyframes fadeUp { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:translateY(0)} }
+@media(max-width:360px){.grid{grid-template-columns:1fr;}.header-title{font-size:17px;}}
+@keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+@keyframes spin{to{transform:rotate(360deg)}}
 </style>
 </head>
 <body>
@@ -292,20 +127,19 @@ body { font-family:var(--font); background:var(--bg); color:var(--text); font-we
   <h1 class="header-title">Raina's Home Wine Cellar</h1>
   <div class="header-update">업데이트 기준일 · 2026.05.17</div>
   <div class="header-stats">
-    <div class="stat"><div class="stat-value">26</div><div class="stat-label">Bottles</div></div>
-    <div class="stat"><div class="stat-value" id="sr">—</div><div class="stat-label">Red</div></div>
-    <div class="stat"><div class="stat-value" id="sw">—</div><div class="stat-label">White</div></div>
-    <div class="stat"><div class="stat-value" id="ss">—</div><div class="stat-label">Sparkling</div></div>
+    <div class="stat"><div class="stat-value" id="sTotal">—</div><div class="stat-label">Bottles</div></div>
+    <div class="stat"><div class="stat-value" id="sRed">—</div><div class="stat-label">Red</div></div>
+    <div class="stat"><div class="stat-value" id="sWhite">—</div><div class="stat-label">White</div></div>
+    <div class="stat"><div class="stat-value" id="sSpark">—</div><div class="stat-label">Sparkling</div></div>
   </div>
 </div>
 
 <div class="nav-wrap">
-  <!-- Row 1: 종류 필터 -->
   <div class="nav-row" id="typeNav">
-    <button class="nav-tab on" data-f="all">전체 <span class="nav-count"></span></button>
-    <button class="nav-tab" data-f="red">레드 <span class="nav-count"></span></button>
-    <button class="nav-tab" data-f="white">화이트 <span class="nav-count"></span></button>
-    <button class="nav-tab" data-f="sparkling">스파클링 <span class="nav-count"></span></button>
+    <button class="nav-tab on" data-f="all">전체 <span class="nav-count" id="cAll"></span></button>
+    <button class="nav-tab" data-f="red">레드 <span class="nav-count" id="cRed"></span></button>
+    <button class="nav-tab" data-f="white">화이트 <span class="nav-count" id="cWhite"></span></button>
+    <button class="nav-tab" data-f="sparkling">스파클링 <span class="nav-count" id="cSpark"></span></button>
     <select class="nav-sort" id="sortSel">
       <option value="rank">소장가치순</option>
       <option value="vivino">Vivino 평점순</option>
@@ -315,9 +149,8 @@ body { font-family:var(--font); background:var(--bg); color:var(--text); font-we
       <option value="region">생산지역순</option>
     </select>
   </div>
-  <!-- Row 2: 나라 필터 (모바일=국기만) -->
   <div class="nav-row" id="countryNav">
-    <button class="nav-tab on-country" data-c="all">🌍 <span class="flag-text">전체</span></button>
+    <button class="nav-tab on-c" data-c="all">🌍 <span class="flag-text">전체</span></button>
     <button class="nav-tab" data-c="USA">🇺🇸 <span class="flag-text">미국</span></button>
     <button class="nav-tab" data-c="France">🇫🇷 <span class="flag-text">프랑스</span></button>
     <button class="nav-tab" data-c="Italy">🇮🇹 <span class="flag-text">이탈리아</span></button>
@@ -331,217 +164,90 @@ body { font-family:var(--font); background:var(--bg); color:var(--text); font-we
 </div>
 
 <div class="container">
-  <div class="grid" id="grid"></div>
+  <div id="loading" class="loading">
+    <div class="loading-spinner"></div>
+    <div class="loading-text">와인 목록 불러오는 중...</div>
+  </div>
+  <div class="grid" id="grid" style="display:none"></div>
 </div>
+
 <div class="tasted-section" id="tastedSection" style="display:none">
-  <div class="tasted-section-header">
+  <div class="tasted-header">
     <span style="font-size:20px">🍷</span>
-    <span class="tasted-section-title">마신 와인 기록</span>
-    <span class="tasted-section-count" id="tastedSectionCount"></span>
+    <span class="tasted-title">마신 와인 기록</span>
+    <span class="tasted-count" id="tastedCount"></span>
   </div>
   <div class="tasted-list" id="tastedList"></div>
 </div>
 
-<div class="overlay" id="overlay" onclick="ocl(event)">
-  <div class="modal" id="modal">
-    <div class="modal-close-bar">
-      <span class="modal-close-bar-title">WINE DETAIL</span>
-      <button class="modal-close-btn" onclick="cl()">✕</button>
-    </div>
-    <div class="modal-layout">
-      <div class="modal-top-photo" id="mPhoto"></div>
-      <div class="modal-right-photo" id="mPhotoDesktop"></div>
-      <div class="mc" id="mContent"></div>
-    </div>
-  </div>
-</div>
-
 <script>
-// ════════════════════════════════════════════
-//  사진: GitHub 저장소의 wines/ 폴더에
-//  1.jpg ~ 24.jpg 로 넣으시면 자동 반영됩니다
-// ════════════════════════════════════════════
-const WINES=[
-  {id:1,name_en:"Buccella Cabernet Sauvignon",name_kr:"부켈라 카베르네 소비뇽",vintage:2018,region:"USA · Napa Valley",grape:"Cabernet Sauvignon",type:"red",vivino:4.5,vu:"https://www.vivino.com/en/buccella-cabernet-sauvignon/w/100715",
-   tasting:{color:["짙은 루비","보랏빛 테두리"],aroma:["블랙커런트","블랙베리","모카","삼나무","바이올렛"],taste:["풍부한 과실미","벨벳 탄닌","균형 잡힌 산도","미네랄"],finish:["길고 우아한 여운","다크초콜릿","스파이스"],body:85,tannin:80,acidity:60,alcohol:88},
-   story:"부켈라는 나파 밸리에서도 가장 희귀하고 소량 생산되는 와이너리 중 하나입니다. 전통적인 와인 명가의 이름을 딴 이 와이너리는 오직 단일 포도밭에서 수확한 카베르네 소비뇽만을 사용하며, 연간 생산량이 극소량에 불과해 구하기가 매우 어렵습니다. 2018 빈티지는 나파 밸리의 훌륭한 해로, 완벽한 생장 시즌을 거쳐 카시스, 블랙베리, 삼나무, 모카의 복합적인 향을 갖춘 와인이 탄생했습니다. 풍부하고 벨벳 같은 탄닌이 우아한 피니시와 이어지는 이 와인은 앞으로 10년 이상 발전할 잠재력을 가지고 있습니다.",
-   food:["프라임 립","숙성 스테이크","양갈비","트러플 요리"],df:2023,dps:2027,dpe:2035,du:2040,rank:4,ct:"★★★★★",cd:"희귀 한정 생산, 높은 소장 가치"},
-  {id:2,name_en:"Dana Estates VASO Cabernet Sauvignon",name_kr:"다나 이스테이츠 바소 카베르네 소비뇽",vintage:2019,region:"USA · Napa Valley",grape:"Cabernet Sauvignon",type:"red",vivino:4.2,vu:"https://www.vivino.com/en/dana-estates-vaso-cabernet-sauvignon/w/1516693",
-   tasting:{color:["진한 루비","검붉은 자주빛"],aroma:["블랙커런트","제비꽃","흑연","카카오닙스","시가박스"],taste:["크리미한 탄닌","생동감 있는 산도","검은 과실의 집중도","미네랄리티"],finish:["긴 여운","삼나무","토스티한 오크"],body:82,tannin:78,acidity:65,alcohol:82},
-   story:"다나 이스테이츠는 한국계 와인 생산자 H. W. 리(이재현)가 2004년 설립한 부티크 와이너리로, 나파 밸리의 Pritchard Hill에 위치합니다. VASO는 스페인어로 '잔'을 의미하며, 최고의 포도밭에서 엄선된 포도만을 사용합니다. 2019 빈티지는 서늘한 기후 덕분에 자연적으로 산도가 유지되어, 블랙커런트, 제비꽃, 흑연의 향이 두드러집니다.",
-   food:["한우 채끝 스테이크","버섯 리조또","양 등심","숙성 치즈"],df:2023,dps:2027,dpe:2033,du:2038,rank:5,ct:"★★★★★",cd:"한국계 프리미엄 나파 부티크 와이너리"},
-  {id:3,name_en:"Nickel & Nickel Branding Iron Cabernet Sauvignon",name_kr:"니켈 & 니켈 브랜딩 아이언",vintage:2021,region:"USA · Napa Valley",grape:"Cabernet Sauvignon",type:"red",vivino:4.0,vu:"https://www.vivino.com/en/nickel-nickel-branding-iron-vineyard-cabernet-sauvignon/w/5792",
-   tasting:{color:["진한 루비","검보라빛"],aroma:["흑자두","모카","삼나무","약한 민트","바닐라"],taste:["부드럽고 우아한 탄닌","세밀한 구조감","신선한 산도"],finish:["긴 여운","다크초콜릿","스파이시한 오크"],body:80,tannin:75,acidity:65,alcohol:80},
-   story:"니켈 & 니켈은 나파 밸리 단일 포도밭(Single Vineyard) 카베르네 소비뇽의 선구자입니다. 브랜딩 아이언(Branding Iron) 포도밭은 오크빌(Oakville) 지역에 위치하며, 서부 나파 특유의 화산성 토양에서 자란 포도로 빚어집니다. 테루아의 순수한 표현을 추구하는 싱글 빈야드 와인의 정수입니다.",
-   food:["그릴드 포터하우스","로스트 덕","숙성 체더 치즈","버섯 타르트"],df:2024,dps:2027,dpe:2032,du:2036,rank:8,ct:"★★★★",cd:"나파 싱글 빈야드, 한정 생산"},
-  {id:4,name_en:"Torcia Red",name_kr:"토르시아 레드",vintage:2019,region:"USA · Napa Valley",grape:"Merlot & Cabernet Sauvignon Blend",type:"red",vivino:3.8,vu:"https://www.vivino.com/",
-   tasting:{color:["밝은 루비","선명한 붉은빛"],aroma:["붉은 자두","체리","가죽","모카","약한 허브"],taste:["부드러운 탄닌","중간 바디","과실의 풍성함","밸런스 좋은 산도"],finish:["중간 여운","바닐라","가볍고 깔끔한 피니시"],body:65,tannin:58,acidity:62,alcohol:75},
-   story:"토르시아(Torcia)는 이탈리아어로 '횃불'을 의미합니다. 나파 밸리의 메를로와 카베르네 소비뇽을 블렌딩하여 만든 이 와인은 보르도 스타일의 우아함과 나파 밸리의 풍성함을 동시에 담고 있습니다. 붉은 과일과 모카, 가죽의 복합적인 향이 매력적입니다.",
-   food:["파스타 볼로네제","리조또","쇠고기 스튜","피자"],df:2022,dps:2025,dpe:2028,du:2031,rank:12,ct:"★★★",cd:"나파 블렌드 데일리 드링커"},
-  {id:5,name_en:"Penfolds Champagne Cuvée Brut",name_kr:"펜폴즈 샴페인 뀌베 브뤼",vintage:null,region:"France · Champagne (×Thiénot)",grape:"Pinot Noir, Pinot Meunier & Chardonnay",type:"sparkling",vivino:3.9,vu:"https://www.vivino.com/",
-   tasting:{color:["옅은 황금빛","가는 버블"],aroma:["청사과","레몬","브리오슈","흰 꽃","아카시아"],taste:["신선하고 크리미한 질감","섬세한 기포","밝은 산도","과실의 생기"],finish:["깔끔하고 상쾌한 여운","미네랄","시트러스 피니시"],body:45,tannin:0,acidity:78,alcohol:55},
-   story:"호주의 와인 명가 펜폴즈(Penfolds)가 프랑스 샹파뉴 띠에노(Thiénot)와의 협업으로 선보이는 스파클링 와인입니다. 전통적인 샴페인 제조 방식을 따라 피노 누아, 피노 뫼니에, 샤르도네를 블렌딩했습니다. 섬세한 기포와 함께 사과, 시트러스, 브리오슈의 향이 어우러집니다.",
-   food:["굴","캐비아","스시","가벼운 카나페","딸기와 크림"],df:2024,dps:2024,dpe:2027,du:2028,rank:19,ct:"★★★",cd:"호주 명가 × 프랑스 협업 스파클링"},
-  {id:6,name_en:"El Enemigo Malbec",name_kr:"엘 에네미고 말백",vintage:2022,region:"Argentina · Mendoza",grape:"Malbec",type:"red",vivino:4.4,vu:"https://www.vivino.com/en/el-enemigo-malbec/w/1185195",
-   tasting:{color:["불투명한 자주빛","인크처럼 짙은 퍼플"],aroma:["짙은 자두","제비꽃","다크초콜릿","가죽","블루베리"],taste:["풍성한 바디","부드럽고 벨벳 같은 탄닌","잘 익은 과실의 달콤함","산도와의 균형"],finish:["길고 진한 여운","초콜릿","담배","스파이시"],body:88,tannin:75,acidity:62,alcohol:85},
-   story:"'적'을 의미하는 엘 에네미고(El Enemigo)는 아르헨티나 멘도사의 혁신적인 와이너리입니다. 안데스 산맥 기슭 고지대(해발 1,000m 이상)의 포도밭에서 자란 말백은 자연 발효와 최소한의 개입으로 양조됩니다. 짙은 자두, 제비꽃, 다크 초콜릿, 가죽의 향이 풍부합니다.",
-   food:["아사도(아르헨티나 바비큐)","양고기 구이","엠파나다","매콤한 소고기 요리"],df:2024,dps:2025,dpe:2029,du:2032,rank:15,ct:"★★★",cd:"아르헨티나 프리미엄 말백"},
-  {id:7,name_en:"Piper-Heidsieck Rare 2013",name_kr:"파이퍼 하이직 레어",vintage:2013,region:"France · Champagne",grape:"Chardonnay",type:"sparkling",vivino:4.5,vu:"https://www.vivino.com/en/piper-heidsieck-rare-cuvee-reservee-brut-champagne/w/1610391",
-   tasting:{color:["밝은 황금빛","섬세하고 지속적인 기포"],aroma:["레몬 타르트","흰 꽃","헤이즐넛","토스트","화이트 피치"],taste:["크리미하고 우아한 질감","생생한 산도","미네랄리티","복합적인 깊이"],finish:["매우 길고 고급스러운 여운","시트러스 제스트","구운 아몬드"],body:55,tannin:0,acidity:85,alcohol:58},
-   story:"파이퍼 하이직의 프레스티지 퀴베인 'Rare(레어)'는 오직 최고의 빈티지에만 생산되는 특별한 샴페인입니다. 2013 빈티지는 서늘하고 섬세한 해로, 샤르도네의 미네랄리티와 산도가 완벽하게 표현되었습니다. 레몬 타르트, 흰 꽃, 헤이즐넛, 미묘한 토스트의 향이 층층이 전개됩니다.",
-   food:["랍스터","관자 구이","화이트 트러플 파스타","고급 해산물 요리"],df:2020,dps:2025,dpe:2032,du:2035,rank:3,ct:"★★★★★",cd:"최고 빈티지에만 생산되는 프레스티지 퀴베"},
-  {id:8,name_en:"Krug Grande Cuvée 171ème Édition",name_kr:"크루그 그랑 퀴베 171 에디션",vintage:null,region:"France · Champagne",grape:"Pinot Noir, Chardonnay & Meunier",type:"sparkling",vivino:4.5,vu:"https://www.vivino.com/en/krug-grande-cuvee/w/2763",
-   tasting:{color:["깊은 황금빛","매우 섬세한 기포의 지속성"],aroma:["구운 빵","헤이즐넛","시트러스 젤리","꿀","말린 과일","샤르퀴트리"],taste:["크리미하고 풍성한 질감","풍부하고 복합적인 미각","높은 산도와의 완벽한 균형"],finish:["무한히 지속되는 듯한 여운","토스티","미네랄","망고와 시트러스"],body:70,tannin:0,acidity:88,alcohol:68},
-   story:"크루그(Krug)의 그랑 퀴베는 샴페인의 절대 아이콘입니다. 171번째 에디션은 무려 10년 이상 다른 시기에 수확된 여러 빈티지의 와인을 블렌딩하는 독보적인 멀티-빈티지 방식으로 양조됩니다. 구운 빵, 헤이즐넛, 시트러스, 과일 젤리, 꿀의 향이 끝없이 펼쳐집니다.",
-   food:["오마카세","캐비아와 블리니","조개찜","탁월한 미식 경험의 시작"],df:2024,dps:2025,dpe:2033,du:2036,rank:1,ct:"★★★★★",cd:"샴페인 아이콘, 최고의 소장 가치"},
-  {id:9,name_en:"Solaris Chikumagawa Cabernet Sauvignon",name_kr:"솔라리스 치쿠마가와 카베르네 소비뇽",vintage:2022,region:"Japan · Nagano",grape:"Cabernet Sauvignon",type:"red",vivino:3.8,vu:"https://www.vivino.com/",
-   tasting:{color:["밝은 루비","선명한 붉은 빛"],aroma:["붉은 과일","허브","약한 후추","라즈베리","스파이스"],taste:["섬세하고 우아한 탄닌","가벼운 바디","신선한 산도","일본 특유의 절제미"],finish:["가볍고 깔끔한 여운","허브","미네랄"],body:55,tannin:52,acidity:72,alcohol:62},
-   story:"일본 나가노(長野)의 치쿠마강(千曲川) 유역에서 생산되는 솔라리스는 일본 와인의 새로운 가능성을 보여주는 와인입니다. 해발 700m 이상의 고지대 포도밭에서 일교차가 큰 기후 덕분에 향기롭고 우아한 카베르네 소비뇽이 탄생합니다.",
-   food:["철판 와규","오리고기","가볍게 양념한 갈비","일본식 스테이크"],df:2024,dps:2026,dpe:2030,du:2033,rank:20,ct:"★★★",cd:"희귀 일본산 카베르네 소비뇽"},
-  {id:10,name_en:"Kamiju Muscat Bailey A",name_kr:"카미주 머스캣 베일리 에이",vintage:2023,region:"Japan · Yamanashi",grape:"Muscat Bailey A",type:"red",vivino:3.8,vu:"https://www.vivino.com/",
-   tasting:{color:["밝고 투명한 루비","생동감 있는 붉은빛"],aroma:["신선한 포도","산딸기","체리","장미","약한 허브"],taste:["가벼운 바디","부드러운 탄닌","포도 특유의 달콤한 과실미","신선한 산도"],finish:["짧고 상쾌한 여운","붉은 베리","가볍고 경쾌한 피니시"],body:42,tannin:38,acidity:68,alcohol:48},
-   story:"카미주(カミジュ)는 야마나시(山梨)에 위치한 일본 와이너리로, 일본 고유 품종인 머스캣 베일리 에이(MBA)를 사용합니다. 특유의 포도 향과 산딸기, 체리의 향이 특징적입니다. 가볍게 즐기거나 일식 요리와 함께하기에 좋습니다.",
-   food:["참치 스테이크","오리 가슴살","된장 소스 요리","가벼운 육류"],df:2024,dps:2024,dpe:2026,du:2027,rank:23,ct:"★★",cd:"일본 토착 품종, 지금 바로 즐기기"},
-  {id:11,name_en:"SALDO Red Blend",name_kr:"살도 레드 블렌드",vintage:2021,region:"USA · California",grape:"Petite Sirah",type:"red",vivino:4.1,vu:"https://www.vivino.com/en/saldo-red-blend/w/1381697",
-   tasting:{color:["불투명한 인크 퍼플","거의 검은 자주빛"],aroma:["블랙베리","블루베리","다크초콜릿","바닐라","커피"],taste:["풀바디","굵고 단단한 탄닌","진하고 파워풀한 과실미","높은 알코올감"],finish:["길고 진한 여운","다크모카","후추","토스티한 오크"],body:95,tannin:90,acidity:58,alcohol:92},
-   story:"살도(SALDO)는 '더 프리즈너(The Prisoner)' 와이너리의 포트폴리오 중 하나로, 페티트 시라(Petite Sirah)를 중심으로 한 파워풀한 레드 블렌드입니다. 블랙베리, 블루베리, 다크 초콜릿, 바닐라의 진한 향이 폭발적으로 펼쳐집니다.",
-   food:["BBQ 폭립","짧은 등심 브레이즈","진한 소스의 파스타","숙성 체다 치즈"],df:2023,dps:2025,dpe:2029,du:2032,rank:13,ct:"★★★",cd:"캘리포니아 파워풀 레드 블렌드"},
-  {id:12,name_en:"Tolaini Chianti Classico",name_kr:"톨라이니 끼안티 클라시코",vintage:2022,region:"Italy · Tuscany",grape:"Sangiovese",type:"red",vivino:4.0,vu:"https://www.vivino.com/en/tolaini-chianti-classico/w/14618",
-   tasting:{color:["밝은 가넷","붉은 오렌지 테두리"],aroma:["체리","붉은 자두","말린 허브","흙냄새","가죽","장미"],taste:["산도와 탄닌의 균형","중간 바디","생생하고 活발한 구조","음식 친화적"],finish:["중간 길이의 여운","사워체리","약한 쓴맛","미네랄"],body:62,tannin:68,acidity:80,alcohol:70},
-   story:"토스카나의 심장 끼안티 클라시코(Chianti Classico) DOCG 지역에서 생산되는 톨라이니는 전통과 현대를 조화롭게 담아낸 와인입니다. 체리, 붉은 자두, 말린 허브, 흙냄새, 가죽의 전형적인 끼안티 향을 완벽하게 구현합니다.",
-   food:["비스테카 알라 피오렌티나","토마토 파스타","라자냐","이탈리안 살루미"],df:2024,dps:2026,dpe:2030,du:2033,rank:16,ct:"★★★",cd:"끼안티 클라시코 DOCG, 음식친화적"},
-  {id:13,name_en:"Terrunyo Carménère",name_kr:"떼루뇨 카르메네르",vintage:2019,region:"Chile · Colchagua Valley",grape:"Carménère",type:"red",vivino:4.0,vu:"https://www.vivino.com/en/terrunyo-carmenere/w/12370",
-   tasting:{color:["짙은 루비","보라빛 테두리"],aroma:["붉은 피망","검은 과일","담배","향신료","인도 잉크"],taste:["중간~풀바디","부드러운 탄닌","독특한 초록 허브의 뉘앙스","잘 익은 과실"],finish:["긴 여운","연기","스파이스","그린 페퍼","지속적인 미네랄"],body:72,tannin:68,acidity:65,alcohol:75},
-   story:"떼루뇨(Terrunyo)는 꼰차 이 또로(Concha y Toro)의 테루아 탐구 시리즈입니다. 칠레의 상징적인 품종 카르메네르는 원래 프랑스 보르도의 품종이었으나 19세기 필록세라로 멸종 위기에 처했다가 칠레에서 기적적으로 살아남았습니다.",
-   food:["그릴드 채끝","칠리 파스타","멕시칸 타코","검은콩 요리"],df:2022,dps:2025,dpe:2028,du:2031,rank:14,ct:"★★★",cd:"칠레 대표 품종, 희귀 카르메네르"},
-  {id:14,name_en:"Château Talbot",name_kr:"샤또 딸보",vintage:2021,region:"France · Saint-Julien",grape:"Cabernet Sauvignon Blend",type:"red",vivino:4.2,vu:"https://www.vivino.com/en/chateau-talbot/w/2512",
-   tasting:{color:["진한 루비","검붉은 자주빛"],aroma:["카시스","삼나무","담배","흑연","제비꽃","블랙커런트 잎"],taste:["우아하고 균형 잡힌 탄닌","클래식한 보르도 구조","중간~풀바디","긴 숙성 잠재력"],finish:["매우 긴 여운","흑연","흙","미네랄","향신료"],body:78,tannin:82,acidity:72,alcohol:78},
-   story:"샤또 딸보(Château Talbot)는 1855년 메독 분류에서 4등급 그랑 크뤼(Grand Cru Classé)에 선정된 유서 깊은 보르도 샤또입니다. 2021 빈티지는 클래식한 보르도 스타일로 카시스, 삼나무, 담배, 흑연의 향이 두드러지며, 20년 이상 발전할 장기 숙성 잠재력을 갖추고 있습니다.",
-   food:["소 등심 로스트","양고기 요리","트러플 버섯 리조또","숙성 콩테 치즈"],df:2025,dps:2030,dpe:2040,du:2045,rank:9,ct:"★★★★",cd:"보르도 4등급 그랑 크뤼, 장기 숙성형"},
-  {id:15,name_en:"Beringer Private Reserve Cabernet Sauvignon",name_kr:"베린저 프라이빗 리저브 카베르네 소비뇽",vintage:2016,region:"USA · Napa Valley",grape:"Cabernet Sauvignon",type:"red",vivino:4.3,vu:"https://www.vivino.com/en/beringer-private-reserve-cabernet-sauvignon/w/2464",
-   tasting:{color:["짙은 루비","보랏빛을 띤 자주"],aroma:["카시스","블랙베리","바닐라","삼나무","초콜릿","체리 잼"],taste:["풍성하고 크리미한 탄닌","나파 특유의 풍부한 과실미","균형 잡힌 산도","풀바디"],finish:["길고 우아한 여운","카카오","달콤한 스파이스","오크"],body:85,tannin:78,acidity:65,alcohol:85},
-   story:"베린저(Beringer)는 1876년 설립된 나파 밸리 최고의 역사를 자랑하는 와이너리입니다. 2016 빈티지는 나파의 훌륭한 해 중 하나로, 카시스, 블랙베리, 초콜릿, 삼나무, 바닐라의 풍성한 향이 조화를 이룹니다. 현재 음용 최적기에 들어서고 있습니다.",
-   food:["드라이 에이징 립아이","오소부코","소 안심 구이","숙성 에담 치즈"],df:2022,dps:2026,dpe:2035,du:2040,rank:6,ct:"★★★★★",cd:"나파 최고 명가 프리미엄 라인"},
-  {id:16,name_en:"Robert Mondavi Maestro",name_kr:"로버트 몬다비 마에스트로",vintage:2018,region:"USA · Napa Valley",grape:"Cabernet Sauvignon Blend",type:"red",vivino:4.1,vu:"https://www.vivino.com/en/robert-mondavi-to-kalon-estate-maestro/w/1198011",
-   tasting:{color:["진한 루비","검보라빛 깊이"],aroma:["블랙커런트","모카","흑연","향신료","삼나무","카카오"],taste:["복합적이고 층층이 전개되는 맛","풀바디","실크 같은 탄닌","긴 숙성 잠재력"],finish:["매우 길고 복합적인 여운","다크 베리","흙","미네랄"],body:82,tannin:76,acidity:68,alcohol:82},
-   story:"로버트 몬다비(Robert Mondavi)는 나파 밸리 와인 르네상스의 선구자입니다. 마에스트로는 카베르네 소비뇽을 중심으로 보르도 5대 품종을 모두 블렌딩한 완벽한 조화와 복합성을 자랑합니다.",
-   food:["소 등심 웰링턴","오리 가슴살","야채 테린","미슐랭 정찬"],df:2023,dps:2027,dpe:2033,du:2038,rank:7,ct:"★★★★",cd:"나파 선구자의 걸작 보르도 블렌드"},
-  {id:17,name_en:"Tommasi Amarone della Valpolicella Classico",name_kr:"토마시 아마로네 델라 발폴리첼라",vintage:2020,region:"Italy · Veneto",grape:"Corvina",type:"red",vivino:4.3,vu:"https://www.vivino.com/en/tommasi-amarone-della-valpolicella-classico/w/7103",
-   tasting:{color:["매우 짙은 가넷","불투명한 깊이"],aroma:["건포도","다크초콜릿","커피","가죽","체리 잼","말린 무화과"],taste:["풀~매우 풀바디","묵직한 탄닌","높은 알코올(14.5%+)","건조 과실의 압도적인 농도"],finish:["매우 길고 강렬한 여운","다크초콜릿","가죽","타닉한 드라이 피니시"],body:98,tannin:92,acidity:65,alcohol:95},
-   story:"아마로네(Amarone)는 이탈리아 베네토 지방의 발폴리첼라에서 코르비나 등의 포도를 수개월간 건조시켜 농축한 포도즙으로 만드는 독특한 와인입니다. 토마시(Tommasi)는 1902년부터 대를 이어온 아마로네의 명가입니다. 최소 10년 이상 숙성 후 진면목이 드러납니다.",
-   food:["브레이즈 쇠고기 뺨살","오소부코","숙성 파르미지아노","진한 초콜릿 디저트"],df:2027,dps:2033,dpe:2045,du:2050,rank:10,ct:"★★★★",cd:"아마로네 명가, 장기 숙성 필수"},
-  {id:18,name_en:"Dom Pérignon",name_kr:"돔 페리뇽",vintage:2013,region:"France · Champagne",grape:"Pinot Noir & Chardonnay Blend",type:"sparkling",vivino:4.5,vu:"https://www.vivino.com/en/dom-perignon-brut-champagne/w/86684",
-   tasting:{color:["밝고 깊은 황금빛","매우 섬세한 기포"],aroma:["밀크초콜릿","아몬드","화이트 피치","레몬","미네랄","흰 꽃"],taste:["크리미하고 긴장감 있는 질감","생생한 산도와 완벽한 균형","복합적이고 우아한 미감"],finish:["매우 길고 순수한 여운","미네랄","레몬 제스트","살짝 짠맛의 미네랄리티"],body:65,tannin:0,acidity:90,alcohol:65},
-   story:"샴페인의 전설 돔 페리뇽(Dom Pérignon)은 모엣 에 샹동의 프레스티지 퀴베로, 오직 최고의 단일 빈티지에만 생산됩니다. 2013 빈티지는 James Suckling 98pt, Wine Spectator 96pt를 받았습니다. 밀크 초콜릿, 아몬드, 화이트 피치, 레몬의 복합적인 향이 섬세하게 전개됩니다.",
-   food:["오마카세 초밥","생굴과 레몬","화이트 아스파라거스","랍스터 테르미도르"],df:2020,dps:2025,dpe:2035,du:2040,rank:2,ct:"★★★★★",cd:"샴페인의 전설, 단일 최고 빈티지"},
-  {id:19,name_en:"Eternal 8 Chenin Blanc",name_kr:"이터널 에잇 슈냉 블랑",vintage:2025,region:"South Africa · Stellenbosch",grape:"Chenin Blanc",type:"white",vivino:3.8,vu:"https://www.vivino.com/",
-   tasting:{color:["밝은 레몬 황금빛","은은한 초록빛"],aroma:["황도","멜론","아카시아 꽃","꿀","바닐라","열대 과실"],taste:["풍부한 과실미와 신선한 산도의 균형","중간 바디","부드럽고 라운드한 질감"],finish:["중간 길이의 여운","꿀","살구","상쾌한 미네랄"],body:55,tannin:0,acidity:72,alcohol:60},
-   story:"남아프리카 스텔렌보쉬(Stellenbosch)의 이터널 에잇은 슈냉 블랑(Chenin Blanc)의 본고장인 남아프리카의 테루아를 담은 와인입니다. 2025 최신 빈티지로 황도, 멜론, 꽃향기, 약간의 꿀과 바닐라의 향이 상큼하게 어우러집니다.",
-   food:["매운 태국 음식","미역국","어패류 파스타","프레시 치즈"],df:2025,dps:2025,dpe:2027,du:2029,rank:22,ct:"★★",cd:"신선한 화이트, 지금 즐기기 최적"},
-  {id:20,name_en:"Cinquanta Collezione +7 (1)",name_kr:"신퀀타 꼴레지오네 +7 (1번)",vintage:2019,region:"Italy · Puglia",grape:"Primitivo & Negroamaro Blend",type:"red",vivino:4.0,vu:"https://www.vivino.com/",
-   tasting:{color:["매우 짙은 루비","불투명한 가넷"],aroma:["블랙베리 잼","말린 무화과","다크초콜릿","향신료","담배"],taste:["풍성하고 관능적인 과실미","부드러운 탄닌","높은 당도에서 오는 바디감"],finish:["길고 따뜻한 여운","초콜릿","커피","지중해 향신료"],body:88,tannin:72,acidity:58,alcohol:88},
-   story:"이탈리아 남부 풀리아(Puglia) 지방의 신퀀타 꼴레지오네 +7은 풀리아를 대표하는 두 품종 프리미티보(Primitivo)와 네그로아마로(Negroamaro)의 블렌드입니다. 블랙베리 잼, 말린 무화과, 초콜릿, 향신료의 진하고 관능적인 향이 특징입니다.",
-   food:["오레키에테 파스타","이탈리안 소시지","그릴드 양고기","올리브 요리"],df:2022,dps:2025,dpe:2028,du:2031,rank:17,ct:"★★★",cd:"이탈리아 남부 풀리아 블렌드"},
-  {id:21,name_en:"Cinquanta Collezione +7 (2)",name_kr:"신퀀타 꼴레지오네 +7 (2번)",vintage:2019,region:"Italy · Puglia",grape:"Primitivo & Negroamaro Blend",type:"red",vivino:4.0,vu:"https://www.vivino.com/",
-   tasting:{color:["매우 짙은 루비","불투명한 가넷"],aroma:["블랙베리 잼","말린 무화과","다크초콜릿","향신료","담배"],taste:["풍성하고 관능적인 과실미","부드러운 탄닌","높은 당도에서 오는 바디감"],finish:["길고 따뜻한 여운","초콜릿","커피","지중해 향신료"],body:88,tannin:72,acidity:58,alcohol:88},
-   story:"이탈리아 남부 풀리아(Puglia) 지방의 신퀀타 꼴레지오네 +7 동일 와인 2번째 보틀입니다. 프리미티보와 네그로아마로의 블렌드로 블랙베리 잼, 말린 무화과, 초콜릿, 향신료의 진한 향이 특징입니다.",
-   food:["오레키에테 파스타","이탈리안 소시지","그릴드 양고기","올리브 요리"],df:2022,dps:2025,dpe:2028,du:2031,rank:18,ct:"★★★",cd:"이탈리아 남부 풀리아 블렌드"},
-  {id:22,name_en:"Rapaura Springs Classic Sauvignon Blanc",name_kr:"라파우라 스프링스 소비뇽 블랑",vintage:2024,region:"New Zealand · Marlborough",grape:"Sauvignon Blanc",type:"white",vivino:3.9,vu:"https://www.vivino.com/en/rapaura-springs-classic-sauvignon-blanc/w/1207337",award:"WineOrbit 93+pts ★★★★★",
-   tasting:{color:["매우 밝은 연노랑","초록빛 반사"],aroma:["자몽","패션프루트","구스베리","잔디","라임","흰 꽃"],taste:["생생하고 폭발적인 산도","가볍고 청량한 바디","열대 과실과 허브의 조화"],finish:["상쾌하고 깔끔한 여운","시트러스","자갈 미네랄"],body:38,tannin:0,acidity:92,alcohol:52},
-   story:"뉴질랜드 말보로(Marlborough)는 세계에서 가장 생동감 넘치는 소비뇽 블랑의 고향입니다. 라파우라 스프링스는 말보로의 자갈이 많은 라파우라 지역에서 생산되며, 이 지역 특유의 미네랄리티를 잘 담아냅니다. WineOrbit 93+ 포인트를 수상한 검증된 품질입니다.",
-   food:["굴","아스파라거스","생선 세비체","닭고기 레몬 버터 구이","샐러드"],df:2024,dps:2024,dpe:2026,du:2028,rank:24,ct:"★★",cd:"NZ 말보로 소비뇽, WineOrbit 93+"},
-  {id:23,name_en:"Penfolds Lot. 518 Spirited Wine with Baijiu",name_kr:"펜폴즈 로트 518 바이주",vintage:null,region:"Australia · South Australia",grape:"Shiraz",type:"red",vivino:4.2,vu:"https://www.vivino.com/en/penfolds-lot-518-spirited-wine-with-baijiu/w/7740624",
-   tasting:{color:["매우 짙은 루비","거의 불투명"],aroma:["블랙베리","후추","스파이스","바이주 특유의 사탕수수향","향신료","훈연"],taste:["와인과 증류주가 결합된 독특한 복합성","묵직하고 강렬한 바디","알코올(21.5%)의 따뜻한 감촉"],finish:["길고 강렬한 여운","중국 향신료","스모키","달콤한 알코올"],body:95,tannin:75,acidity:52,alcohol:98},
-   story:"펜폴즈 로트 518은 와인과 중국 전통 백주(바이주, 白酒)를 결합한 세계 최초의 혁신적인 시도입니다. 호주 쉬라즈 와인에 마오타이로 유명한 귀주성의 소주를 더해 독특한 풍미를 만들어냈습니다. 알코올 도수 21.5%의 강렬하고 독창적인 경험입니다.",
-   food:["베이징 덕","마라 샹궈","숙성 치즈","대담한 아시안 퓨전 요리"],df:2024,dps:2024,dpe:2028,du:2030,rank:11,ct:"★★★★",cd:"와인+바이주 세계 최초 혁신, 희귀 아이템"},
-  {id:24,name_en:"Southern Ocean Sauvignon Blanc",name_kr:"서던 오션 소비뇽 블랑",vintage:2021,region:"South Africa · Western Cape",grape:"Sauvignon Blanc",type:"white",vivino:3.7,vu:"https://www.vivino.com/",
-   tasting:{color:["밝은 연노랑","초록빛 하이라이트"],aroma:["자몽","레몬그라스","허브","녹색 피망","라임","미네랄"],taste:["신선하고 경쾌한 산도","가볍고 드라이한 바디","대서양 해풍의 미네랄리티"],finish:["짧고 상쾌한 여운","시트러스","허브","소금기 있는 미네랄"],body:40,tannin:0,acidity:85,alcohol:50},
-   story:"남아프리카 웨스턴 케이프(Western Cape)의 서던 오션은 대서양의 시원한 해풍의 영향을 받아 생생한 산도와 신선함이 살아있는 소비뇽 블랑입니다. 자몽, 레몬그라스, 허브, 미네랄의 향이 상쾌하게 펼쳐집니다.",
-   food:["새우 레몬 버터","굴","그릴드 생선","토마토 모차렐라 샐러드"],df:2022,dps:2023,dpe:2025,du:2026,rank:23,ct:"★★",cd:"남아공 화이트, 지금 바로 음용 권장"},
-  {id:25,name_en:"Eternal Eight Chenin Blanc 2023",name_kr:"이터널 에잇 슈냉 블랑 2023",vintage:2023,region:"South Africa · Stellenbosch",grape:"Chenin Blanc",type:"white",vivino:3.9,vu:"https://www.vivino.com/",
-   tasting:{color:["깊은 황금빛","초록빛 반사","2025보다 깊은 색"],aroma:["잘 익은 황도","망고","아카시아 꿀","바닐라","버터스카치","구운 사과"],taste:["2년 숙성의 풍성함","크리미하고 라운드한 질감","산도와 과실미의 균형","중간~풀바디"],finish:["길어진 여운","꿀","살구","버터 토스트","미네랄"],body:62,tannin:0,acidity:70,alcohol:63},
-   story:"이터널 에잇(Eternal Eight)의 2023 슈냉 블랑은 2025 빈티지보다 2년 더 숙성된 버전으로, 남아프리카 스텔렌보쉬의 테루아가 더욱 깊이 표현됩니다. 슈냉 블랑은 남아공에서 가장 많이 재배되는 품종으로, 이 와인은 신선한 과실미에서 풍성한 꿀과 버터스카치로 발전한 복합성을 보여줍니다. 레이블의 천사 이미지는 '우리를 나누는 것보다 우리를 하나로 묶는 것이 더 위대하다'는 철학을 담고 있습니다. 현재 음용 최적기에 있으며, 2025 빈티지와 함께 버티컬 테이스팅을 즐기기에도 좋습니다.",
-   food:["크림 파스타","꿀 드레싱 샐러드","구운 닭고기","소프트 치즈","게장"],df:2024,dps:2025,dpe:2027,du:2029,rank:21,ct:"★★★",cd:"2023 빈티지, 2025와 버티컬 테이스팅 추천"},
-  {id:26,name_en:"Le Cupole di Trinoro",name_kr:"레 쿠폴레 디 트리노로",vintage:2021,region:"Italy · Tuscany, Val d'Orcia",grape:"Cabernet Franc, Merlot, Cabernet Sauvignon, Petit Verdot",type:"red",vivino:4.2,vu:"https://www.vivino.com/en/le-cupole-di-trinoro/w/4534",
-   tasting:{color:["깊고 진한 루비","보랏빛 테두리"],aroma:["카시스","블랙베리","제비꽃","담배","미네랄","가죽"],taste:["우아하고 실크 같은 탄닌","중간~풀바디","생동감 있는 산도","보르도 스타일의 정제된 구조"],finish:["길고 미네랄한 여운","흑연","삼나무","향신료","우아한 드라이 피니시"],body:78,tannin:74,acidity:72,alcohol:80},
-   story:"레 쿠폴레 디 트리노로(Le Cupole di Trinoro)는 토스카나 Val d'Orcia의 컬트 와이너리 테누타 디 트리노로(Tenuta di Trinoro)의 세컨드 와인입니다. 안드레아 프란체티(Andrea Franchetti)가 설립한 이 와이너리는 보르도 품종—특히 카베르네 프랑을 중심으로—을 토스카나의 극단적인 환경에서 재배하여 독창적인 스타일을 만들어냅니다. '쿠폴레(Cupole)'는 이탈리아어로 '돔(Dome)'을 의미하며, 피렌체 두오모의 웅장함에서 영감을 받았습니다. 2021 빈티지는 토스카나의 균형 잡힌 해로 카시스, 제비꽃, 담배, 미네랄의 복합적인 향이 우아하게 전개됩니다. 수량이 제한되고 세컨드 와인임에도 불구하고 세계적으로 인정받는 품질로 소장 가치가 높습니다.",
-   food:["비스테카 알라 피오렌티나","양고기 안심","트러플 리조또","숙성 페코리노","그릴드 포르치니"],df:2023,dps:2026,dpe:2032,du:2037,rank:7,ct:"★★★★",cd:"토스카나 컬트 와이너리 테누타 디 트리노로 세컨드 와인"},
-];
-
 const NOW=new Date().getFullYear();
-const TL={red:"레드",white:"화이트",sparkling:"스파클링"};
-const TB={red:"badge-red",white:"badge-white",sparkling:"badge-sparkling"};
-const CC={red:"chip-r",white:"chip-w",sparkling:"chip-s"};
+let WINES=[],af='all',ac='all';
 
-// ── TASTED: localStorage ──
-function getTasted(){
-  try{ return JSON.parse(localStorage.getItem('wineTasted')||'{}'); }
-  catch(e){ return {}; }
-}
-function setTasted(obj){
-  try{ localStorage.setItem('wineTasted', JSON.stringify(obj)); }
-  catch(e){}
-}
-function toggleTasted(id, e){
+function getTasted(){try{return JSON.parse(localStorage.getItem('wineTasted')||'{}')}catch(e){return{}}}
+function setTasted(obj){try{localStorage.setItem('wineTasted',JSON.stringify(obj))}catch(e){}}
+function formatDate(iso){if(!iso)return'';const[y,m,d]=iso.split('-');return`${y}.${m}.${d}`}
+function toggleTasted(id,e){
   e.stopPropagation();
   const data=getTasted();
-  if(data[id]){ delete data[id]; }
-  else{ data[id]=new Date().toISOString().slice(0,10); }
-  setTasted(data);
-  rg(); updateCounts();
-}
-function formatDate(iso){
-  if(!iso) return '';
-  const [y,m,d]=iso.split('-');
-  return `${y}.${m}.${d}`;
+  if(data[id]){delete data[id]}else{data[id]=new Date().toISOString().slice(0,10)}
+  setTasted(data);render();updateStats();
 }
 
-function ph(id){return`wines/${id}.jpg`;}
-
-function ds(w){
-  if(NOW<w.df) return{t:`${w.df}년부터 오픈`,c:"wait"};
-  if(NOW>w.du) return{t:"음용기 경과",c:"expired"};
-  if(NOW>=w.dps&&NOW<=w.dpe) return{t:"지금 최적 🟢",c:"peak"};
-  return{t:`피크: ${w.dps}–${w.dpe}`,c:""};
+function vTag(t){return t==='white'?'tag-w':t==='sparkling'?'tag-s':'tag-r'}
+function typeName(t){return{red:'레드',white:'화이트',sparkling:'스파클링'}[t]||t}
+function badgeCls(t){return{red:'badge-red',white:'badge-white',sparkling:'badge-sparkling'}[t]||''}
+function ph(id){return`wines/${id}.jpg`}
+function drinkStatus(w){
+  if(NOW<w.df)return{t:`${w.df}년부터`,c:'wait'};
+  if(NOW>w.du)return{t:'음용기 경과',c:'expired'};
+  if(NOW>=w.dps&&NOW<=w.dpe)return{t:'지금 최적 🟢',c:'peak'};
+  return{t:`피크: ${w.dps}–${w.dpe}`,c:''}
 }
-
 function dnd(w){
   if(NOW>=w.dps&&NOW<=w.dpe)return 0;
-  return Math.min(Math.abs(NOW-w.dps),Math.abs(NOW-w.dpe));
+  return Math.min(Math.abs(NOW-w.dps),Math.abs(NOW-w.dpe))
 }
-
-// SVG bottle placeholder
 function bsvg(type){
-  const p={red:{b:"#e2c4cb",l:"#8c1a31"},white:{b:"#dfd7b0",l:"#7a5c14"},sparkling:{b:"#b0c4d8",l:"#1a5c8c"}}[type]||{b:"#ccc",l:"#666"};
-  return`<svg width="52" height="130" viewBox="0 0 40 100" xmlns="http://www.w3.org/2000/svg"><rect x="16" y="0" width="8" height="6" rx="2" fill="${p.l}" opacity=".5"/><rect x="15" y="5" width="10" height="20" rx="3" fill="${p.b}" opacity=".6"/><path d="M13 25 Q8 32 8 42 L8 82 Q8 92 20 92 Q32 92 32 82 L32 42 Q32 32 27 25 Z" fill="${p.b}" opacity=".55"/><rect x="12" y="50" width="16" height="20" rx="2" fill="${p.l}" opacity=".2"/><path d="M11 38 Q9 42 9 50 L10 50 Q10 42 12 38Z" fill="rgba(255,255,255,.2)"/></svg>`;
-}
-function bsvg_lg(type){
-  const p={red:{b:"#e2c4cb",l:"#8c1a31"},white:{b:"#dfd7b0",l:"#7a5c14"},sparkling:{b:"#b0c4d8",l:"#1a5c8c"}}[type]||{b:"#ccc",l:"#666"};
-  return`<svg width="80" height="200" viewBox="0 0 40 100" xmlns="http://www.w3.org/2000/svg"><rect x="16" y="0" width="8" height="6" rx="2" fill="${p.l}" opacity=".5"/><rect x="15" y="5" width="10" height="20" rx="3" fill="${p.b}" opacity=".6"/><path d="M13 25 Q8 32 8 42 L8 82 Q8 92 20 92 Q32 92 32 82 L32 42 Q32 32 27 25 Z" fill="${p.b}" opacity=".55"/><rect x="12" y="50" width="16" height="20" rx="2" fill="${p.l}" opacity=".2"/><path d="M11 38 Q9 42 9 50 L10 50 Q10 42 12 38Z" fill="rgba(255,255,255,.2)"/></svg>`;
+  const p={red:{b:'#e2c4cb',l:'#8c1a31'},white:{b:'#dfd7b0',l:'#7a5c14'},sparkling:{b:'#b0c4d8',l:'#1a5c8c'}}[type]||{b:'#ccc',l:'#666'};
+  return`<svg width="52" height="130" viewBox="0 0 40 100"><rect x="16" y="0" width="8" height="6" rx="2" fill="${p.l}" opacity=".5"/><rect x="15" y="5" width="10" height="20" rx="3" fill="${p.b}" opacity=".6"/><path d="M13 25 Q8 32 8 42 L8 82 Q8 92 20 92 Q32 92 32 82 L32 42 Q32 32 27 25 Z" fill="${p.b}" opacity=".55"/><rect x="12" y="50" width="16" height="20" rx="2" fill="${p.l}" opacity=".2"/></svg>`
 }
 
-// RENDER CARD
-function rc(w,i){
-  const d=ds(w); const top=w.rank<=5;
+function getList(){
+  const s=document.getElementById('sortSel').value;
+  let arr=[...WINES];
+  if(af!=='all')arr=arr.filter(w=>w.type===af);
+  if(ac!=='all')arr=arr.filter(w=>w.country===ac);
+  return arr.sort((a,b)=>{
+    if(s==='rank')return a.rank-b.rank;
+    if(s==='vivino')return b.vivino-a.vivino;
+    if(s==='vd')return(b.vintage||0)-(a.vintage||0);
+    if(s==='va')return(a.vintage||9999)-(b.vintage||9999);
+    if(s==='now')return dnd(a)-dnd(b);
+    if(s==='region')return a.region.localeCompare(b.region);
+    return 0;
+  });
+}
+
+function renderCard(w,i){
+  const d=drinkStatus(w);const top=w.rank<=5;
   const pct=((w.vivino/5)*100).toFixed(0);
-  const vTag=w.type==="white"?"tag-vw":w.type==="sparkling"?"tag-vs":"tag-v";
-  const tasted=getTasted();
-  const isTasted=!!tasted[w.id]; const tDate=tasted[w.id]||'';
+  const tasted=getTasted();const isTasted=!!tasted[w.id];const tDate=tasted[w.id]||'';
   const src=ph(w.id);
-  return`<div class="card${isTasted?' tasted':''}" style="animation-delay:${i*.04}s" onclick="om(${w.id})">
+  return`<a class="card${isTasted?' tasted':''}" style="animation-delay:${i*.04}s" href="wine.html?id=${w.id}">
   <div class="card-photo">
     <div class="card-photo-bg" style="background-image:url('${src}')"></div>
     <img class="main-img" src="${src}" alt="${w.name_kr}" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
     <div class="photo-ph" style="display:none">${bsvg(w.type)}</div>
-    <span class="card-type-badge ${TB[w.type]}" style="z-index:2">${TL[w.type]}</span>
-    <div class="card-rank${top?' top':''}" style="z-index:2">${top?'★':'#'}${w.rank}</div>
-    ${isTasted?`<div class="tasted-ribbon"><span style="font-size:13px">✅</span><span class="tasted-ribbon-text">마셨어요</span><span class="tasted-ribbon-date">${formatDate(tDate)}</span></div>`:''}
+    <span class="card-type-badge ${badgeCls(w.type)}">${typeName(w.type)}</span>
+    <div class="card-rank${top?' top':''}">${top?'★':'#'}${w.rank}</div>
+    ${isTasted?`<div class="tasted-ribbon"><span>✅</span><span class="tasted-ribbon-text">마셨어요</span><span class="tasted-ribbon-date">${formatDate(tDate)}</span></div>`:''}
   </div>
   <div class="card-body">
     <div class="card-name-kr">${w.name_kr}</div>
     <div class="card-name-en">${w.name_en}</div>
     <div class="card-tags">
-      ${w.vintage?`<span class="tag ${vTag}">${w.vintage}</span>`:`<span class="tag ${vTag}">NV</span>`}
+      <span class="tag ${vTag(w.type)}">${w.vintage||'NV'}</span>
       <span class="tag">${w.region.split('·')[0].trim()}</span>
       <span class="tag">${w.grape.split(',')[0].split('&')[0].trim()}</span>
     </div>
@@ -555,206 +261,80 @@ function rc(w,i){
     <span class="ds ${d.c}">${d.t}</span>
     <span class="card-arrow">›</span>
   </div>
-</div>`;
+</a>`
 }
 
-// FILTER STATE
-let af='all', ac='all';
-
-function gl(){
-  const s=document.getElementById('sortSel').value;
-  let arr=[...WINES];
-  if(af!=='all') arr=arr.filter(w=>w.type===af);
-  if(ac!=='all') arr=arr.filter(w=>(COUNTRY_MAP[w.id]||'')===ac);
-  return arr.sort((a,b)=>{
-    if(s==='rank')   return a.rank-b.rank;
-    if(s==='vivino') return b.vivino-a.vivino;
-    if(s==='vd')     return(b.vintage||0)-(a.vintage||0);
-    if(s==='va')     return(a.vintage||9999)-(b.vintage||9999);
-    if(s==='now')    return dnd(a)-dnd(b);
-    if(s==='region') return a.region.localeCompare(b.region);
-    return 0;
-  });
-}
-
-function rg(){
-  document.getElementById('grid').innerHTML=gl().map((w,i)=>rc(w,i)).join('');
-  renderTastedSection();
-}
-
-// ── 마신 와인 섹션 렌더 ──
-function renderTastedSection(){
-  const tasted=getTasted();
-  const tastedIds=Object.keys(tasted).map(Number);
+function renderTasted(){
+  const tasted=getTasted();const ids=Object.keys(tasted).map(Number);
   const sec=document.getElementById('tastedSection');
-  const list=document.getElementById('tastedList');
-  const countEl=document.getElementById('tastedSectionCount');
-  if(tastedIds.length===0){ sec.style.display='none'; return; }
+  if(!ids.length||!WINES.length){sec.style.display='none';return}
   sec.style.display='block';
-  countEl.textContent=`총 ${tastedIds.length}병`;
-  // Sort by date desc
-  const sorted=tastedIds
-    .map(id=>({wine:WINES.find(w=>w.id===id), date:tasted[id]}))
-    .filter(x=>x.wine)
-    .sort((a,b)=>b.date.localeCompare(a.date));
-  const vTagFor=w=>w.type==="white"?"tag-vw":w.type==="sparkling"?"tag-vs":"tag-v";
-  list.innerHTML=sorted.map(({wine:w,date})=>`
-    <div class="tasted-item" onclick="om(${w.id})">
-      <div class="tasted-item-photo">
-        <img src="${ph(w.id)}" alt="${w.name_kr}" onerror="this.style.opacity=0">
-      </div>
+  document.getElementById('tastedCount').textContent=`총 ${ids.length}병`;
+  const sorted=ids.map(id=>({w:WINES.find(x=>x.id===id),date:tasted[id]}))
+    .filter(x=>x.w).sort((a,b)=>b.date.localeCompare(a.date));
+  document.getElementById('tastedList').innerHTML=sorted.map(({w,date})=>`
+    <a class="tasted-item" href="wine.html?id=${w.id}">
+      <div class="tasted-item-photo"><img src="${ph(w.id)}" alt="${w.name_kr}" onerror="this.style.opacity=0"></div>
       <div class="tasted-item-body">
         <div class="tasted-item-name">${w.name_kr}</div>
         <div class="tasted-item-en">${w.name_en}</div>
         <div class="tasted-item-tags">
-          <span class="tag ${vTagFor(w)}" style="font-size:10px">${w.vintage||'NV'}</span>
-          <span class="tag" style="font-size:10px">${TL[w.type]}</span>
+          <span class="tag ${vTag(w.type)}" style="font-size:10px">${w.vintage||'NV'}</span>
+          <span class="tag" style="font-size:10px">${typeName(w.type)}</span>
           <span class="tag" style="font-size:10px">${w.region.split('·')[0].trim()}</span>
         </div>
       </div>
-      <div class="tasted-item-date">
+      <div class="tasted-item-right">
         <div class="tasted-date-label">음용일</div>
         <div class="tasted-date-val">${formatDate(date)}</div>
-        <button onclick="toggleTasted(${w.id},event)" style="margin-top:6px;padding:3px 8px;border-radius:10px;font-size:10px;border:1px solid #e0e0e0;background:#fff;color:#6e6e73;cursor:pointer;font-family:var(--font)">취소</button>
+        <button class="untaste-btn" onclick="toggleTasted(${w.id},event)">취소</button>
       </div>
-    </div>`).join('');
+    </a>`).join('');
 }
 
-function updateCounts(){
-  const tasted=getTasted();
-  const c={all:WINES.length,red:0,white:0,sparkling:0};
+function updateStats(){
+  const c={red:0,white:0,sparkling:0};
   WINES.forEach(w=>c[w.type]++);
-  document.querySelectorAll('#typeNav .nav-tab[data-f]').forEach(b=>{
-    const f=b.dataset.f;
-    if(b.querySelector('.nav-count'))
-      b.querySelector('.nav-count').textContent=c[f]||'';
-  });
-  document.getElementById('sr').textContent=c.red;
-  document.getElementById('sw').textContent=c.white;
-  document.getElementById('ss').textContent=c.sparkling;
+  document.getElementById('sTotal').textContent=WINES.length;
+  document.getElementById('sRed').textContent=c.red;
+  document.getElementById('sWhite').textContent=c.white;
+  document.getElementById('sSpark').textContent=c.sparkling;
+  document.getElementById('cAll').textContent=WINES.length;
+  document.getElementById('cRed').textContent=c.red;
+  document.getElementById('cWhite').textContent=c.white;
+  document.getElementById('cSpark').textContent=c.sparkling;
 }
 
-// Type filter
-document.querySelectorAll('#typeNav .nav-tab[data-f]').forEach(btn=>{
+function render(){
+  document.getElementById('grid').innerHTML=getList().map((w,i)=>renderCard(w,i)).join('');
+  renderTasted();
+}
+
+document.querySelectorAll('#typeNav .nav-tab').forEach(btn=>{
   btn.addEventListener('click',()=>{
-    document.querySelectorAll('#typeNav .nav-tab').forEach(b=>b.classList.remove('on','on-tasted'));
-    btn.classList.add(btn.dataset.f==='tasted'?'on-tasted':'on');
-    af=btn.dataset.f; rg();
+    document.querySelectorAll('#typeNav .nav-tab').forEach(b=>b.classList.remove('on'));
+    btn.classList.add('on');af=btn.dataset.f;render();
   });
 });
-
-// Country filter
-document.querySelectorAll('#countryNav .nav-tab[data-c]').forEach(btn=>{
+document.querySelectorAll('#countryNav .nav-tab').forEach(btn=>{
   btn.addEventListener('click',()=>{
-    document.querySelectorAll('#countryNav .nav-tab').forEach(b=>b.classList.remove('on-country'));
-    btn.classList.add('on-country');
-    ac=btn.dataset.c; rg();
+    document.querySelectorAll('#countryNav .nav-tab').forEach(b=>b.classList.remove('on-c'));
+    btn.classList.add('on-c');ac=btn.dataset.c;render();
   });
 });
+document.getElementById('sortSel').addEventListener('change',render);
 
-document.getElementById('sortSel').addEventListener('change',rg);
-
-// MODAL – now includes tasted toggle
-function om(id){
-  const w=WINES.find(x=>x.id===id); if(!w) return;
-  const tasted=getTasted(); const isTasted=!!tasted[w.id];
-  const d=ds(w); const top=w.rank<=5;
-  const ts=w.du-w.df+2;
-  const pF=(((w.df-(w.df-1))/ts)*100).toFixed(1);
-  const pW=(((w.du-w.df)/ts)*100).toFixed(1);
-  const pP=(((w.dps-(w.df-1))/ts)*100).toFixed(1);
-  const pPW=(((w.dpe-w.dps)/ts)*100).toFixed(1);
-  const pN=Math.min(100,Math.max(0,((NOW-(w.df-1))/ts)*100)).toFixed(1);
-  const inD=NOW>=w.df&&NOW<=w.du;
-  const vTag=w.type==="white"?"tag-vw":w.type==="sparkling"?"tag-vs":"tag-v";
-  const src=ph(w.id);
-
-  // 모바일 상단 이미지
-  document.getElementById('mPhoto').innerHTML=`
-    <div class="photo-bg" style="background-image:url('${src}')"></div>
-    <img class="modal-main-img" src="${src}" alt="${w.name_kr}" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
-    <div class="modal-photo-ph" style="display:none">${bsvg_lg(w.type)}</div>`;
-
-  // 데스크탑 우측 이미지
-  document.getElementById('mPhotoDesktop').innerHTML=`
-    <img src="${src}" alt="${w.name_kr}" style="width:100%;border-radius:14px;object-fit:contain;max-height:420px;background:#f0ece8;display:block;box-shadow:0 4px 20px rgba(0,0,0,0.1);" onerror="this.style.opacity=0">`;
-
-  const totalWines = WINES.length;
-  document.getElementById('mContent').innerHTML=`
-    <div class="mc-type-row">
-      <span class="mc-chip ${CC[w.type]}">${TL[w.type]}</span>
-      ${w.vintage?`<span class="tag ${vTag}">${w.vintage}</span>`:`<span class="tag ${vTag}">NV</span>`}
-      <span class="mc-rank${top?' top':''}">${top?'★ ':''}#${w.rank}</span>
-      <button onclick="toggleTasted(${w.id},event);om(${w.id});" style="margin-left:auto;padding:5px 14px;border-radius:20px;font-size:12px;font-weight:600;border:1.5px solid ${isTasted?'#1a7a3c':'var(--sep)'};background:${isTasted?'#1a7a3c':'#fff'};color:${isTasted?'#fff':'var(--sub)'};cursor:pointer;font-family:var(--font);transition:all .15s">${isTasted?'✅ 마셨어요':'🍷 마셨어요 체크'}</button>
-    </div>
-    <h2 class="mc-title">${w.name_kr}</h2>
-    <p class="mc-title-en">${w.name_en}</p>
-    ${isTasted?`<div style="padding:9px 13px;background:#f0faf4;border:1px solid rgba(26,122,60,.15);border-radius:10px;margin-bottom:16px;font-size:13px;color:#1a7a3c;font-weight:500">✅ ${formatDate(tasted[w.id])} 음용</div>`:''}
-    <div class="mc-vivino">
-      <div class="v-logo-md">V</div>
-      <div><div class="mc-v-score">${w.vivino.toFixed(1)}</div><div class="mc-v-label">Vivino 커뮤니티 평점 / 5.0</div></div>
-      <a href="${w.vu}" target="_blank" rel="noopener" class="mc-v-link">Vivino →</a>
-    </div>
-    <div class="msec">
-      <div class="msec-title">생산 정보</div>
-      <div class="info-grid">
-        <div class="info-cell"><div class="info-label">생산지역</div><div class="info-value">${w.region}</div></div>
-        <div class="info-cell"><div class="info-label">포도 품종</div><div class="info-value">${w.grape}</div></div>
-      </div>
-    </div>
-    <div class="msec">
-      <div class="msec-title">와인 스토리</div>
-      <p class="msec-text">${w.story}</p>
-    </div>
-    ${w.tasting?`<div class="msec">
-      <div class="msec-title">테이스팅 노트</div>
-      <div class="tasting-grid">
-        <div class="tasting-cell"><div class="tasting-label">🎨 색상</div><div class="tasting-pills">${w.tasting.color.map(x=>`<span class="tasting-pill pill-color">${x}</span>`).join('')}</div></div>
-        <div class="tasting-cell"><div class="tasting-label">👃 향 · 아로마</div><div class="tasting-pills">${w.tasting.aroma.map(x=>`<span class="tasting-pill pill-aroma">${x}</span>`).join('')}</div></div>
-        <div class="tasting-cell"><div class="tasting-label">👅 맛 · 팔라트</div><div class="tasting-pills">${w.tasting.taste.map(x=>`<span class="tasting-pill pill-taste">${x}</span>`).join('')}</div></div>
-        <div class="tasting-cell"><div class="tasting-label">✨ 피니시 · 여운</div><div class="tasting-pills">${w.tasting.finish.map(x=>`<span class="tasting-pill pill-finish">${x}</span>`).join('')}</div></div>
-      </div>
-      <div class="tasting-structure">
-        ${[{label:'바디',val:w.tasting.body,color:'#8c1a31'},{label:w.type==='sparkling'?'산도':'탄닌',val:w.type==='sparkling'?w.tasting.acidity:w.tasting.tannin,color:'#5a3e8c'},{label:'산도',val:w.tasting.acidity,color:'#1a5c8c'},{label:'알코올',val:w.tasting.alcohol,color:'#7a5c14'}].filter((_,i)=>!(w.type==='sparkling'&&i===1)).map(s=>`<div class="str-item"><div class="str-label">${s.label}</div><div class="str-bar-wrap"><div class="str-bar" style="width:${s.val}%;background:linear-gradient(90deg,${s.color}33,${s.color}88);"></div></div><div class="str-val">${s.val>=80?'강함':s.val>=55?'중간':'가벼움'}</div></div>`).join('')}
-      </div>
-    </div>`:''}
-    <div class="msec">
-      <div class="msec-title">음용 시기</div>
-      <div class="dw-meta">
-        <div class="dw-item"><div class="dw-item-label">현재 상태</div><div class="dw-item-value ${d.c==='peak'?'cur':''}">${d.t}</div></div>
-        <div class="dw-item"><div class="dw-item-label">음용 가능</div><div class="dw-item-value">${w.df} – ${w.du}</div></div>
-        <div class="dw-item"><div class="dw-item-label">최적 피크</div><div class="dw-item-value peak">${w.dps} – ${w.dpe}</div></div>
-      </div>
-      <div class="dw-track">
-        <div class="dw-fill" style="left:${pF}%;width:${pW}%"></div>
-        <div class="dw-peak" style="left:${pP}%;width:${pPW}%"></div>
-        ${inD?`<div class="dw-now" style="left:${pN}%"></div>`:''}
-      </div>
-      <div class="dw-labels"><span>${w.df}</span><span>${w.dps}–${w.dpe} 피크</span><span>${w.du}</span></div>
-    </div>
-    <div class="msec">
-      <div class="msec-title">어울리는 음식</div>
-      <div class="food-tags">${w.food.map(f=>`<span class="food-tag">${f}</span>`).join('')}</div>
-    </div>
-    <div class="msec">
-      <div class="msec-title">소장 가치</div>
-      <div class="collect-row">
-        <div class="collect-num">${w.rank}</div>
-        <div><div class="collect-stars">${w.ct}</div><div class="collect-tier">컬렉션 ${w.rank}위 / ${totalWines}병</div><div class="collect-desc">${w.cd}</div></div>
-      </div>
-    </div>`;
-  document.getElementById('overlay').classList.add('open');
-  document.body.style.overflow='hidden';
-}
-function cl(){
-  document.getElementById('overlay').classList.remove('open');
-  document.body.style.overflow='';
-}
-function ocl(e){if(e.target===document.getElementById('overlay'))cl();}
-document.addEventListener('keydown',e=>{if(e.key==='Escape')cl();});
-
-// INIT
-updateCounts(); rg(); renderTastedSection();
+fetch('wines.json')
+  .then(r=>r.json())
+  .then(data=>{
+    WINES=data;
+    document.getElementById('loading').style.display='none';
+    document.getElementById('grid').style.display='grid';
+    updateStats();render();
+  })
+  .catch(err=>{
+    document.getElementById('loading').innerHTML=`<div style="color:#8c1a31;font-size:14px;text-align:center">⚠️ 데이터를 불러올 수 없습니다.<br><small style="color:#aeaeb2">${err.message}</small></div>`;
+  });
 </script>
 </body>
 </html>
