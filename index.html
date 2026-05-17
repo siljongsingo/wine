@@ -30,20 +30,8 @@ html{scroll-behavior:smooth;}
 body{font-family:var(--font);background:var(--bg);color:var(--text);-webkit-font-smoothing:antialiased;padding-bottom:0;}
 
 .header-title{font-size:30px;font-weight:700;letter-spacing:-.025em;color:var(--text);line-height:1.1;margin-bottom:10px;}
-.header-topbar{background:#fff;border-bottom:1px solid var(--sep);padding:0 16px;height:52px;display:flex;align-items:center;justify-content:center;position:relative;}
-.header-topbar-title{font-size:17px;font-weight:700;color:var(--text);letter-spacing:-.02em;}
-.header{background:#fff;padding:20px 20px 24px;text-align:center;}
 .header-update{font-size:11px;color:var(--hint);margin-bottom:20px;letter-spacing:.02em;}
-.admin-link{position:absolute;top:50%;right:14px;transform:translateY(-50%);width:32px;height:32px;border-radius:50%;background:var(--bg);border:1px solid var(--sep);display:flex;align-items:center;justify-content:center;font-size:15px;text-decoration:none;transition:all .18s;color:var(--sub);}
-.admin-link:hover{background:var(--wine-bg);border-color:rgba(140,26,49,.2);}
-.header-stats{display:inline-flex;background:var(--bg);border-radius:14px;overflow:hidden;border:1px solid var(--sep);max-width:100%;}
-.stat{padding:14px 22px;text-align:center;border-right:1px solid var(--sep);flex:1;}
-.stat:last-child{border-right:none;}
-.stat-value{font-size:24px;font-weight:700;color:var(--text);letter-spacing:-.03em;line-height:1;}
-.stat-label{font-size:10px;color:var(--hint);font-weight:500;letter-spacing:.06em;text-transform:uppercase;margin-top:4px;}
 
-.nav-date-bar{text-align:center;font-size:10px;color:var(--hint);padding:5px 16px 3px;border-bottom:1px solid var(--sep2);letter-spacing:.04em;}
-.nav-wrap{position:sticky;top:0;z-index:100;background:var(--nav);backdrop-filter:saturate(180%) blur(20px);-webkit-backdrop-filter:saturate(180%) blur(20px);border-bottom:1px solid var(--sep);}
 .nav-row{max-width:1320px;margin:0 auto;padding:6px 16px;display:flex;align-items:center;gap:4px;flex-wrap:wrap;min-height:46px;}
 #countryNav{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;min-height:40px;padding:4px 16px;}
 #countryNav::-webkit-scrollbar{display:none;}
@@ -56,7 +44,7 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);-webkit-font
 .flag-text{display:inline;}
 .nav-sort{margin-left:auto;flex-shrink:0;padding:6px 26px 6px 12px;font-size:12px;font-family:var(--font);font-weight:500;color:var(--text);background:var(--bg);border:1px solid var(--sep);border-radius:20px;cursor:pointer;outline:none;appearance:none;-webkit-appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='7' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23aeaeb2' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 9px center;}
 
-.container{max-width:1320px;margin:0 auto;padding:24px max(20px,env(safe-area-inset-right)) 16px max(20px,env(safe-area-inset-left));}
+.container{max-width:1320px;margin:0 auto;padding:20px 20px 16px;}
 .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:20px;}
 
 .card{background:var(--card);border-radius:var(--r);box-shadow:var(--shadow);overflow:hidden;cursor:pointer;transition:box-shadow .22s,transform .22s;display:flex;flex-direction:column;border:1px solid rgba(0,0,0,0.04);animation:fadeUp .35s ease both;text-decoration:none;color:inherit;}
@@ -120,15 +108,38 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);-webkit-font
 .loading-spinner{width:32px;height:32px;border:3px solid var(--sep);border-top-color:var(--wine);border-radius:50%;animation:spin .7s linear infinite;}
 .loading-text{font-size:14px;color:var(--hint);}
 
+/* ── STICKY HEADER (전체 고정) ── */
+.sticky-header{position:sticky;top:0;z-index:100;background:#fff;border-bottom:2px solid var(--sep);box-shadow:0 2px 12px rgba(0,0,0,0.06);}
+
+/* 타이틀 행 */
+.title-row{display:flex;align-items:center;padding:14px 16px 10px;gap:8px;}
+.header-title{font-size:20px;font-weight:700;letter-spacing:-.025em;color:var(--text);line-height:1.1;flex:1;text-align:center;}
+.admin-link{width:34px;height:34px;border-radius:50%;background:var(--bg);border:1px solid var(--sep);display:flex;align-items:center;justify-content:center;font-size:16px;text-decoration:none;transition:all .18s;color:var(--sub);flex-shrink:0;}
+.admin-link:hover{background:var(--wine-bg);border-color:rgba(140,26,49,.2);}
+/* 왼쪽 균형을 위한 플레이스홀더 */
+.title-spacer{width:34px;flex-shrink:0;}
+
+/* 통계 행 */
+.header-stats{display:flex;background:var(--bg);border-radius:12px;overflow:hidden;border:1px solid var(--sep);margin:0 16px 12px;}
+.stat{padding:10px 0;text-align:center;border-right:1px solid var(--sep);flex:1;}
+.stat:last-child{border-right:none;}
+.stat-value{font-size:22px;font-weight:700;color:var(--text);letter-spacing:-.03em;line-height:1;}
+.stat-label{font-size:9px;color:var(--hint);font-weight:500;letter-spacing:.05em;text-transform:uppercase;margin-top:3px;}
+
+/* 날짜 바 */
+.nav-date-bar{text-align:center;font-size:10px;color:var(--hint);padding:4px 16px;border-top:1px solid var(--sep2);letter-spacing:.04em;}
+
+/* 필터 행 (nav-wrap은 sticky-header 안에 있으므로 일반 div) */
+.nav-wrap{background:transparent;}
 @media(max-width:700px){.flag-text{display:none;}#countryNav .nav-tab{padding:5px 8px;font-size:16px;}}
 @media(max-width:768px){
-  .header{padding:32px 16px 28px;}.header-title{font-size:22px;}.header-update{font-size:11px;margin-bottom:20px;}
-  .header-stats{width:100%;}.stat{flex:1;min-width:60px;padding:12px 8px;}.stat-value{font-size:20px;}.stat-label{font-size:9px;}
+  .header-title{font-size:18px;}.title-row{padding:12px 14px 8px;}
+  .header-stats{margin:0 12px 10px;}.stat{padding:9px 0;}.stat-value{font-size:18px;}
   .grid{grid-template-columns:1fr 1fr;gap:10px;}.container{padding:16px 12px 16px;}.tasted-section{padding:0 12px 32px;}
 }
 @media(max-width:480px){
   .grid{grid-template-columns:1fr 1fr;gap:8px;}.card-photo{height:180px;}.card-name-kr{font-size:13px;}
-  .card-body{padding:10px 12px;}.nav-tab{font-size:12px;padding:5px 9px;}.header-title{font-size:19px;}
+  .card-body{padding:10px 12px;}.nav-tab{font-size:12px;padding:5px 9px;}
 }
 @media(max-width:360px){.grid{grid-template-columns:1fr;}.header-title{font-size:17px;}}
 @keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
@@ -137,21 +148,24 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);-webkit-font
 </head>
 <body>
 
-<div class="header-topbar">
-  <span class="header-topbar-title">Raina's Home Wine Cellar</span>
-  <a href="admin.html" class="admin-link">⚙️</a>
-</div>
-<div class="header">
+<div class="sticky-header">
+  <!-- 타이틀 행 -->
+  <div class="title-row">
+    <div class="title-spacer"></div>
+    <h1 class="header-title">Raina's Home Wine Cellar</h1>
+    <a href="admin.html" class="admin-link" title="관리자">⚙️</a>
+  </div>
+  <!-- 통계 행 -->
   <div class="header-stats">
     <div class="stat"><div class="stat-value" id="sTotal">—</div><div class="stat-label">Bottles</div></div>
     <div class="stat"><div class="stat-value" id="sRed">—</div><div class="stat-label">Red</div></div>
     <div class="stat"><div class="stat-value" id="sWhite">—</div><div class="stat-label">White</div></div>
     <div class="stat"><div class="stat-value" id="sSpark">—</div><div class="stat-label">Sparkling</div></div>
   </div>
-</div>
-
-<div class="nav-wrap">
+  <!-- 날짜 -->
   <div class="nav-date-bar">업데이트 기준일 · 2026.05.17</div>
+  <!-- 필터 -->
+  <div class="nav-wrap">
   <div class="nav-row" id="typeNav">
     <button class="nav-tab on" data-f="all">전체 <span class="nav-count" id="cAll"></span></button>
     <button class="nav-tab" data-f="red">레드 <span class="nav-count" id="cRed"></span></button>
@@ -178,7 +192,8 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);-webkit-font
     <button class="nav-tab" data-c="NewZealand">🇳🇿 <span class="flag-text">뉴질랜드</span></button>
     <button class="nav-tab" data-c="Australia">🇦🇺 <span class="flag-text">호주</span></button>
   </div>
-</div>
+  </div><!-- end nav-wrap -->
+</div><!-- end sticky-header -->
 
 <div class="container">
   <div id="loading" class="loading">
