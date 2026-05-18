@@ -114,6 +114,8 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);-webkit-font
 /* 타이틀 행 */
 .title-row{display:flex;align-items:center;padding:14px 16px 10px;gap:8px;}
 .header-title{font-size:20px;font-weight:700;letter-spacing:-.025em;color:var(--text);line-height:1.1;flex:1;text-align:center;}
+.refresh-btn{width:34px;height:34px;border-radius:50%;background:var(--bg);border:1px solid var(--sep);display:flex;align-items:center;justify-content:center;font-size:16px;cursor:pointer;transition:all .18s;color:var(--sub);flex-shrink:0;font-family:var(--font);}
+.refresh-btn:hover{background:var(--blue-bg);color:var(--blue);border-color:var(--blue);}
 .admin-link{width:34px;height:34px;border-radius:50%;background:var(--bg);border:1px solid var(--sep);display:flex;align-items:center;justify-content:center;font-size:16px;text-decoration:none;transition:all .18s;color:var(--sub);flex-shrink:0;}
 .admin-link:hover{background:var(--wine-bg);border-color:rgba(140,26,49,.2);}
 /* 왼쪽 균형을 위한 플레이스홀더 */
@@ -170,7 +172,7 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);-webkit-font
 <div class="sticky-header">
   <!-- 타이틀 행 -->
   <div class="title-row">
-    <div class="title-spacer"></div>
+    <button class="refresh-btn" onclick="location.reload(true)" title="최신 버전으로 새로고침">↺</button>
     <h1 class="header-title">Raina's Home Wine Cellar</h1>
     <a href="admin.html" class="admin-link" title="관리자">⚙️</a>
   </div>
