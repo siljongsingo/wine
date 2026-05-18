@@ -84,32 +84,45 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);-webkit-font
 .tab-btn{padding:6px 18px;border-radius:9px;border:none;background:transparent;font-size:13px;font-weight:500;color:var(--sub);cursor:pointer;font-family:var(--font);transition:all .15s;}
 .tab-btn.on{background:var(--card);color:var(--text);font-weight:600;box-shadow:0 1px 4px rgba(0,0,0,0.1);}
 
-/* TABLE */
-.table-wrap{background:var(--card);border-radius:var(--r);box-shadow:var(--shadow);overflow:hidden;overflow-x:auto;}
-table{width:100%;border-collapse:collapse;min-width:720px;}
-thead tr{background:var(--text);}
-th{padding:11px 14px;text-align:left;font-size:11px;font-weight:600;color:rgba(255,255,255,0.8);letter-spacing:.06em;text-transform:uppercase;white-space:nowrap;}
-tbody tr{border-bottom:1px solid var(--sep2);}
-tbody tr:last-child{border-bottom:none;}
-tbody tr:hover{background:#fafafa;}
-td{padding:10px 14px;font-size:13px;color:var(--text);vertical-align:middle;}
-.td-name{font-weight:600;max-width:180px;}
-.td-name small{display:block;font-size:11px;color:var(--hint);font-weight:400;margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-.type-badge{padding:3px 8px;border-radius:6px;font-size:10px;font-weight:600;}
-.tb-r{background:var(--wine-bg);color:var(--wine);}
-.tb-w{background:var(--gold-bg);color:var(--gold);}
-.tb-s{background:var(--blue-bg);color:var(--blue);}
-.td-input{width:100%;padding:6px 10px;border:1px solid var(--sep);border-radius:8px;font-size:13px;font-family:var(--font);color:var(--text);background:var(--bg);outline:none;min-width:90px;}
-.td-input:focus{border-color:var(--wine);background:#fff;}
-.td-input.price{min-width:100px;text-align:right;}
-.save-row-btn{padding:5px 12px;background:var(--wine-bg);color:var(--wine);border:1px solid rgba(140,26,49,.15);border-radius:8px;font-size:11px;font-weight:600;cursor:pointer;font-family:var(--font);white-space:nowrap;transition:all .15s;}
-.save-row-btn:hover{background:var(--wine);color:#fff;}
-.save-row-btn.saved{background:var(--green-bg);color:var(--green);border-color:rgba(26,122,60,.15);}
-
-/* TASTED TABLE */
+/* SYNC STATUS */
 .tasted-tag{padding:3px 9px;border-radius:20px;font-size:11px;font-weight:500;background:var(--green-bg);color:var(--green);}
 .untaste-btn{padding:4px 10px;border-radius:8px;font-size:11px;border:1px solid var(--sep);background:#fff;color:var(--sub);cursor:pointer;font-family:var(--font);}
 .untaste-btn:hover{border-color:#dc2626;color:#dc2626;}
+
+/* ── PURCHASE CARDS (모바일 최적화) ── */
+.purchase-list{display:flex;flex-direction:column;gap:12px;}
+.purchase-card{background:var(--card);border-radius:var(--r);box-shadow:var(--shadow);overflow:hidden;border:1px solid var(--sep);}
+.pc-header{display:flex;align-items:center;gap:10px;padding:12px 16px;border-bottom:1px solid var(--sep2);background:#fafafa;}
+.pc-num{font-size:11px;color:var(--hint);font-weight:500;min-width:18px;}
+.pc-name{flex:1;min-width:0;}
+.pc-name-kr{font-size:14px;font-weight:600;color:var(--text);letter-spacing:-.01em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.pc-name-en{font-size:11px;color:var(--hint);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.pc-badge{padding:3px 8px;border-radius:6px;font-size:10px;font-weight:600;white-space:nowrap;flex-shrink:0;}
+.tb-r{background:var(--wine-bg);color:var(--wine);}
+.tb-w{background:var(--gold-bg);color:var(--gold);}
+.tb-s{background:var(--blue-bg);color:var(--blue);}
+.pc-body{padding:12px 16px;display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.pc-field{display:flex;flex-direction:column;gap:4px;}
+.pc-field.full{grid-column:1/-1;}
+.pc-label{font-size:10px;font-weight:600;color:var(--hint);letter-spacing:.05em;text-transform:uppercase;}
+.pc-input{padding:8px 12px;border:1px solid var(--sep);border-radius:9px;font-size:13px;font-family:var(--font);color:var(--text);background:var(--bg);outline:none;width:100%;}
+.pc-input:focus{border-color:var(--wine);background:#fff;}
+.pc-footer{padding:10px 16px;border-top:1px solid var(--sep2);display:flex;align-items:center;justify-content:space-between;}
+.pc-saved-info{font-size:11px;color:var(--green);font-weight:500;}
+.save-row-btn{padding:7px 16px;background:var(--wine-bg);color:var(--wine);border:1.5px solid rgba(140,26,49,.2);border-radius:20px;font-size:12px;font-weight:600;cursor:pointer;font-family:var(--font);transition:all .15s;}
+.save-row-btn:hover{background:var(--wine);color:#fff;}
+.save-row-btn.saved{background:var(--green-bg);color:var(--green);border-color:rgba(26,122,60,.2);}
+
+/* TASTED LIST (카드형) */
+.tasted-list-admin{display:flex;flex-direction:column;gap:10px;}
+.tasted-card-admin{background:var(--card);border:1px solid #e0f0e8;border-radius:var(--r);padding:12px 16px;display:flex;align-items:center;gap:12px;}
+.tasted-card-body{flex:1;min-width:0;}
+.tasted-card-name{font-size:14px;font-weight:600;color:var(--text);margin-bottom:3px;}
+.tasted-card-en{font-size:11px;color:var(--hint);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.tasted-card-tags{display:flex;gap:5px;margin-top:5px;flex-wrap:wrap;}
+.tasted-card-date{text-align:right;flex-shrink:0;}
+.tasted-card-date-label{font-size:10px;color:var(--hint);}
+.tasted-card-date-val{font-size:13px;font-weight:600;color:var(--green);margin-top:2px;white-space:nowrap;}
 
 /* SYNC STATUS */
 .sync-bar{padding:10px 16px;border-radius:10px;font-size:13px;font-weight:500;margin-bottom:16px;display:none;align-items:center;gap:8px;}
@@ -220,27 +233,11 @@ td{padding:10px 14px;font-size:13px;color:var(--text);vertical-align:middle;}
         <span class="sec-title">구매 정보 관리</span>
         <span class="sec-count" id="purchaseCount"></span>
         <button class="sec-btn btn-sync" onclick="syncPurchase()">
-          <span>↑↓</span> Google Sheets 동기화
+          <span>↑↓</span> Sheets 동기화
         </button>
       </div>
       <div class="sync-bar" id="purchaseSyncBar"></div>
-      <div class="table-wrap">
-        <table>
-          <thead>
-            <tr>
-              <th>#</th>
-              <th>와인명</th>
-              <th>종류</th>
-              <th>빈티지</th>
-              <th>구매처</th>
-              <th>구매일</th>
-              <th>구매금액 (원)</th>
-              <th>저장</th>
-            </tr>
-          </thead>
-          <tbody id="purchaseBody"></tbody>
-        </table>
-      </div>
+      <div class="purchase-list" id="purchaseList"></div>
     </div>
 
     <!-- ── 음용 기록 탭 ── -->
@@ -249,25 +246,11 @@ td{padding:10px 14px;font-size:13px;color:var(--text);vertical-align:middle;}
         <span class="sec-title">마신 와인 기록</span>
         <span class="sec-count" id="tastedRecordCount"></span>
         <button class="sec-btn btn-sync" onclick="syncTasted()">
-          <span>↑↓</span> Google Sheets 동기화
+          <span>↑↓</span> Sheets 동기화
         </button>
       </div>
       <div class="sync-bar" id="tastedSyncBar"></div>
-      <div class="table-wrap">
-        <table>
-          <thead>
-            <tr>
-              <th>#</th>
-              <th>와인명</th>
-              <th>종류</th>
-              <th>빈티지</th>
-              <th>음용일</th>
-              <th>상태</th>
-            </tr>
-          </thead>
-          <tbody id="tastedBody"></tbody>
-        </table>
-      </div>
+      <div class="tasted-list-admin" id="tastedListAdmin"></div>
     </div>
 
     <!-- ── 설정 가이드 탭 ── -->
@@ -558,64 +541,154 @@ function formatPrice(n){ if(!n) return ''; return parseInt(n).toLocaleString()+'
 function formatDate(iso){ if(!iso) return ''; const[y,m,d]=String(iso).split('-'); return `${y}.${m}.${d}`; }
 
 // ══════════════════════════════════════
-//  INIT
+//  INIT — 시작 시 Sheets 자동 동기화
 // ══════════════════════════════════════
-function initApp(){
-  // Restore URL input — use saved or default
+async function initApp(){
   const url = getScriptUrl();
   document.getElementById('scriptUrl').value = url;
   updateUrlStatus(url);
 
-  // Load purchase from localStorage
+  // localStorage에서 먼저 로드
   purchaseData = getPurchaseLocal();
 
-  // Load wines.json
-  fetch('wines.json')
-    .then(r=>r.json())
-    .then(data=>{
-      WINES = data;
-      renderPurchaseTable();
-      renderTastedTable();
-      updateSummary();
-    })
-    .catch(()=>{
-      // Fallback: try parent dir
-      fetch('../wines.json').then(r=>r.json()).then(data=>{
-        WINES=data; renderPurchaseTable(); renderTastedTable(); updateSummary();
-      }).catch(()=>{
-        document.getElementById('purchaseBody').innerHTML =
-          '<tr><td colspan="8" style="text-align:center;padding:24px;color:#aeaeb2">wines.json을 찾을 수 없습니다</td></tr>';
-      });
-    });
+  // wines.json 로드
+  let winesData;
+  try {
+    const r = await fetch('wines.json');
+    winesData = await r.json();
+  } catch(e) {
+    try { const r=await fetch('../wines.json'); winesData=await r.json(); } catch(e2){ winesData=[]; }
+  }
+  WINES = winesData;
+
+  // Sheets에서 최신 데이터 자동 로드
+  if(url && url.includes('script.google.com')){
+    showSyncBar('purchaseSyncBar','loading','Google Sheets에서 데이터 불러오는 중...');
+    try{
+      // 구매 데이터
+      const pr = await fetch(url+'?action=getPurchase');
+      if(pr.ok){
+        const rows = await pr.json();
+        if(Array.isArray(rows)){
+          rows.forEach(row=>{
+            if(row.id) purchaseData[row.id]={store:row.store||'',date:row.date||'',price:row.price||''};
+          });
+          setPurchaseLocal(purchaseData);
+        }
+      }
+      // 음용 데이터
+      const tr = await fetch(url+'?action=getTasted');
+      if(tr.ok){
+        const trows = await tr.json();
+        if(Array.isArray(trows)){
+          const local=getTasted();
+          trows.forEach(row=>{if(row.id&&row.tasted_date) local[row.id]=row.tasted_date;});
+          setTasted(local);
+        }
+      }
+      showSyncBar('purchaseSyncBar','ok','✅ Google Sheets 동기화 완료');
+      setTimeout(()=>{const b=document.getElementById('purchaseSyncBar');if(b)b.style.display='none';},2500);
+    } catch(e){
+      showSyncBar('purchaseSyncBar','err','⚠️ 오프라인 상태 — 저장된 데이터를 표시합니다');
+    }
+  }
+
+  renderPurchaseList();
+  renderTastedList();
+  updateSummary();
 }
 
 if(sessionStorage.getItem('wineAdmin') === '1') initApp();
 
 // ══════════════════════════════════════
-//  PURCHASE TABLE
+//  PURCHASE CARD LIST (모바일 최적화)
 // ══════════════════════════════════════
-function renderPurchaseTable(){
-  const tbody = document.getElementById('purchaseBody');
+function renderPurchaseList(){
+  const list = document.getElementById('purchaseList');
   document.getElementById('purchaseCount').textContent = `총 ${WINES.length}병`;
 
-  tbody.innerHTML = WINES.map(w => {
+  list.innerHTML = WINES.map(w => {
     const p = purchaseData[w.id] || {};
-    return `<tr id="row-${w.id}">
-      <td style="color:var(--hint);font-size:12px">${w.id}</td>
-      <td class="td-name">${w.name_kr}<small>${w.name_en}</small></td>
-      <td><span class="type-badge ${typeBadge(w.type)}">${typeName(w.type)}</span></td>
-      <td style="color:var(--sub)">${w.vintage||'NV'}</td>
-      <td><input class="td-input" id="store-${w.id}" type="text" placeholder="구매처" value="${p.store||''}" onchange="markDirty(${w.id})"></td>
-      <td><input class="td-input" id="date-${w.id}" type="date" value="${p.date||''}" onchange="markDirty(${w.id})"></td>
-      <td><input class="td-input price" id="price-${w.id}" type="number" placeholder="0" value="${p.price||''}" onchange="markDirty(${w.id})"></td>
-      <td><button class="save-row-btn${p.store||p.date||p.price?' saved':''}" id="savebtn-${w.id}" onclick="saveRow(${w.id})">저장</button></td>
-    </tr>`;
+    const hasSaved = p.store || p.date || p.price;
+    return `<div class="purchase-card" id="card-${w.id}">
+      <div class="pc-header">
+        <span class="pc-num">${w.id}</span>
+        <div class="pc-name">
+          <div class="pc-name-kr">${w.name_kr}</div>
+          <div class="pc-name-en">${w.name_en} · ${w.vintage||'NV'}</div>
+        </div>
+        <span class="pc-badge tb-${w.type==='sparkling'?'s':w.type==='white'?'w':'r'}">${
+          w.type==='red'?'레드':w.type==='white'?'화이트':'스파클링'}</span>
+      </div>
+      <div class="pc-body">
+        <div class="pc-field full">
+          <label class="pc-label">구매처</label>
+          <input class="pc-input" id="store-${w.id}" type="text" placeholder="와인샵, 온라인 등"
+            value="${p.store||''}" oninput="markDirty(${w.id})">
+        </div>
+        <div class="pc-field">
+          <label class="pc-label">구매일</label>
+          <input class="pc-input" id="date-${w.id}" type="date"
+            value="${p.date||''}" oninput="markDirty(${w.id})">
+        </div>
+        <div class="pc-field">
+          <label class="pc-label">구매금액 (원)</label>
+          <input class="pc-input" id="price-${w.id}" type="number" placeholder="0"
+            value="${p.price||''}" oninput="markDirty(${w.id})">
+        </div>
+      </div>
+      <div class="pc-footer">
+        <span class="pc-saved-info" id="savedinfo-${w.id}">
+          ${hasSaved ? '✅ 저장됨' + (p.price ? ' · '+parseInt(p.price).toLocaleString()+'원' : '') : ''}
+        </span>
+        <button class="save-row-btn${hasSaved?' saved':''}" id="savebtn-${w.id}"
+          onclick="saveRow(${w.id})">저장</button>
+      </div>
+    </div>`;
   }).join('');
 }
 
 function markDirty(id){
-  const btn = document.getElementById('savebtn-'+id);
-  btn.textContent = '저장'; btn.className = 'save-row-btn';
+  const btn=document.getElementById('savebtn-'+id);
+  btn.textContent='저장'; btn.className='save-row-btn';
+  const info=document.getElementById('savedinfo-'+id);
+  if(info) info.textContent='';
+}
+
+// ══════════════════════════════════════
+//  TASTED CARD LIST
+// ══════════════════════════════════════
+function renderTastedList(){
+  const tasted=getTasted();
+  const ids=Object.keys(tasted).map(Number).filter(id=>WINES.find(w=>w.id===id));
+  document.getElementById('tastedRecordCount').textContent=`총 ${ids.length}병`;
+  const list=document.getElementById('tastedListAdmin');
+  if(!ids.length){
+    list.innerHTML='<div style="text-align:center;padding:32px;color:var(--hint);font-size:14px">아직 마신 와인이 없습니다</div>';
+    return;
+  }
+  const sorted=ids.sort((a,b)=>(tasted[b]||'').localeCompare(tasted[a]||''));
+  const typeLabel={red:'레드',white:'화이트',sparkling:'스파클링'};
+  const typeCls={red:'tb-r',white:'tb-w',sparkling:'tb-s'};
+  list.innerHTML=sorted.map(id=>{
+    const w=WINES.find(x=>x.id===id);if(!w)return'';
+    const date=tasted[id];
+    return`<div class="tasted-card-admin">
+      <div class="tasted-card-body">
+        <div class="tasted-card-name">${w.name_kr}</div>
+        <div class="tasted-card-en">${w.name_en}</div>
+        <div class="tasted-card-tags">
+          <span class="pc-badge ${typeCls[w.type]}">${typeLabel[w.type]}</span>
+          <span class="pc-badge" style="background:var(--bg);color:var(--sub)">${w.vintage||'NV'}</span>
+        </div>
+      </div>
+      <div class="tasted-card-date">
+        <div class="tasted-card-date-label">음용일</div>
+        <div class="tasted-card-date-val">${formatDate(date)}</div>
+        <button class="untaste-btn" style="margin-top:6px" onclick="removeTasted(${id})">취소</button>
+      </div>
+    </div>`;
+  }).join('');
 }
 
 function saveRow(id){
@@ -624,26 +697,24 @@ function saveRow(id){
   const date  = document.getElementById('date-'+id).value;
   const price = document.getElementById('price-'+id).value;
 
-  // Save to localStorage
   purchaseData[id] = {store, date, price};
   setPurchaseLocal(purchaseData);
 
-  // Update button
   const btn = document.getElementById('savebtn-'+id);
   btn.textContent = '✅ 저장됨'; btn.className = 'save-row-btn saved';
 
+  const info = document.getElementById('savedinfo-'+id);
+  if(info) info.textContent = '✅ 저장됨' + (price ? ' · '+parseInt(price).toLocaleString()+'원' : '');
+
   updateSummary();
 
-  // Auto-sync to Sheets if URL set
   const url = getScriptUrl();
   if(url && url.includes('script.google.com')){
-    const payload = {
-      action: 'savePurchase',
-      data: {id, name_kr:w.name_kr, type:w.type, vintage:w.vintage||'NV', store, date, price, memo:''}
-    };
-    fetch(url, {method:'POST', body:JSON.stringify(payload)})
-      .then(r=>r.json())
-      .then(res=>{ if(res.ok) console.log('Synced:', id); })
+    fetch(url, {method:'POST', body:JSON.stringify({
+      action:'savePurchase',
+      data:{id, name_kr:w.name_kr, type:w.type, vintage:w.vintage||'NV', store, date, price, memo:''}
+    })}).then(r=>r.json())
+      .then(res=>{ if(res.ok){ btn.textContent='✅ 저장됨 (Sheets)'; }})
       .catch(e=>console.warn('Sync error:', e));
   }
 }
@@ -651,38 +722,12 @@ function saveRow(id){
 // ══════════════════════════════════════
 //  TASTED TABLE
 // ══════════════════════════════════════
-function renderTastedTable(){
-  const tasted = getTasted();
-  const ids = Object.keys(tasted).map(Number).filter(id=>WINES.find(w=>w.id===id));
-  document.getElementById('tastedRecordCount').textContent = `총 ${ids.length}병`;
-
-  const tbody = document.getElementById('tastedBody');
-  if(!ids.length){
-    tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:24px;color:#aeaeb2">아직 마신 와인이 없습니다</td></tr>';
-    return;
-  }
-  const sorted = ids.sort((a,b)=>(tasted[b]||'').localeCompare(tasted[a]||''));
-  tbody.innerHTML = sorted.map(id=>{
-    const w = WINES.find(x=>x.id===id);
-    if(!w) return '';
-    const date = tasted[id];
-    return `<tr>
-      <td style="color:var(--hint);font-size:12px">${w.id}</td>
-      <td class="td-name">${w.name_kr}<small>${w.name_en}</small></td>
-      <td><span class="type-badge ${typeBadge(w.type)}">${typeName(w.type)}</span></td>
-      <td style="color:var(--sub)">${w.vintage||'NV'}</td>
-      <td><span class="tasted-tag">${formatDate(date)}</span></td>
-      <td><button class="untaste-btn" onclick="removeTasted(${id})">취소</button></td>
-    </tr>`;
-  }).join('');
-}
-
 function removeTasted(id){
   if(!confirm('음용 기록을 삭제할까요?')) return;
   const data = getTasted();
   delete data[id];
   setTasted(data);
-  renderTastedTable();
+  renderTastedList();
   updateSummary();
 
   const url = getScriptUrl();
@@ -732,7 +777,7 @@ async function syncPurchase(){
         if(row.id){ purchaseData[row.id]={store:row.store||'',date:row.date||'',price:row.price||''}; }
       });
       setPurchaseLocal(purchaseData);
-      renderPurchaseTable();
+      renderPurchaseList();
       updateSummary();
       showSyncBar('purchaseSyncBar','ok',`✅ ${data.length}건 Google Sheets에서 불러오기 완료`);
     } else {
@@ -788,7 +833,7 @@ function switchTab(tab){
   document.getElementById('tabPurchase').style.display = tab==='purchase'?'block':'none';
   document.getElementById('tabTasted').style.display   = tab==='tasted'?'block':'none';
   document.getElementById('tabGuide').style.display    = tab==='guide'?'block':'none';
-  if(tab==='tasted') renderTastedTable();
+  if(tab==='tasted') renderTastedList();
 }
 
 function copyScript(){
