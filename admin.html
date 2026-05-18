@@ -50,6 +50,8 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);-webkit-font
 .topbar-back:hover{opacity:.7;}
 .topbar-title{font-size:15px;font-weight:700;color:var(--text);}
 .topbar-badge{margin-left:8px;padding:3px 10px;background:var(--wine-bg);color:var(--wine);border-radius:20px;font-size:11px;font-weight:600;}
+.refresh-btn{padding:5px 11px;border-radius:20px;background:var(--bg);border:1px solid var(--sep);font-size:13px;color:var(--sub);cursor:pointer;font-family:var(--font);line-height:1;transition:all .18s;}
+.refresh-btn:hover{background:var(--blue-bg);color:var(--blue);border-color:var(--blue);}
 .topbar-logout{margin-left:auto;padding:5px 14px;border-radius:20px;background:var(--bg);border:1px solid var(--sep);font-size:12px;color:var(--sub);cursor:pointer;font-family:var(--font);}
 
 /* PAGE */
@@ -101,9 +103,10 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);-webkit-font
 .tb-r{background:var(--wine-bg);color:var(--wine);}
 .tb-w{background:var(--gold-bg);color:var(--gold);}
 .tb-s{background:var(--blue-bg);color:var(--blue);}
-.pc-body{padding:12px 16px;display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.pc-body{padding:12px 16px;display:flex;flex-direction:column;gap:10px;}
+.pc-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
 .pc-field{display:flex;flex-direction:column;gap:4px;}
-.pc-field.full{grid-column:1/-1;}
+.pc-field.full{width:100%;}
 .pc-label{font-size:10px;font-weight:600;color:var(--hint);letter-spacing:.05em;text-transform:uppercase;}
 .pc-input{padding:8px 12px;border:1px solid var(--sep);border-radius:9px;font-size:13px;font-family:var(--font);color:var(--text);background:var(--bg);outline:none;width:100%;}
 .pc-input:focus{border-color:var(--wine);background:#fff;}
@@ -184,6 +187,7 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);-webkit-font
 <!-- ══ APP ══ -->
 <div id="app">
   <div class="topbar">
+    <button class="refresh-btn" onclick="location.reload(true)" title="최신 버전으로 새로고침">↺</button>
     <a class="topbar-back" href="index.html">
       <svg width="8" height="14" viewBox="0 0 8 14" fill="none"><path d="M7 1L1 7L7 13" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
       목록
@@ -194,23 +198,6 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);-webkit-font
   </div>
 
   <div class="page">
-
-    <!-- Google Sheets 연동 설정 -->
-    <div class="config-card">
-      <div class="config-icon">📊</div>
-      <div class="config-body">
-        <div class="config-label">Google Apps Script URL</div>
-        <input class="config-input" id="scriptUrl" type="url"
-          placeholder="https://script.google.com/macros/s/.../exec"
-          oninput="saveScriptUrl()">
-        <div class="config-hint">Apps Script 웹 앱 배포 URL · 아래 설정 가이드 탭 참고</div>
-      </div>
-      <div style="display:flex;flex-direction:column;gap:6px;flex-shrink:0;">
-        <button class="config-save-btn" onclick="testConnection()">🔌 연결 테스트</button>
-        <span class="config-status" id="urlStatus">미설정</span>
-      </div>
-    </div>
-    <div class="sync-bar" id="testBar" style="margin-top:-16px;margin-bottom:20px;border-radius:10px;"></div>
 
     <!-- 요약 카드 -->
     <div class="total-card">
@@ -305,6 +292,25 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);-webkit-font
             </div>
           </div>
         </div>
+      </div>
+
+      <!-- Google Apps Script URL 설정 (하단) -->
+      <div style="margin-top:20px;">
+        <div class="config-card">
+          <div class="config-icon">📊</div>
+          <div class="config-body">
+            <div class="config-label">Google Apps Script URL</div>
+            <input class="config-input" id="scriptUrl" type="url"
+              placeholder="https://script.google.com/macros/s/.../exec"
+              oninput="saveScriptUrl()">
+            <div class="config-hint">Apps Script 웹 앱 배포 URL</div>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:6px;flex-shrink:0;">
+            <button class="config-save-btn" onclick="testConnection()">🔌 연결 테스트</button>
+            <span class="config-status" id="urlStatus">미설정</span>
+          </div>
+        </div>
+        <div class="sync-bar" id="testBar" style="margin-top:-8px;border-radius:10px;"></div>
       </div>
     </div>
 
@@ -626,15 +632,17 @@ function renderPurchaseList(){
           <input class="pc-input" id="store-${w.id}" type="text" placeholder="와인샵, 온라인 등"
             value="${p.store||''}" oninput="markDirty(${w.id})">
         </div>
-        <div class="pc-field">
-          <label class="pc-label">구매일</label>
-          <input class="pc-input" id="date-${w.id}" type="date"
-            value="${p.date||''}" oninput="markDirty(${w.id})">
-        </div>
-        <div class="pc-field">
-          <label class="pc-label">구매금액 (원)</label>
-          <input class="pc-input" id="price-${w.id}" type="number" placeholder="0"
-            value="${p.price||''}" oninput="markDirty(${w.id})">
+        <div class="pc-row">
+          <div class="pc-field">
+            <label class="pc-label">구매일</label>
+            <input class="pc-input" id="date-${w.id}" type="date"
+              value="${p.date||''}" oninput="markDirty(${w.id})">
+          </div>
+          <div class="pc-field">
+            <label class="pc-label">구매금액 (원)</label>
+            <input class="pc-input" id="price-${w.id}" type="number" placeholder="0"
+              value="${p.price||''}" oninput="markDirty(${w.id})">
+          </div>
         </div>
       </div>
       <div class="pc-footer">
