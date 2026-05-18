@@ -25,6 +25,9 @@
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
 body{font-family:var(--font);background:var(--bg);color:var(--text);-webkit-font-smoothing:antialiased;min-height:100vh;}
 
+.refresh-btn{width:36px;height:36px;border-radius:50%;background:var(--bg);border:1.5px solid var(--sep);display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all .18s;color:var(--sub);flex-shrink:0;padding:0;}
+.refresh-btn:hover{background:var(--blue-bg);color:var(--blue);border-color:var(--blue);}
+.refresh-btn:active{transform:rotate(180deg);}
 /* TOP BAR */
 .topbar{position:sticky;top:0;z-index:100;background:rgba(255,255,255,0.88);backdrop-filter:saturate(180%) blur(20px);-webkit-backdrop-filter:saturate(180%) blur(20px);border-bottom:1px solid var(--sep);padding:0 20px;height:52px;display:flex;align-items:center;gap:12px;}
 .back-btn{display:flex;align-items:center;gap:6px;font-size:14px;font-weight:500;color:var(--wine);text-decoration:none;padding:6px 0;transition:opacity .15s;}
@@ -152,7 +155,7 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);-webkit-font
 <body>
 
 <div class="topbar">
-  <button class="refresh-btn" onclick="location.reload(true)" title="최신 버전으로 새로고침">↺</button>
+  <button class="refresh-btn" onclick="location.reload(true)" title="최신 버전으로 새로고침"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 4v6h-6"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg></button>
   <a class="back-btn" href="index.html">
     <svg width="8" height="14" viewBox="0 0 8 14" fill="none"><path d="M7 1L1 7L7 13" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
     목록
