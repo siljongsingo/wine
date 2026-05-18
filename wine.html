@@ -323,6 +323,35 @@ function renderDetail(){
     </div>`;
 }
 
+// ── Google Sheets URL ──
+const SCRIPT_URL='https://script.google.com/macros/s/AKfycbzHk7Zfvn8u1J9tm66SBOKsQ-_u4RUY1v1AswybW0hbsjC2ZUKFbogQi5uNaCFLdvX_zA/exec';
+
+async function syncFromSheets(){
+  try{
+    const res=await fetch(SCRIPT_URL+'?action=getTasted');
+    if(!res.ok) return;
+    const rows=await res.json();
+    if(!Array.isArray(rows)||!rows.length) return;
+    const local=getTasted();
+    rows.forEach(row=>{if(row.id&&row.tasted_date) local[row.id]=row.tasted_date;});
+    setTasted(local);
+  }catch(e){console.warn('Sheets 동기화 실패:',e.message);}
+}
+
+async function syncTastedToSheets(id, date){
+  try{
+    if(date){
+      await fetch(SCRIPT_URL,{method:'POST',body:JSON.stringify({
+        action:'saveTasted',
+        data:{id,name_kr:WINE.name_kr,type:WINE.type,vintage:WINE.vintage||'NV',tasted_date:date}
+      })});
+    } else {
+      await fetch(SCRIPT_URL,{method:'POST',body:JSON.stringify({action:'deleteTasted',id})});
+    }
+  }catch(e){console.warn('Sheets 저장 실패:',e.message);}
+}
+
+// 마셨어요 토글 (Sheets 즉시 동기화)
 // INIT
 const params=new URLSearchParams(location.search);
 const wineId=parseInt(params.get('id'));
@@ -332,7 +361,7 @@ if(!wineId){
 }else{
   fetch('wines.json')
     .then(r=>r.json())
-    .then(data=>{
+    .then(async data=>{
       ALL_WINES=data;
       WINE=data.find(w=>w.id===wineId);
       if(!WINE){
@@ -341,6 +370,8 @@ if(!wineId){
       }
       document.title=`${WINE.name_kr} · Raina's Cellar`;
       document.getElementById('topbarTitle').textContent=WINE.name_kr;
+      // Sheets에서 최신 음용 데이터 가져오기
+      await syncFromSheets();
       document.getElementById('stateBox').style.display='none';
       document.getElementById('page').style.display='block';
       renderPhoto();
