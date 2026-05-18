@@ -50,8 +50,16 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);-webkit-font
 .topbar-back:hover{opacity:.7;}
 .topbar-title{font-size:15px;font-weight:700;color:var(--text);}
 .topbar-badge{margin-left:8px;padding:3px 10px;background:var(--wine-bg);color:var(--wine);border-radius:20px;font-size:11px;font-weight:600;}
-.refresh-btn{padding:5px 11px;border-radius:20px;background:var(--bg);border:1px solid var(--sep);font-size:13px;color:var(--sub);cursor:pointer;font-family:var(--font);line-height:1;transition:all .18s;}
+.refresh-btn{
+  width:36px;height:36px;border-radius:50%;
+  background:var(--bg);border:1.5px solid var(--sep);
+  display:flex;align-items:center;justify-content:center;
+  font-size:18px;line-height:1;cursor:pointer;
+  transition:all .18s;color:var(--sub);flex-shrink:0;
+  font-family:var(--font);padding:0;
+}
 .refresh-btn:hover{background:var(--blue-bg);color:var(--blue);border-color:var(--blue);}
+.refresh-btn:active{transform:rotate(180deg);}
 .topbar-logout{margin-left:auto;padding:5px 14px;border-radius:20px;background:var(--bg);border:1px solid var(--sep);font-size:12px;color:var(--sub);cursor:pointer;font-family:var(--font);}
 
 /* PAGE */
@@ -187,7 +195,7 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);-webkit-font
 <!-- ══ APP ══ -->
 <div id="app">
   <div class="topbar">
-    <button class="refresh-btn" onclick="location.reload(true)" title="최신 버전으로 새로고침">↺</button>
+    <button class="refresh-btn" onclick="location.reload(true)" title="최신 버전으로 새로고침"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 4v6h-6"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg></button>
     <a class="topbar-back" href="index.html">
       <svg width="8" height="14" viewBox="0 0 8 14" fill="none"><path d="M7 1L1 7L7 13" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
       목록
