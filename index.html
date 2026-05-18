@@ -158,6 +158,9 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);-webkit-font
 /* 날짜 + 정렬 한 줄 */
 .date-sort-row{display:flex;align-items:center;padding:4px 14px 6px;border-top:1px solid var(--sep2);}
 .date-sort-bar{font-size:10px;color:var(--hint);letter-spacing:.04em;flex:1;}
+
+.fs-sub{font-size:8px;color:var(--hint);margin-top:1px;letter-spacing:.03em;}
+.fs-btn.on .fs-sub,.fs-btn.on-r .fs-sub,.fs-btn.on-w .fs-sub,.fs-btn.on-s .fs-sub{color:rgba(255,255,255,0.65);}
 @keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
 @keyframes spin{to{transform:rotate(360deg)}}
 </style>
@@ -171,6 +174,8 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);-webkit-font
     <h1 class="header-title">Raina's Home Wine Cellar</h1>
     <a href="admin.html" class="admin-link" title="관리자">⚙️</a>
   </div>
+  <!-- 마신 와인 배지 -->
+  <div id="tastedBadge" style="display:none;text-align:center;font-size:11px;color:var(--green);font-weight:500;padding:2px 0 0;"></div>
   <!-- 통합 필터-통계 버튼 -->
   <div class="filter-stat-row">
     <button class="fs-btn on" data-f="all">
@@ -349,12 +354,19 @@ function renderTasted(){
 }
 
 function updateStats(){
+  const tasted=getTasted();
+  // 마신 와인 제외한 잔여 수량만 표시
+  const remaining=WINES.filter(w=>!tasted[w.id]);
   const cnt={red:0,white:0,sparkling:0};
-  WINES.forEach(w=>cnt[w.type]++);
-  document.getElementById('sTotal').textContent=WINES.length;
+  remaining.forEach(w=>cnt[w.type]++);
+  document.getElementById('sTotal').textContent=remaining.length;
   document.getElementById('sRed').textContent=cnt.red;
   document.getElementById('sWhite').textContent=cnt.white;
   document.getElementById('sSpark').textContent=cnt.sparkling;
+  // 마신 와인 수 배지 표시
+  const tastedCount=Object.keys(tasted).length;
+  const badge=document.getElementById('tastedBadge');
+  if(badge){badge.textContent=tastedCount>0?`🍷 ${tastedCount}병 음용`:'';badge.style.display=tastedCount>0?'block':'none';}
 }
 
 function render(){
@@ -384,13 +396,87 @@ document.querySelectorAll('#countryNav .nav-tab').forEach(btn=>{
 });
 document.getElementById('sortSel').addEventListener('change',render);
 
+// 다른 페이지(wine.html)에서 마셨어요 변경 시 자동 반영
+window.addEventListener('storage', e=>{
+  if(e.key==='wineTasted'){ render(); updateStats(); }
+});
+
+// ── Google Sheets URL ──
+const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzHk7Zfvn8u1J9tm66SBOKsQ-_u4RUY1v1AswybW0hbsjC2ZUKFbogQi5uNaCFLdvX_zA/exec';
+
+// ── Sheets 동기화 ──
+async function syncFromSheets(){
+  try{
+    const res = await fetch(SCRIPT_URL+'?action=getTasted');
+    if(!res.ok) return;
+    const rows = await res.json();
+    if(!Array.isArray(rows)||!rows.length) return;
+
+    // Sheets 데이터를 localStorage에 병합 (Sheets 우선)
+    const local = getTasted();
+    rows.forEach(row=>{
+      if(row.id && row.tasted_date){
+        local[row.id] = row.tasted_date;
+      }
+    });
+    setTasted(local);
+  } catch(e){
+    console.warn('Sheets 동기화 실패 (오프라인?):', e.message);
+  }
+}
+
+async function syncTastedToSheets(id, date){
+  const w = WINES.find(x=>x.id===id);
+  if(!w) return;
+  try{
+    if(date){
+      // 마셨어요 추가
+      await fetch(SCRIPT_URL, {method:'POST', body:JSON.stringify({
+        action:'saveTasted',
+        data:{id, name_kr:w.name_kr, type:w.type, vintage:w.vintage||'NV', tasted_date:date}
+      })});
+    } else {
+      // 마셨어요 취소
+      await fetch(SCRIPT_URL, {method:'POST', body:JSON.stringify({
+        action:'deleteTasted', id
+      })});
+    }
+  } catch(e){
+    console.warn('Sheets 저장 실패:', e.message);
+  }
+}
+
+// ── 마셨어요 토글 (Sheets 즉시 동기화) ──
+function toggleTasted(id,e){
+  e.stopPropagation();
+  const data=getTasted();
+  let date = null;
+  if(data[id]){
+    delete data[id];
+  } else {
+    date = new Date().toISOString().slice(0,10);
+    data[id] = date;
+  }
+  setTasted(data);
+  render(); updateStats();
+  // Sheets 비동기 저장
+  syncTastedToSheets(id, date);
+}
+
 fetch('wines.json')
   .then(r=>r.json())
-  .then(data=>{
+  .then(async data=>{
     WINES=data;
+    // 로딩 메시지 업데이트
+    const loadingText = document.querySelector('.loading-text');
+    if(loadingText) loadingText.textContent='Google Sheets 동기화 중...';
+
+    // Sheets에서 마신 와인 데이터 가져오기
+    await syncFromSheets();
+
     document.getElementById('loading').style.display='none';
     document.getElementById('grid').style.display='grid';
-    updateStats();render();
+    updateStats(); render();
   })
   .catch(err=>{
     document.getElementById('loading').innerHTML=`<div style="color:#8c1a31;font-size:14px;text-align:center">⚠️ 데이터를 불러올 수 없습니다.<br><small style="color:#aeaeb2">${err.message}</small></div>`;
