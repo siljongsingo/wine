@@ -231,6 +231,7 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);-webkit-font
     <button class="nav-tab" data-c="NewZealand">🇳🇿 <span class="flag-text">뉴질랜드</span></button>
     <button class="nav-tab" data-c="Australia">🇦🇺 <span class="flag-text">호주</span></button>
     <button class="nav-tab" data-c="Spain">🇪🇸 <span class="flag-text">스페인</span></button>
+    <button class="nav-tab" data-c="UK">🇬🇧 <span class="flag-text">영국</span></button>
   </div>
   </div><!-- end nav-wrap -->
 </div><!-- end sticky-header -->
@@ -256,7 +257,13 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);-webkit-font
 const NOW=new Date().getFullYear();
 let WINES=[],af='all',ac='all';
 
-function getTasted(){try{return JSON.parse(localStorage.getItem('wineTasted')||'{}')}catch(e){return{}}}
+function getTasted(){
+  try{
+    const saved=JSON.parse(localStorage.getItem('wineTasted')||'{}');
+    // DEFAULT_TASTED 병합 (저장된 항목 우선, 없는 항목만 기본값 적용)
+    return Object.assign({}, DEFAULT_TASTED, saved);
+  }catch(e){ return Object.assign({}, DEFAULT_TASTED); }
+}
 function setTasted(obj){try{localStorage.setItem('wineTasted',JSON.stringify(obj))}catch(e){}}
 function formatDate(iso){if(!iso)return'';const[y,m,d]=iso.split('-');return`${y}.${m}.${d}`}
 function toggleTasted(id,e){

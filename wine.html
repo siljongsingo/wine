@@ -180,7 +180,14 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);-webkit-font
 const NOW=new Date().getFullYear();
 let WINE=null,ALL_WINES=[];
 
-function getTasted(){try{return JSON.parse(localStorage.getItem('wineTasted')||'{}')}catch(e){return{}}}
+// 기본 음용 기록
+const DEFAULT_TASTED={6:'2026-06-05',19:'2026-06-05',24:'2026-06-03',25:'2026-05-19'};
+function getTasted(){
+  try{
+    const saved=JSON.parse(localStorage.getItem('wineTasted')||'{}');
+    return Object.assign({},DEFAULT_TASTED,saved);
+  }catch(e){return Object.assign({},DEFAULT_TASTED);}
+}
 function setTasted(obj){try{localStorage.setItem('wineTasted',JSON.stringify(obj))}catch(e){}}
 function formatDate(iso){if(!iso)return'';const[y,m,d]=iso.split('-');return`${y}.${m}.${d}`}
 
