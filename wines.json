@@ -1436,14 +1436,14 @@
   },
   {
     "id": 27,
-    "name_en": "DADÁ Art #391 Sauvignon Blanc",
-    "name_kr": "다다 아트 #391 소비뇽 블랑",
+    "name_en": "DADÁ Art Sauvignon Blanc #391",
+    "name_kr": "다다 아트 소비뇽 블랑 #391",
     "vintage": null,
-    "region": "Argentina · Finca Las Moras (New Zealand grapes)",
+    "region": "Argentina · San Juan (Finca Las Moras)",
     "grape": "Sauvignon Blanc",
     "type": "white",
-    "vivino": 3.8,
-    "vu": "https://www.vivino.com/",
+    "vivino": 3.9,
+    "vu": "https://www.vivino.com/en/bodega-finca-las-moras-dada-art-sauvignon-blanc-391/w/11984228",
     "country": "Argentina",
     "tasting": {
       "color": [
@@ -1494,10 +1494,10 @@
     "name_kr": "메나쥬 아 트로아 골드 샤르도네",
     "vintage": 2023,
     "region": "USA · California",
-    "grape": "Chardonnay",
+    "grape": "Chardonnay, Viognier & Verdelho",
     "type": "white",
-    "vivino": 3.9,
-    "vu": "https://www.vivino.com/",
+    "vivino": 3.7,
+    "vu": "https://www.vivino.com/US/en/menage-a-trois-gold-chardonnay-california-white-wine-v/w/4898486",
     "country": "USA",
     "tasting": {
       "color": [
@@ -1548,11 +1548,11 @@
     "name_en": "DADÁ Art White Malbec #391",
     "name_kr": "다다 아트 화이트 말백 #391",
     "vintage": 2024,
-    "region": "Argentina · San Juan",
-    "grape": "Malbec (White)",
+    "region": "Argentina · San Juan (Finca Las Moras)",
+    "grape": "Malbec (White / Blanc de Malbec)",
     "type": "white",
     "vivino": 3.8,
-    "vu": "https://www.vivino.com/",
+    "vu": "https://www.vivino.com/en/bodega-finca-las-moras-dada-art-white-malbec-391/w/10000931",
     "country": "Argentina",
     "tasting": {
       "color": [
@@ -1600,14 +1600,14 @@
   },
   {
     "id": 30,
-    "name_en": "Freixenet Reserva Vintage",
-    "name_kr": "프레이스네트 레세르바 빈티지",
+    "name_en": "Freixenet Cava Reserva Vintage",
+    "name_kr": "프레이스네트 카바 레세르바 빈티지",
     "vintage": 2021,
     "region": "Spain · Penedès (Cava DO)",
-    "grape": "Macabeo, Parellada & Xarel·lo",
+    "grape": "Chardonnay, Macabeo & Parellada",
     "type": "sparkling",
-    "vivino": 3.9,
-    "vu": "https://www.vivino.com/",
+    "vivino": 3.7,
+    "vu": "https://www.vivino.com/en/freixenet-cava-reserva-vintage-brut-nature/w/1141516",
     "country": "Spain",
     "tasting": {
       "color": [
@@ -1654,14 +1654,14 @@
   },
   {
     "id": 31,
-    "name_en": "Marques de Casa Concha Blue Carmenere",
+    "name_en": "Marques de Casa Concha Blue Carmenère",
     "name_kr": "마르케스 데 카사 콘차 블루 카르메네르",
     "vintage": 2021,
     "region": "Chile · Peumo, Colchagua Valley",
-    "grape": "Carmenere",
+    "grape": "Carménère, Cabernet Sauvignon & Merlot",
     "type": "red",
-    "vivino": 4.1,
-    "vu": "https://www.vivino.com/",
+    "vivino": 4.2,
+    "vu": "https://www.vivino.com/en/marques-de-casa-concha-carmenere/w/1135113",
     "country": "Chile",
     "tasting": {
       "color": [
@@ -1716,8 +1716,8 @@
     "region": "Chile · Maipo Andes",
     "grape": "Cabernet Sauvignon",
     "type": "red",
-    "vivino": 4.2,
-    "vu": "https://www.vivino.com/",
+    "vivino": 4.1,
+    "vu": "https://www.vivino.com/US/en/marques-de-casa-concha-gold-cabernet-sauvignon/w/12790047",
     "country": "Chile",
     "tasting": {
       "color": [
@@ -1765,5 +1765,61 @@
     "rank": 32,
     "ct": "★★★",
     "cd": "마이포 안데스 프리미엄 카베르네 소비뇽"
+  },
+  {
+    "id": 33,
+    "name_en": "Hattingley Valley English Sparkling Wine (M&S Collection)",
+    "name_kr": "해팅글리 밸리 잉글리시 스파클링 와인",
+    "vintage": 2018,
+    "region": "England · Hampshire, Hattingley Valley",
+    "grape": "Chardonnay (53%), Pinot Noir (30%) & Pinot Meunier (14%)",
+    "type": "sparkling",
+    "vivino": 4.1,
+    "vu": "https://www.vivino.com/en/hattingley-m-s-collection-english-sparkling/w/11811837",
+    "country": "UK",
+    "tasting": {
+      "color": [
+        "밝은 황금빛",
+        "섬세하고 지속적인 기포"
+      ],
+      "aroma": [
+        "레몬 타르트",
+        "그린 애플",
+        "흰 꽃",
+        "브리오슈",
+        "초크 미네랄"
+      ],
+      "taste": [
+        "생생하고 긴장감 있는 산도",
+        "크리미한 질감",
+        "영국 스파클링 특유의 미네랄리티",
+        "복합적인 효모 뉘앙스"
+      ],
+      "finish": [
+        "길고 순수한 여운",
+        "레몬 제스트",
+        "초크",
+        "짭조름한 미네랄"
+      ],
+      "body": 58,
+      "tannin": 0,
+      "acidity": 88,
+      "alcohol": 60
+    },
+    "story": "해팅글리 밸리(Hattingley Valley)는 잉글랜드 햄프셔(Hampshire)에 위치한 영국 최고의 스파클링 와인 생산자 중 하나입니다. M&S(Marks & Spencer) 콜렉션의 일환으로 선정된 이 와인은 '세계 유명 지역의 아이코닉 와인 중 탁월한 선별'이라는 M&S의 철학을 담고 있습니다. 2018 빈티지는 전통 방식(Traditional Method Brut)으로 양조되었으며, 영국 남부의 초크(chalk) 토양에서 자란 피노 누아, 샤르도네, 뫼니에를 블렌딩했습니다. 샴페인과 같은 제조 방식으로 만들어지나 영국 특유의 높은 산도와 미네랄리티가 독보적입니다. 최근 영국 스파클링 와인이 세계 주요 대회에서 샴페인을 누르며 급부상하고 있습니다.",
+    "food": [
+      "굴과 레몬",
+      "스모크 살몬",
+      "생선 앤 칩스",
+      "피시 파이",
+      "크림 스콘"
+    ],
+    "df": 2020,
+    "dps": 2025,
+    "dpe": 2030,
+    "du": 2033,
+    "rank": 33,
+    "ct": "★★★★",
+    "cd": "영국 최고급 스파클링 — 샴페인에 도전하는 English Sparkling"
   }
 ]
