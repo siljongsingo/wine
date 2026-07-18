@@ -256,48 +256,144 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);-webkit-font
 <script>
 const NOW=new Date().getFullYear();
 let WINES=[],af='all',ac='all';
+const DEFAULT_TASTED={6:'2026-06-05',19:'2026-06-05',24:'2026-06-03',25:'2026-05-19'};
+const SCRIPT_URL='https://script.google.com/macros/s/AKfycbzHk7Zfvn8u1J9tm66SBOKsQ-_u4RUY1v1AswybW0hbsjC2ZUKFbogQi5uNaCFLdvX_zA/exec';
 
 function getTasted(){
-  try{
-    const saved=JSON.parse(localStorage.getItem('wineTasted')||'{}');
-    // DEFAULT_TASTED 병합 (저장된 항목 우선, 없는 항목만 기본값 적용)
-    return Object.assign({}, DEFAULT_TASTED, saved);
-  }catch(e){ return Object.assign({}, DEFAULT_TASTED); }
+  try{var s=JSON.parse(localStorage.getItem('wineTasted')||'{}');return Object.assign({},DEFAULT_TASTED,s);}
+  catch(e){return Object.assign({},DEFAULT_TASTED);}
 }
-function setTasted(obj){try{localStorage.setItem('wineTasted',JSON.stringify(obj))}catch(e){}}
-function formatDate(iso){if(!iso)return'';const[y,m,d]=iso.split('-');return`${y}.${m}.${d}`}
+function setTasted(o){try{localStorage.setItem('wineTasted',JSON.stringify(o));}catch(e){}}
+function formatDate(iso){if(!iso)return'';var p=iso.split('-');return p[0]+'.'+p[1]+'.'+p[2];}
+
+async function syncFromSheets(){
+  try{
+    var res=await fetch(SCRIPT_URL+'?action=getTasted');
+    if(!res.ok)return;
+    var rows=await res.json();
+    if(!Array.isArray(rows))return;
+    var local=getTasted();
+    rows.forEach(function(r){if(r.id&&r.tasted_date)local[r.id]=r.tasted_date;});
+    setTasted(local);
+  }catch(e){}
+}
+async function syncTastedToSheets(id,date){
+  var w=WINES.find(function(x){return x.id===id;});if(!w)return;
+  try{
+    var body=date
+      ?JSON.stringify({action:'saveTasted',data:{id:id,name_kr:w.name_kr,type:w.type,vintage:w.vintage||'NV',tasted_date:date}})
+      :JSON.stringify({action:'deleteTasted',id:id});
+    await fetch(SCRIPT_URL,{method:'POST',body:body});
+  }catch(e){}
+}
 function toggleTasted(id,e){
   e.stopPropagation();
-  const data=getTasted();
-  if(data[id]){delete data[id]}else{data[id]=new Date().toISOString().slice(0,10)}
-  setTasted(data);render();updateStats();
+  var data=getTasted(),date=null;
+  if(data[id])delete data[id];
+  else{date=new Date().toISOString().slice(0,10);data[id]=date;}
+  setTasted(data);render();updateStats();syncTastedToSheets(id,date);
 }
 
-function vTag(t){return t==='white'?'tag-w':t==='sparkling'?'tag-s':'tag-r'}
-function typeName(t){return{red:'레드',white:'화이트',sparkling:'스파클링'}[t]||t}
-function badgeCls(t){return{red:'badge-red',white:'badge-white',sparkling:'badge-sparkling'}[t]||''}
-function ph(id){return`wines/${id}.jpg`}
+function vTag(t){return t==='white'?'tag-w':t==='sparkling'?'tag-s':'tag-r';}
+function typeName(t){return{red:'레드',white:'화이트',sparkling:'스파클링'}[t]||t;}
+function badgeCls(t){return{red:'badge-red',white:'badge-white',sparkling:'badge-sparkling'}[t]||'';}
+function ph(id){return 'wines/'+id+'.jpg';}
 function drinkStatus(w){
-  if(NOW<w.df)return{t:`${w.df}년부터`,c:'wait'};
+  if(NOW<w.df)return{t:w.df+'년부터',c:'wait'};
   if(NOW>w.du)return{t:'음용기 경과',c:'expired'};
-  if(NOW>=w.dps&&NOW<=w.dpe)return{t:'지금 최적 🟢',c:'peak'};
-  return{t:`피크: ${w.dps}–${w.dpe}`,c:''}
+  if(NOW>=w.dps&&NOW<=w.dpe)return{t:'지금 최적 \uD83D\uDFE2',c:'peak'};
+  return{t:'피크: '+w.dps+'\u2013'+w.dpe,c:''};
 }
 function dnd(w){
   if(NOW>=w.dps&&NOW<=w.dpe)return 0;
-  return Math.min(Math.abs(NOW-w.dps),Math.abs(NOW-w.dpe))
-}
-function bsvg(type){
-  const p={red:{b:'#e2c4cb',l:'#8c1a31'},white:{b:'#dfd7b0',l:'#7a5c14'},sparkling:{b:'#b0c4d8',l:'#1a5c8c'}}[type]||{b:'#ccc',l:'#666'};
-  return`<svg width="52" height="130" viewBox="0 0 40 100"><rect x="16" y="0" width="8" height="6" rx="2" fill="${p.l}" opacity=".5"/><rect x="15" y="5" width="10" height="20" rx="3" fill="${p.b}" opacity=".6"/><path d="M13 25 Q8 32 8 42 L8 82 Q8 92 20 92 Q32 92 32 82 L32 42 Q32 32 27 25 Z" fill="${p.b}" opacity=".55"/><rect x="12" y="50" width="16" height="20" rx="2" fill="${p.l}" opacity=".2"/></svg>`
+  return Math.min(Math.abs(NOW-w.dps),Math.abs(NOW-w.dpe));
 }
 
+function renderCard(w,i){
+  var d=drinkStatus(w),top=w.rank<=5,pct=Math.round(w.vivino/5*100);
+  var tasted=getTasted(),isTasted=!!tasted[w.id],tDate=tasted[w.id]||'';
+  var id=w.id;
+  var html='<a class="card'+(isTasted?' tasted':'')+'" style="animation-delay:'+(i*0.04)+'s" href="wine.html?id='+id+'">';
+  html+='<div class="card-photo">';
+  html+='<div class="card-photo-bg" style="background-image:url(wines/'+id+'.jpg)"></div>';
+  html+='<img class="main-img" src="wines/'+id+'.jpg" alt="" onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'flex\'">';
+  html+='<div class="photo-ph" style="display:none"></div>';
+  html+='<span class="card-type-badge '+badgeCls(w.type)+'">'+typeName(w.type)+'</span>';
+  html+='<div class="card-rank'+(top?' top':'')+'">'+( top?'★':'#')+w.rank+'</div>';
+  if(isTasted)html+='<div class="tasted-ribbon"><span>\u2705</span><span class="tasted-ribbon-text">\ub9c8\uc168\uc5b4\uc694</span><span class="tasted-ribbon-date">'+formatDate(tDate)+'</span></div>';
+  html+='</div>';
+  html+='<div class="card-body">';
+  html+='<div class="card-name-kr">'+w.name_kr+'</div>';
+  html+='<div class="card-name-en">'+w.name_en+'</div>';
+  html+='<div class="card-tags">';
+  html+='<span class="tag '+vTag(w.type)+'">'+(w.vintage||'NV')+'</span>';
+  var region=w.region.indexOf('\u00b7')>=0?w.region.split('\u00b7')[0].trim():w.region.split('·')[0].trim();
+  html+='<span class="tag">'+region+'</span>';
+  var grape=w.grape.split(',')[0].split('&')[0].trim();
+  html+='<span class="tag">'+grape+'</span>';
+  html+='</div>';
+  html+='<div class="card-vivino"><div class="v-logo-sm">V</div>';
+  html+='<div class="v-bar"><div class="v-bar-fill" style="width:'+pct+'%"></div></div>';
+  html+='<span class="v-score-sm">'+w.vivino.toFixed(1)+'</span></div>';
+  html+='</div>';
+  html+='<div class="card-footer"><span class="ds '+d.c+'">'+d.t+'</span><span class="card-arrow">&#8250;</span></div>';
+  html+='</a>';
+  return html;
+}
+
+function renderTasted(){
+  var tasted=getTasted(),ids=Object.keys(tasted).map(Number);
+  var sec=document.getElementById('tastedSection');
+  if(!ids.length||!WINES.length){sec.style.display='none';return;}
+  sec.style.display='block';
+  document.getElementById('tastedCount').textContent='\uc218 '+ids.length+'\ubcd1';
+  document.getElementById('tastedCount').textContent='\uc644 '+ids.length+'\ubcd1';
+  var sorted=ids.map(function(id){return{w:WINES.find(function(x){return x.id===id;}),date:tasted[id]};})
+    .filter(function(x){return x.w;}).sort(function(a,b){return b.date.localeCompare(a.date);});
+  var html='';
+  sorted.forEach(function(item){
+    var w=item.w,date=item.date;
+    html+='<a class="tasted-item" href="wine.html?id='+w.id+'">';
+    html+='<div class="tasted-item-photo"><img src="'+ph(w.id)+'" onerror="this.style.opacity=0"></div>';
+    html+='<div class="tasted-item-body">';
+    html+='<div class="tasted-item-name">'+w.name_kr+'</div>';
+    html+='<div class="tasted-item-en">'+w.name_en+'</div>';
+    html+='<div class="tasted-item-tags">';
+    html+='<span class="tag '+vTag(w.type)+'" style="font-size:10px">'+(w.vintage||'NV')+'</span>';
+    html+='<span class="tag" style="font-size:10px">'+typeName(w.type)+'</span>';
+    html+='</div></div>';
+    html+='<div class="tasted-item-right">';
+    html+='<div class="tasted-date-label">\uc74c\uc6a9\uc77c</div>';
+    html+='<div class="tasted-date-val">'+formatDate(date)+'</div>';
+    html+='<button class="untaste-btn" onclick="event.preventDefault();toggleTasted('+w.id+',event)">\ucde8\uc18c</button>';
+    html+='</div></a>';
+  });
+  document.getElementById('tastedList').innerHTML=html;
+}
+
+function updateStats(){
+  var tasted=getTasted();
+  var rem=WINES.filter(function(w){return !tasted[w.id];});
+  var cnt={red:0,white:0,sparkling:0};
+  rem.forEach(function(w){cnt[w.type]++;});
+  document.getElementById('sTotal').textContent=rem.length;
+  document.getElementById('sRed').textContent=cnt.red;
+  document.getElementById('sWhite').textContent=cnt.white;
+  document.getElementById('sSpark').textContent=cnt.sparkling;
+}
+
+function render(){
+  var list=getList();
+  var html='';
+  list.forEach(function(w,i){html+=renderCard(w,i);});
+  document.getElementById('grid').innerHTML=html;
+  renderTasted();
+}
 function getList(){
-  const s=document.getElementById('sortSel').value;
-  let arr=[...WINES];
-  if(af!=='all')arr=arr.filter(w=>w.type===af);
-  if(ac!=='all')arr=arr.filter(w=>w.country===ac);
-  return arr.sort((a,b)=>{
+  var s=document.getElementById('sortSel').value,arr=WINES.slice();
+  if(af!=='all')arr=arr.filter(function(w){return w.type===af;});
+  if(ac!=='all')arr=arr.filter(function(w){return w.country===ac;});
+  arr.sort(function(a,b){
     if(s==='rank')return a.rank-b.rank;
     if(s==='vivino')return b.vivino-a.vivino;
     if(s==='vd')return(b.vintage||0)-(a.vintage||0);
@@ -306,191 +402,34 @@ function getList(){
     if(s==='region')return a.region.localeCompare(b.region);
     return 0;
   });
+  return arr;
 }
 
-function renderCard(w,i){
-  const d=drinkStatus(w);const top=w.rank<=5;
-  const pct=((w.vivino/5)*100).toFixed(0);
-  const tasted=getTasted();const isTasted=!!tasted[w.id];const tDate=tasted[w.id]||'';
-  const src=ph(w.id);
-  return`<a class="card${isTasted?' tasted':''}" style="animation-delay:${i*.04}s" href="wine.html?id=${w.id}">
-  <div class="card-photo">
-    <div class="card-photo-bg" style="background-image:url('${src}')"></div>
-    <img class="main-img" src="${src}" alt="${w.name_kr}" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
-    <div class="photo-ph" style="display:none">${bsvg(w.type)}</div>
-    <span class="card-type-badge ${badgeCls(w.type)}">${typeName(w.type)}</span>
-    <div class="card-rank${top?' top':''}">${top?'★':'#'}${w.rank}</div>
-    ${isTasted?`<div class="tasted-ribbon"><span>✅</span><span class="tasted-ribbon-text">마셨어요</span><span class="tasted-ribbon-date">${formatDate(tDate)}</span></div>`:''}
-  </div>
-  <div class="card-body">
-    <div class="card-name-kr">${w.name_kr}</div>
-    <div class="card-name-en">${w.name_en}</div>
-    <div class="card-tags">
-      <span class="tag ${vTag(w.type)}">${w.vintage||'NV'}</span>
-      <span class="tag">${w.region.split('·')[0].trim()}</span>
-      <span class="tag">${w.grape.split(',')[0].split('&')[0].trim()}</span>
-    </div>
-    <div class="card-vivino">
-      <div class="v-logo-sm">V</div>
-      <div class="v-bar"><div class="v-bar-fill" style="width:${pct}%"></div></div>
-      <span class="v-score-sm">${w.vivino.toFixed(1)}</span>
-    </div>
-  </div>
-  <div class="card-footer">
-    <span class="ds ${d.c}">${d.t}</span>
-    <span class="card-arrow">›</span>
-  </div>
-</a>`
-}
-
-function renderTasted(){
-  const tasted=getTasted();const ids=Object.keys(tasted).map(Number);
-  const sec=document.getElementById('tastedSection');
-  if(!ids.length||!WINES.length){sec.style.display='none';return}
-  sec.style.display='block';
-  document.getElementById('tastedCount').textContent=`총 ${ids.length}병`;
-  const sorted=ids.map(id=>({w:WINES.find(x=>x.id===id),date:tasted[id]}))
-    .filter(x=>x.w).sort((a,b)=>b.date.localeCompare(a.date));
-  document.getElementById('tastedList').innerHTML=sorted.map(({w,date})=>`
-    <a class="tasted-item" href="wine.html?id=${w.id}">
-      <div class="tasted-item-photo"><img src="${ph(w.id)}" alt="${w.name_kr}" onerror="this.style.opacity=0"></div>
-      <div class="tasted-item-body">
-        <div class="tasted-item-name">${w.name_kr}</div>
-        <div class="tasted-item-en">${w.name_en}</div>
-        <div class="tasted-item-tags">
-          <span class="tag ${vTag(w.type)}" style="font-size:10px">${w.vintage||'NV'}</span>
-          <span class="tag" style="font-size:10px">${typeName(w.type)}</span>
-          <span class="tag" style="font-size:10px">${w.region.split('·')[0].trim()}</span>
-        </div>
-      </div>
-      <div class="tasted-item-right">
-        <div class="tasted-date-label">음용일</div>
-        <div class="tasted-date-val">${formatDate(date)}</div>
-        <button class="untaste-btn" onclick="toggleTasted(${w.id},event)">취소</button>
-      </div>
-    </a>`).join('');
-}
-
-function updateStats(){
-  const tasted=getTasted();
-  // 마신 와인 제외한 잔여 수량만 표시
-  const remaining=WINES.filter(w=>!tasted[w.id]);
-  const cnt={red:0,white:0,sparkling:0};
-  remaining.forEach(w=>cnt[w.type]++);
-  document.getElementById('sTotal').textContent=remaining.length;
-  document.getElementById('sRed').textContent=cnt.red;
-  document.getElementById('sWhite').textContent=cnt.white;
-  document.getElementById('sSpark').textContent=cnt.sparkling;
-  // 마신 와인 수 배지 표시
-  const tastedCount=Object.keys(tasted).length;
-  const badge=document.getElementById('tastedBadge');
-  if(badge){badge.textContent=tastedCount>0?`🍷 ${tastedCount}병 음용`:'';badge.style.display=tastedCount>0?'block':'none';}
-}
-
-function render(){
-  document.getElementById('grid').innerHTML=getList().map((w,i)=>renderCard(w,i)).join('');
-  renderTasted();
-}
-
-document.querySelectorAll('.fs-btn').forEach(btn=>{
-  btn.addEventListener('click',()=>{
-    document.querySelectorAll('.fs-btn').forEach(b=>{
-      b.classList.remove('on','on-r','on-w','on-s');
-    });
-    const f=btn.dataset.f;
-    af=f;
-    if(f==='all')    btn.classList.add('on');
-    else if(f==='red')       btn.classList.add('on-r');
-    else if(f==='white')     btn.classList.add('on-w');
-    else if(f==='sparkling') btn.classList.add('on-s');
+document.querySelectorAll('.fs-btn').forEach(function(btn){
+  btn.addEventListener('click',function(){
+    document.querySelectorAll('.fs-btn').forEach(function(b){b.classList.remove('on','on-r','on-w','on-s');});
+    var f=btn.dataset.f;af=f;
+    if(f==='all')btn.classList.add('on');
+    else if(f==='red')btn.classList.add('on-r');
+    else if(f==='white')btn.classList.add('on-w');
+    else if(f==='sparkling')btn.classList.add('on-s');
     render();
   });
 });
-document.querySelectorAll('#countryNav .nav-tab').forEach(btn=>{
-  btn.addEventListener('click',()=>{
-    document.querySelectorAll('#countryNav .nav-tab').forEach(b=>b.classList.remove('on-c'));
+document.querySelectorAll('#countryNav .nav-tab').forEach(function(btn){
+  btn.addEventListener('click',function(){
+    document.querySelectorAll('#countryNav .nav-tab').forEach(function(b){b.classList.remove('on-c');});
     btn.classList.add('on-c');ac=btn.dataset.c;render();
   });
 });
 document.getElementById('sortSel').addEventListener('change',render);
+window.addEventListener('storage',function(e){if(e.key==='wineTasted'){render();updateStats();}});
 
-// 다른 페이지(wine.html)에서 마셨어요 변경 시 자동 반영
-window.addEventListener('storage', e=>{
-  if(e.key==='wineTasted'){ render(); updateStats(); }
-});
-
-// ── Google Sheets URL ──
-const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzHk7Zfvn8u1J9tm66SBOKsQ-_u4RUY1v1AswybW0hbsjC2ZUKFbogQi5uNaCFLdvX_zA/exec';
-
-// ── Sheets 동기화 ──
-async function syncFromSheets(){
-  try{
-    const res = await fetch(SCRIPT_URL+'?action=getTasted');
-    if(!res.ok) return;
-    const rows = await res.json();
-    if(!Array.isArray(rows)||!rows.length) return;
-
-    // Sheets 데이터를 localStorage에 병합 (Sheets 우선)
-    const local = getTasted();
-    rows.forEach(row=>{
-      if(row.id && row.tasted_date){
-        local[row.id] = row.tasted_date;
-      }
-    });
-    setTasted(local);
-  } catch(e){
-    console.warn('Sheets 동기화 실패 (오프라인?):', e.message);
-  }
-}
-
-async function syncTastedToSheets(id, date){
-  const w = WINES.find(x=>x.id===id);
-  if(!w) return;
-  try{
-    if(date){
-      // 마셨어요 추가
-      await fetch(SCRIPT_URL, {method:'POST', body:JSON.stringify({
-        action:'saveTasted',
-        data:{id, name_kr:w.name_kr, type:w.type, vintage:w.vintage||'NV', tasted_date:date}
-      })});
-    } else {
-      // 마셨어요 취소
-      await fetch(SCRIPT_URL, {method:'POST', body:JSON.stringify({
-        action:'deleteTasted', id
-      })});
-    }
-  } catch(e){
-    console.warn('Sheets 저장 실패:', e.message);
-  }
-}
-
-// ── 마셨어요 토글 (Sheets 즉시 동기화) ──
-function toggleTasted(id,e){
-  e.stopPropagation();
-  const data=getTasted();
-  let date = null;
-  if(data[id]){
-    delete data[id];
-  } else {
-    date = new Date().toISOString().slice(0,10);
-    data[id] = date;
-  }
-  setTasted(data);
-  render(); updateStats();
-  // Sheets 비동기 저장
-  syncTastedToSheets(id, date);
-}
-
-// ── 와인 데이터 내장 (wines.json 불필요) ──
-WINES = [{"id":1,"name_en":"Buccella Cabernet Sauvignon","name_kr":"부켈라 카베르네 소비뇽","vintage":2018,"region":"USA · Napa Valley","grape":"Cabernet Sauvignon","type":"red","vivino":4.5,"vu":"https://www.vivino.com/en/buccella-cabernet-sauvignon/w/100715","tasting":{"color":["짙은 루비","보랏빛 테두리"],"aroma":["블랙커런트","블랙베리","모카","삼나무","바이올렛"],"taste":["풍부한 과실미","벨벳 탄닌","균형 잡힌 산도","미네랄"],"finish":["길고 우아한 여운","다크초콜릿","스파이스"],"body":85,"tannin":80,"acidity":60,"alcohol":88},"story":"부켈라는 나파 밸리에서도 가장 희귀하고 소량 생산되는 와이너리 중 하나입니다. 전통적인 와인 명가의 이름을 딴 이 와이너리는 오직 단일 포도밭에서 수확한 카베르네 소비뇽만을 사용하며, 연간 생산량이 극소량에 불과해 구하기가 매우 어렵습니다. 2018 빈티지는 나파 밸리의 훌륭한 해로, 완벽한 생장 시즌을 거쳐 카시스, 블랙베리, 삼나무, 모카의 복합적인 향을 갖춘 와인이 탄생했습니다. 풍부하고 벨벳 같은 탄닌이 우아한 피니시와 이어지는 이 와인은 앞으로 10년 이상 발전할 잠재력을 가지고 있습니다.","food":["프라임 립","숙성 스테이크","양갈비","트러플 요리"],"df":2023,"dps":2027,"dpe":2035,"du":2040,"rank":4,"ct":"★★★★★","cd":"희귀 한정 생산, 높은 소장 가치","country":"USA"},{"id":2,"name_en":"Dana Estates VASO Cabernet Sauvignon","name_kr":"다나 이스테이츠 바소 카베르네 소비뇽","vintage":2019,"region":"USA · Napa Valley","grape":"Cabernet Sauvignon","type":"red","vivino":4.2,"vu":"https://www.vivino.com/en/dana-estates-vaso-cabernet-sauvignon/w/1516693","tasting":{"color":["진한 루비","검붉은 자주빛"],"aroma":["블랙커런트","제비꽃","흑연","카카오닙스","시가박스"],"taste":["크리미한 탄닌","생동감 있는 산도","검은 과실의 집중도","미네랄리티"],"finish":["긴 여운","삼나무","토스티한 오크"],"body":82,"tannin":78,"acidity":65,"alcohol":82},"story":"다나 이스테이츠는 한국계 와인 생산자 H. W. 리(이재현)가 2004년 설립한 부티크 와이너리로, 나파 밸리의 Pritchard Hill에 위치합니다. VASO는 스페인어로 '잔'을 의미하며, 최고의 포도밭에서 엄선된 포도만을 사용합니다. 2019 빈티지는 서늘한 기후 덕분에 자연적으로 산도가 유지되어, 블랙커런트, 제비꽃, 흑연의 향이 두드러집니다.","food":["한우 채끝 스테이크","버섯 리조또","양 등심","숙성 치즈"],"df":2023,"dps":2027,"dpe":2033,"du":2038,"rank":5,"ct":"★★★★★","cd":"한국계 프리미엄 나파 부티크 와이너리","country":"USA"},{"id":3,"name_en":"Nickel & Nickel Branding Iron Cabernet Sauvignon","name_kr":"니켈 & 니켈 브랜딩 아이언","vintage":2021,"region":"USA · Napa Valley","grape":"Cabernet Sauvignon","type":"red","vivino":4.0,"vu":"https://www.vivino.com/en/nickel-nickel-branding-iron-vineyard-cabernet-sauvignon/w/5792","tasting":{"color":["진한 루비","검보라빛"],"aroma":["흑자두","모카","삼나무","약한 민트","바닐라"],"taste":["부드럽고 우아한 탄닌","세밀한 구조감","신선한 산도"],"finish":["긴 여운","다크초콜릿","스파이시한 오크"],"body":80,"tannin":75,"acidity":65,"alcohol":80},"story":"니켈 & 니켈은 나파 밸리 단일 포도밭(Single Vineyard) 카베르네 소비뇽의 선구자입니다. 브랜딩 아이언(Branding Iron) 포도밭은 오크빌(Oakville) 지역에 위치하며, 서부 나파 특유의 화산성 토양에서 자란 포도로 빚어집니다. 테루아의 순수한 표현을 추구하는 싱글 빈야드 와인의 정수입니다.","food":["그릴드 포터하우스","로스트 덕","숙성 체더 치즈","버섯 타르트"],"df":2024,"dps":2027,"dpe":2032,"du":2036,"rank":8,"ct":"★★★★","cd":"나파 싱글 빈야드, 한정 생산","country":"USA"},{"id":4,"name_en":"Torcia Red","name_kr":"토르시아 레드","vintage":2019,"region":"USA · Napa Valley","grape":"Merlot & Cabernet Sauvignon Blend","type":"red","vivino":3.8,"vu":"https://www.vivino.com/","tasting":{"color":["밝은 루비","선명한 붉은빛"],"aroma":["붉은 자두","체리","가죽","모카","약한 허브"],"taste":["부드러운 탄닌","중간 바디","과실의 풍성함","밸런스 좋은 산도"],"finish":["중간 여운","바닐라","가볍고 깔끔한 피니시"],"body":65,"tannin":58,"acidity":62,"alcohol":75},"story":"토르시아(Torcia)는 이탈리아어로 '횃불'을 의미합니다. 나파 밸리의 메를로와 카베르네 소비뇽을 블렌딩하여 만든 이 와인은 보르도 스타일의 우아함과 나파 밸리의 풍성함을 동시에 담고 있습니다. 붉은 과일과 모카, 가죽의 복합적인 향이 매력적입니다.","food":["파스타 볼로네제","리조또","쇠고기 스튜","피자"],"df":2022,"dps":2025,"dpe":2028,"du":2031,"rank":12,"ct":"★★★","cd":"나파 블렌드 데일리 드링커","country":"USA"},{"id":5,"name_en":"Penfolds Champagne Cuvée Brut","name_kr":"펜폴즈 샴페인 뀌베 브뤼","vintage":null,"region":"France · Champagne (×Thiénot)","grape":"Pinot Noir, Pinot Meunier & Chardonnay","type":"sparkling","vivino":3.9,"vu":"https://www.vivino.com/","tasting":{"color":["옅은 황금빛","가는 버블"],"aroma":["청사과","레몬","브리오슈","흰 꽃","아카시아"],"taste":["신선하고 크리미한 질감","섬세한 기포","밝은 산도","과실의 생기"],"finish":["깔끔하고 상쾌한 여운","미네랄","시트러스 피니시"],"body":45,"tannin":0,"acidity":78,"alcohol":55},"story":"호주의 와인 명가 펜폴즈(Penfolds)가 프랑스 샹파뉴 띠에노(Thiénot)와의 협업으로 선보이는 스파클링 와인입니다. 전통적인 샴페인 제조 방식을 따라 피노 누아, 피노 뫼니에, 샤르도네를 블렌딩했습니다. 섬세한 기포와 함께 사과, 시트러스, 브리오슈의 향이 어우러집니다.","food":["굴","캐비아","스시","가벼운 카나페","딸기와 크림"],"df":2024,"dps":2024,"dpe":2027,"du":2028,"rank":19,"ct":"★★★","cd":"호주 명가 × 프랑스 협업 스파클링","country":"France"},{"id":6,"name_en":"El Enemigo Malbec","name_kr":"엘 에네미고 말백","vintage":2022,"region":"Argentina · Mendoza","grape":"Malbec","type":"red","vivino":4.4,"vu":"https://www.vivino.com/en/el-enemigo-malbec/w/1185195","tasting":{"color":["불투명한 자주빛","인크처럼 짙은 퍼플"],"aroma":["짙은 자두","제비꽃","다크초콜릿","가죽","블루베리"],"taste":["풍성한 바디","부드럽고 벨벳 같은 탄닌","잘 익은 과실의 달콤함","산도와의 균형"],"finish":["길고 진한 여운","초콜릿","담배","스파이시"],"body":88,"tannin":75,"acidity":62,"alcohol":85},"story":"'적'을 의미하는 엘 에네미고(El Enemigo)는 아르헨티나 멘도사의 혁신적인 와이너리입니다. 안데스 산맥 기슭 고지대(해발 1,000m 이상)의 포도밭에서 자란 말백은 자연 발효와 최소한의 개입으로 양조됩니다. 짙은 자두, 제비꽃, 다크 초콜릿, 가죽의 향이 풍부합니다.","food":["아사도(아르헨티나 바비큐)","양고기 구이","엠파나다","매콤한 소고기 요리"],"df":2024,"dps":2025,"dpe":2029,"du":2032,"rank":15,"ct":"★★★","cd":"아르헨티나 프리미엄 말백","country":"Argentina"},{"id":7,"name_en":"Piper-Heidsieck Rare 2013","name_kr":"파이퍼 하이직 레어","vintage":2013,"region":"France · Champagne","grape":"Chardonnay","type":"sparkling","vivino":4.5,"vu":"https://www.vivino.com/en/piper-heidsieck-rare-cuvee-reservee-brut-champagne/w/1610391","tasting":{"color":["밝은 황금빛","섬세하고 지속적인 기포"],"aroma":["레몬 타르트","흰 꽃","헤이즐넛","토스트","화이트 피치"],"taste":["크리미하고 우아한 질감","생생한 산도","미네랄리티","복합적인 깊이"],"finish":["매우 길고 고급스러운 여운","시트러스 제스트","구운 아몬드"],"body":55,"tannin":0,"acidity":85,"alcohol":58},"story":"파이퍼 하이직의 프레스티지 퀴베인 'Rare(레어)'는 오직 최고의 빈티지에만 생산되는 특별한 샴페인입니다. 2013 빈티지는 서늘하고 섬세한 해로, 샤르도네의 미네랄리티와 산도가 완벽하게 표현되었습니다. 레몬 타르트, 흰 꽃, 헤이즐넛, 미묘한 토스트의 향이 층층이 전개됩니다.","food":["랍스터","관자 구이","화이트 트러플 파스타","고급 해산물 요리"],"df":2020,"dps":2025,"dpe":2032,"du":2035,"rank":3,"ct":"★★★★★","cd":"최고 빈티지에만 생산되는 프레스티지 퀴베","country":"France"},{"id":8,"name_en":"Krug Grande Cuvée 171ème Édition","name_kr":"크루그 그랑 퀴베 171 에디션","vintage":null,"region":"France · Champagne","grape":"Pinot Noir, Chardonnay & Meunier","type":"sparkling","vivino":4.5,"vu":"https://www.vivino.com/en/krug-grande-cuvee/w/2763","tasting":{"color":["깊은 황금빛","매우 섬세한 기포의 지속성"],"aroma":["구운 빵","헤이즐넛","시트러스 젤리","꿀","말린 과일","샤르퀴트리"],"taste":["크리미하고 풍성한 질감","풍부하고 복합적인 미각","높은 산도와의 완벽한 균형"],"finish":["무한히 지속되는 듯한 여운","토스티","미네랄","망고와 시트러스"],"body":70,"tannin":0,"acidity":88,"alcohol":68},"story":"크루그(Krug)의 그랑 퀴베는 샴페인의 절대 아이콘입니다. 171번째 에디션은 무려 10년 이상 다른 시기에 수확된 여러 빈티지의 와인을 블렌딩하는 독보적인 멀티-빈티지 방식으로 양조됩니다. 구운 빵, 헤이즐넛, 시트러스, 과일 젤리, 꿀의 향이 끝없이 펼쳐집니다.","food":["오마카세","캐비아와 블리니","조개찜","탁월한 미식 경험의 시작"],"df":2024,"dps":2025,"dpe":2033,"du":2036,"rank":1,"ct":"★★★★★","cd":"샴페인 아이콘, 최고의 소장 가치","country":"France"},{"id":9,"name_en":"Solaris Chikumagawa Cabernet Sauvignon","name_kr":"솔라리스 치쿠마가와 카베르네 소비뇽","vintage":2022,"region":"Japan · Nagano","grape":"Cabernet Sauvignon","type":"red","vivino":3.8,"vu":"https://www.vivino.com/","tasting":{"color":["밝은 루비","선명한 붉은 빛"],"aroma":["붉은 과일","허브","약한 후추","라즈베리","스파이스"],"taste":["섬세하고 우아한 탄닌","가벼운 바디","신선한 산도","일본 특유의 절제미"],"finish":["가볍고 깔끔한 여운","허브","미네랄"],"body":55,"tannin":52,"acidity":72,"alcohol":62},"story":"일본 나가노(長野)의 치쿠마강(千曲川) 유역에서 생산되는 솔라리스는 일본 와인의 새로운 가능성을 보여주는 와인입니다. 해발 700m 이상의 고지대 포도밭에서 일교차가 큰 기후 덕분에 향기롭고 우아한 카베르네 소비뇽이 탄생합니다.","food":["철판 와규","오리고기","가볍게 양념한 갈비","일본식 스테이크"],"df":2024,"dps":2026,"dpe":2030,"du":2033,"rank":20,"ct":"★★★","cd":"희귀 일본산 카베르네 소비뇽","country":"Japan"},{"id":10,"name_en":"Kamiju Muscat Bailey A","name_kr":"카미주 머스캣 베일리 에이","vintage":2023,"region":"Japan · Yamanashi","grape":"Muscat Bailey A","type":"red","vivino":3.8,"vu":"https://www.vivino.com/","tasting":{"color":["밝고 투명한 루비","생동감 있는 붉은빛"],"aroma":["신선한 포도","산딸기","체리","장미","약한 허브"],"taste":["가벼운 바디","부드러운 탄닌","포도 특유의 달콤한 과실미","신선한 산도"],"finish":["짧고 상쾌한 여운","붉은 베리","가볍고 경쾌한 피니시"],"body":42,"tannin":38,"acidity":68,"alcohol":48},"story":"카미주(カミジュ)는 야마나시(山梨)에 위치한 일본 와이너리로, 일본 고유 품종인 머스캣 베일리 에이(MBA)를 사용합니다. 특유의 포도 향과 산딸기, 체리의 향이 특징적입니다. 가볍게 즐기거나 일식 요리와 함께하기에 좋습니다.","food":["참치 스테이크","오리 가슴살","된장 소스 요리","가벼운 육류"],"df":2024,"dps":2024,"dpe":2026,"du":2027,"rank":23,"ct":"★★","cd":"일본 토착 품종, 지금 바로 즐기기","country":"Japan"},{"id":11,"name_en":"SALDO Red Blend","name_kr":"살도 레드 블렌드","vintage":2021,"region":"USA · California","grape":"Petite Sirah","type":"red","vivino":4.1,"vu":"https://www.vivino.com/en/saldo-red-blend/w/1381697","tasting":{"color":["불투명한 인크 퍼플","거의 검은 자주빛"],"aroma":["블랙베리","블루베리","다크초콜릿","바닐라","커피"],"taste":["풀바디","굵고 단단한 탄닌","진하고 파워풀한 과실미","높은 알코올감"],"finish":["길고 진한 여운","다크모카","후추","토스티한 오크"],"body":95,"tannin":90,"acidity":58,"alcohol":92},"story":"살도(SALDO)는 '더 프리즈너(The Prisoner)' 와이너리의 포트폴리오 중 하나로, 페티트 시라(Petite Sirah)를 중심으로 한 파워풀한 레드 블렌드입니다. 블랙베리, 블루베리, 다크 초콜릿, 바닐라의 진한 향이 폭발적으로 펼쳐집니다.","food":["BBQ 폭립","짧은 등심 브레이즈","진한 소스의 파스타","숙성 체다 치즈"],"df":2023,"dps":2025,"dpe":2029,"du":2032,"rank":13,"ct":"★★★","cd":"캘리포니아 파워풀 레드 블렌드","country":"USA"},{"id":12,"name_en":"Tolaini Chianti Classico","name_kr":"톨라이니 끼안티 클라시코","vintage":2022,"region":"Italy · Tuscany","grape":"Sangiovese","type":"red","vivino":4.0,"vu":"https://www.vivino.com/en/tolaini-chianti-classico/w/14618","tasting":{"color":["밝은 가넷","붉은 오렌지 테두리"],"aroma":["체리","붉은 자두","말린 허브","흙냄새","가죽","장미"],"taste":["산도와 탄닌의 균형","중간 바디","생생하고 活발한 구조","음식 친화적"],"finish":["중간 길이의 여운","사워체리","약한 쓴맛","미네랄"],"body":62,"tannin":68,"acidity":80,"alcohol":70},"story":"토스카나의 심장 끼안티 클라시코(Chianti Classico) DOCG 지역에서 생산되는 톨라이니는 전통과 현대를 조화롭게 담아낸 와인입니다. 체리, 붉은 자두, 말린 허브, 흙냄새, 가죽의 전형적인 끼안티 향을 완벽하게 구현합니다.","food":["비스테카 알라 피오렌티나","토마토 파스타","라자냐","이탈리안 살루미"],"df":2024,"dps":2026,"dpe":2030,"du":2033,"rank":16,"ct":"★★★","cd":"끼안티 클라시코 DOCG, 음식친화적","country":"Italy"},{"id":13,"name_en":"Terrunyo Carménère","name_kr":"떼루뇨 카르메네르","vintage":2019,"region":"Chile · Colchagua Valley","grape":"Carménère","type":"red","vivino":4.0,"vu":"https://www.vivino.com/en/terrunyo-carmenere/w/12370","tasting":{"color":["짙은 루비","보라빛 테두리"],"aroma":["붉은 피망","검은 과일","담배","향신료","인도 잉크"],"taste":["중간~풀바디","부드러운 탄닌","독특한 초록 허브의 뉘앙스","잘 익은 과실"],"finish":["긴 여운","연기","스파이스","그린 페퍼","지속적인 미네랄"],"body":72,"tannin":68,"acidity":65,"alcohol":75},"story":"떼루뇨(Terrunyo)는 꼰차 이 또로(Concha y Toro)의 테루아 탐구 시리즈입니다. 칠레의 상징적인 품종 카르메네르는 원래 프랑스 보르도의 품종이었으나 19세기 필록세라로 멸종 위기에 처했다가 칠레에서 기적적으로 살아남았습니다.","food":["그릴드 채끝","칠리 파스타","멕시칸 타코","검은콩 요리"],"df":2022,"dps":2025,"dpe":2028,"du":2031,"rank":14,"ct":"★★★","cd":"칠레 대표 품종, 희귀 카르메네르","country":"Chile"},{"id":14,"name_en":"Château Talbot","name_kr":"샤또 딸보","vintage":2021,"region":"France · Saint-Julien","grape":"Cabernet Sauvignon Blend","type":"red","vivino":4.2,"vu":"https://www.vivino.com/en/chateau-talbot/w/2512","tasting":{"color":["진한 루비","검붉은 자주빛"],"aroma":["카시스","삼나무","담배","흑연","제비꽃","블랙커런트 잎"],"taste":["우아하고 균형 잡힌 탄닌","클래식한 보르도 구조","중간~풀바디","긴 숙성 잠재력"],"finish":["매우 긴 여운","흑연","흙","미네랄","향신료"],"body":78,"tannin":82,"acidity":72,"alcohol":78},"story":"샤또 딸보(Château Talbot)는 1855년 메독 분류에서 4등급 그랑 크뤼(Grand Cru Classé)에 선정된 유서 깊은 보르도 샤또입니다. 2021 빈티지는 클래식한 보르도 스타일로 카시스, 삼나무, 담배, 흑연의 향이 두드러지며, 20년 이상 발전할 장기 숙성 잠재력을 갖추고 있습니다.","food":["소 등심 로스트","양고기 요리","트러플 버섯 리조또","숙성 콩테 치즈"],"df":2025,"dps":2030,"dpe":2040,"du":2045,"rank":9,"ct":"★★★★","cd":"보르도 4등급 그랑 크뤼, 장기 숙성형","country":"France"},{"id":15,"name_en":"Beringer Private Reserve Cabernet Sauvignon","name_kr":"베린저 프라이빗 리저브 카베르네 소비뇽","vintage":2016,"region":"USA · Napa Valley","grape":"Cabernet Sauvignon","type":"red","vivino":4.3,"vu":"https://www.vivino.com/en/beringer-private-reserve-cabernet-sauvignon/w/2464","tasting":{"color":["짙은 루비","보랏빛을 띤 자주"],"aroma":["카시스","블랙베리","바닐라","삼나무","초콜릿","체리 잼"],"taste":["풍성하고 크리미한 탄닌","나파 특유의 풍부한 과실미","균형 잡힌 산도","풀바디"],"finish":["길고 우아한 여운","카카오","달콤한 스파이스","오크"],"body":85,"tannin":78,"acidity":65,"alcohol":85},"story":"베린저(Beringer)는 1876년 설립된 나파 밸리 최고의 역사를 자랑하는 와이너리입니다. 2016 빈티지는 나파의 훌륭한 해 중 하나로, 카시스, 블랙베리, 초콜릿, 삼나무, 바닐라의 풍성한 향이 조화를 이룹니다. 현재 음용 최적기에 들어서고 있습니다.","food":["드라이 에이징 립아이","오소부코","소 안심 구이","숙성 에담 치즈"],"df":2022,"dps":2026,"dpe":2035,"du":2040,"rank":6,"ct":"★★★★★","cd":"나파 최고 명가 프리미엄 라인","country":"USA"},{"id":16,"name_en":"Robert Mondavi Maestro","name_kr":"로버트 몬다비 마에스트로","vintage":2018,"region":"USA · Napa Valley","grape":"Cabernet Sauvignon Blend","type":"red","vivino":4.1,"vu":"https://www.vivino.com/en/robert-mondavi-to-kalon-estate-maestro/w/1198011","tasting":{"color":["진한 루비","검보라빛 깊이"],"aroma":["블랙커런트","모카","흑연","향신료","삼나무","카카오"],"taste":["복합적이고 층층이 전개되는 맛","풀바디","실크 같은 탄닌","긴 숙성 잠재력"],"finish":["매우 길고 복합적인 여운","다크 베리","흙","미네랄"],"body":82,"tannin":76,"acidity":68,"alcohol":82},"story":"로버트 몬다비(Robert Mondavi)는 나파 밸리 와인 르네상스의 선구자입니다. 마에스트로는 카베르네 소비뇽을 중심으로 보르도 5대 품종을 모두 블렌딩한 완벽한 조화와 복합성을 자랑합니다.","food":["소 등심 웰링턴","오리 가슴살","야채 테린","미슐랭 정찬"],"df":2023,"dps":2027,"dpe":2033,"du":2038,"rank":7,"ct":"★★★★","cd":"나파 선구자의 걸작 보르도 블렌드","country":"USA"},{"id":17,"name_en":"Tommasi Amarone della Valpolicella Classico","name_kr":"토마시 아마로네 델라 발폴리첼라","vintage":2020,"region":"Italy · Veneto","grape":"Corvina","type":"red","vivino":4.3,"vu":"https://www.vivino.com/en/tommasi-amarone-della-valpolicella-classico/w/7103","tasting":{"color":["매우 짙은 가넷","불투명한 깊이"],"aroma":["건포도","다크초콜릿","커피","가죽","체리 잼","말린 무화과"],"taste":["풀~매우 풀바디","묵직한 탄닌","높은 알코올(14.5%+)","건조 과실의 압도적인 농도"],"finish":["매우 길고 강렬한 여운","다크초콜릿","가죽","타닉한 드라이 피니시"],"body":98,"tannin":92,"acidity":65,"alcohol":95},"story":"아마로네(Amarone)는 이탈리아 베네토 지방의 발폴리첼라에서 코르비나 등의 포도를 수개월간 건조시켜 농축한 포도즙으로 만드는 독특한 와인입니다. 토마시(Tommasi)는 1902년부터 대를 이어온 아마로네의 명가입니다. 최소 10년 이상 숙성 후 진면목이 드러납니다.","food":["브레이즈 쇠고기 뺨살","오소부코","숙성 파르미지아노","진한 초콜릿 디저트"],"df":2027,"dps":2033,"dpe":2045,"du":2050,"rank":10,"ct":"★★★★","cd":"아마로네 명가, 장기 숙성 필수","country":"Italy"},{"id":18,"name_en":"Dom Pérignon","name_kr":"돔 페리뇽","vintage":2013,"region":"France · Champagne","grape":"Pinot Noir & Chardonnay Blend","type":"sparkling","vivino":4.5,"vu":"https://www.vivino.com/en/dom-perignon-brut-champagne/w/86684","tasting":{"color":["밝고 깊은 황금빛","매우 섬세한 기포"],"aroma":["밀크초콜릿","아몬드","화이트 피치","레몬","미네랄","흰 꽃"],"taste":["크리미하고 긴장감 있는 질감","생생한 산도와 완벽한 균형","복합적이고 우아한 미감"],"finish":["매우 길고 순수한 여운","미네랄","레몬 제스트","살짝 짠맛의 미네랄리티"],"body":65,"tannin":0,"acidity":90,"alcohol":65},"story":"샴페인의 전설 돔 페리뇽(Dom Pérignon)은 모엣 에 샹동의 프레스티지 퀴베로, 오직 최고의 단일 빈티지에만 생산됩니다. 2013 빈티지는 James Suckling 98pt, Wine Spectator 96pt를 받았습니다. 밀크 초콜릿, 아몬드, 화이트 피치, 레몬의 복합적인 향이 섬세하게 전개됩니다.","food":["오마카세 초밥","생굴과 레몬","화이트 아스파라거스","랍스터 테르미도르"],"df":2020,"dps":2025,"dpe":2035,"du":2040,"rank":2,"ct":"★★★★★","cd":"샴페인의 전설, 단일 최고 빈티지","country":"France"},{"id":19,"name_en":"Eternal 8 Chenin Blanc","name_kr":"이터널 에잇 슈냉 블랑","vintage":2025,"region":"South Africa · Stellenbosch","grape":"Chenin Blanc","type":"white","vivino":3.8,"vu":"https://www.vivino.com/","tasting":{"color":["밝은 레몬 황금빛","은은한 초록빛"],"aroma":["황도","멜론","아카시아 꽃","꿀","바닐라","열대 과실"],"taste":["풍부한 과실미와 신선한 산도의 균형","중간 바디","부드럽고 라운드한 질감"],"finish":["중간 길이의 여운","꿀","살구","상쾌한 미네랄"],"body":55,"tannin":0,"acidity":72,"alcohol":60},"story":"남아프리카 스텔렌보쉬(Stellenbosch)의 이터널 에잇은 슈냉 블랑(Chenin Blanc)의 본고장인 남아프리카의 테루아를 담은 와인입니다. 2025 최신 빈티지로 황도, 멜론, 꽃향기, 약간의 꿀과 바닐라의 향이 상큼하게 어우러집니다.","food":["매운 태국 음식","미역국","어패류 파스타","프레시 치즈"],"df":2025,"dps":2025,"dpe":2027,"du":2029,"rank":22,"ct":"★★","cd":"신선한 화이트, 지금 즐기기 최적","country":"SouthAfrica"},{"id":20,"name_en":"Cinquanta Collezione +7 (1)","name_kr":"신퀀타 꼴레지오네 +7 (1번)","vintage":2019,"region":"Italy · Puglia","grape":"Primitivo & Negroamaro Blend","type":"red","vivino":4.0,"vu":"https://www.vivino.com/","tasting":{"color":["매우 짙은 루비","불투명한 가넷"],"aroma":["블랙베리 잼","말린 무화과","다크초콜릿","향신료","담배"],"taste":["풍성하고 관능적인 과실미","부드러운 탄닌","높은 당도에서 오는 바디감"],"finish":["길고 따뜻한 여운","초콜릿","커피","지중해 향신료"],"body":88,"tannin":72,"acidity":58,"alcohol":88},"story":"이탈리아 남부 풀리아(Puglia) 지방의 신퀀타 꼴레지오네 +7은 풀리아를 대표하는 두 품종 프리미티보(Primitivo)와 네그로아마로(Negroamaro)의 블렌드입니다. 블랙베리 잼, 말린 무화과, 초콜릿, 향신료의 진하고 관능적인 향이 특징입니다.","food":["오레키에테 파스타","이탈리안 소시지","그릴드 양고기","올리브 요리"],"df":2022,"dps":2025,"dpe":2028,"du":2031,"rank":17,"ct":"★★★","cd":"이탈리아 남부 풀리아 블렌드","country":"Italy"},{"id":21,"name_en":"Cinquanta Collezione +7 (2)","name_kr":"신퀀타 꼴레지오네 +7 (2번)","vintage":2019,"region":"Italy · Puglia","grape":"Primitivo & Negroamaro Blend","type":"red","vivino":4.0,"vu":"https://www.vivino.com/","tasting":{"color":["매우 짙은 루비","불투명한 가넷"],"aroma":["블랙베리 잼","말린 무화과","다크초콜릿","향신료","담배"],"taste":["풍성하고 관능적인 과실미","부드러운 탄닌","높은 당도에서 오는 바디감"],"finish":["길고 따뜻한 여운","초콜릿","커피","지중해 향신료"],"body":88,"tannin":72,"acidity":58,"alcohol":88},"story":"이탈리아 남부 풀리아(Puglia) 지방의 신퀀타 꼴레지오네 +7 동일 와인 2번째 보틀입니다. 프리미티보와 네그로아마로의 블렌드로 블랙베리 잼, 말린 무화과, 초콜릿, 향신료의 진한 향이 특징입니다.","food":["오레키에테 파스타","이탈리안 소시지","그릴드 양고기","올리브 요리"],"df":2022,"dps":2025,"dpe":2028,"du":2031,"rank":18,"ct":"★★★","cd":"이탈리아 남부 풀리아 블렌드","country":"Italy"},{"id":22,"name_en":"Rapaura Springs Classic Sauvignon Blanc","name_kr":"라파우라 스프링스 소비뇽 블랑","vintage":2024,"region":"New Zealand · Marlborough","grape":"Sauvignon Blanc","type":"white","vivino":3.9,"vu":"https://www.vivino.com/en/rapaura-springs-classic-sauvignon-blanc/w/1207337","award":"WineOrbit 93+pts ★★★★★","tasting":{"color":["매우 밝은 연노랑","초록빛 반사"],"aroma":["자몽","패션프루트","구스베리","잔디","라임","흰 꽃"],"taste":["생생하고 폭발적인 산도","가볍고 청량한 바디","열대 과실과 허브의 조화"],"finish":["상쾌하고 깔끔한 여운","시트러스","자갈 미네랄"],"body":38,"tannin":0,"acidity":92,"alcohol":52},"story":"뉴질랜드 말보로(Marlborough)는 세계에서 가장 생동감 넘치는 소비뇽 블랑의 고향입니다. 라파우라 스프링스는 말보로의 자갈이 많은 라파우라 지역에서 생산되며, 이 지역 특유의 미네랄리티를 잘 담아냅니다. WineOrbit 93+ 포인트를 수상한 검증된 품질입니다.","food":["굴","아스파라거스","생선 세비체","닭고기 레몬 버터 구이","샐러드"],"df":2024,"dps":2024,"dpe":2026,"du":2028,"rank":24,"ct":"★★","cd":"NZ 말보로 소비뇽, WineOrbit 93+","country":"NewZealand"},{"id":23,"name_en":"Penfolds Lot. 518 Spirited Wine with Baijiu","name_kr":"펜폴즈 로트 518 바이주","vintage":null,"region":"Australia · South Australia","grape":"Shiraz","type":"red","vivino":4.2,"vu":"https://www.vivino.com/en/penfolds-lot-518-spirited-wine-with-baijiu/w/7740624","tasting":{"color":["매우 짙은 루비","거의 불투명"],"aroma":["블랙베리","후추","스파이스","바이주 특유의 사탕수수향","향신료","훈연"],"taste":["와인과 증류주가 결합된 독특한 복합성","묵직하고 강렬한 바디","알코올(21.5%)의 따뜻한 감촉"],"finish":["길고 강렬한 여운","중국 향신료","스모키","달콤한 알코올"],"body":95,"tannin":75,"acidity":52,"alcohol":98},"story":"펜폴즈 로트 518은 와인과 중국 전통 백주(바이주, 白酒)를 결합한 세계 최초의 혁신적인 시도입니다. 호주 쉬라즈 와인에 마오타이로 유명한 귀주성의 소주를 더해 독특한 풍미를 만들어냈습니다. 알코올 도수 21.5%의 강렬하고 독창적인 경험입니다.","food":["베이징 덕","마라 샹궈","숙성 치즈","대담한 아시안 퓨전 요리"],"df":2024,"dps":2024,"dpe":2028,"du":2030,"rank":11,"ct":"★★★★","cd":"와인+바이주 세계 최초 혁신, 희귀 아이템","country":"Australia"},{"id":24,"name_en":"Southern Ocean Sauvignon Blanc","name_kr":"서던 오션 소비뇽 블랑","vintage":2021,"region":"South Africa · Western Cape","grape":"Sauvignon Blanc","type":"white","vivino":3.7,"vu":"https://www.vivino.com/","tasting":{"color":["밝은 연노랑","초록빛 하이라이트"],"aroma":["자몽","레몬그라스","허브","녹색 피망","라임","미네랄"],"taste":["신선하고 경쾌한 산도","가볍고 드라이한 바디","대서양 해풍의 미네랄리티"],"finish":["짧고 상쾌한 여운","시트러스","허브","소금기 있는 미네랄"],"body":40,"tannin":0,"acidity":85,"alcohol":50},"story":"남아프리카 웨스턴 케이프(Western Cape)의 서던 오션은 대서양의 시원한 해풍의 영향을 받아 생생한 산도와 신선함이 살아있는 소비뇽 블랑입니다. 자몽, 레몬그라스, 허브, 미네랄의 향이 상쾌하게 펼쳐집니다.","food":["새우 레몬 버터","굴","그릴드 생선","토마토 모차렐라 샐러드"],"df":2022,"dps":2023,"dpe":2025,"du":2026,"rank":23,"ct":"★★","cd":"남아공 화이트, 지금 바로 음용 권장","country":"SouthAfrica"},{"id":25,"name_en":"Eternal Eight Chenin Blanc 2023","name_kr":"이터널 에잇 슈냉 블랑 2023","vintage":2023,"region":"South Africa · Stellenbosch","grape":"Chenin Blanc","type":"white","vivino":3.9,"vu":"https://www.vivino.com/","tasting":{"color":["깊은 황금빛","초록빛 반사","2025보다 깊은 색"],"aroma":["잘 익은 황도","망고","아카시아 꿀","바닐라","버터스카치","구운 사과"],"taste":["2년 숙성의 풍성함","크리미하고 라운드한 질감","산도와 과실미의 균형","중간~풀바디"],"finish":["길어진 여운","꿀","살구","버터 토스트","미네랄"],"body":62,"tannin":0,"acidity":70,"alcohol":63},"story":"이터널 에잇(Eternal Eight)의 2023 슈냉 블랑은 2025 빈티지보다 2년 더 숙성된 버전으로, 남아프리카 스텔렌보쉬의 테루아가 더욱 깊이 표현됩니다. 슈냉 블랑은 남아공에서 가장 많이 재배되는 품종으로, 이 와인은 신선한 과실미에서 풍성한 꿀과 버터스카치로 발전한 복합성을 보여줍니다. 레이블의 천사 이미지는 '우리를 나누는 것보다 우리를 하나로 묶는 것이 더 위대하다'는 철학을 담고 있습니다. 현재 음용 최적기에 있으며, 2025 빈티지와 함께 버티컬 테이스팅을 즐기기에도 좋습니다.","food":["크림 파스타","꿀 드레싱 샐러드","구운 닭고기","소프트 치즈","게장"],"df":2024,"dps":2025,"dpe":2027,"du":2029,"rank":21,"ct":"★★★","cd":"2023 빈티지, 2025와 버티컬 테이스팅 추천","country":"SouthAfrica"},{"id":26,"name_en":"Le Cupole di Trinoro","name_kr":"레 쿠폴레 디 트리노로","vintage":2021,"region":"Italy · Tuscany, Val d'Orcia","grape":"Cabernet Franc, Merlot, Cabernet Sauvignon, Petit Verdot","type":"red","vivino":4.2,"vu":"https://www.vivino.com/en/le-cupole-di-trinoro/w/4534","tasting":{"color":["깊고 진한 루비","보랏빛 테두리"],"aroma":["카시스","블랙베리","제비꽃","담배","미네랄","가죽"],"taste":["우아하고 실크 같은 탄닌","중간~풀바디","생동감 있는 산도","보르도 스타일의 정제된 구조"],"finish":["길고 미네랄한 여운","흑연","삼나무","향신료","우아한 드라이 피니시"],"body":78,"tannin":74,"acidity":72,"alcohol":80},"story":"레 쿠폴레 디 트리노로(Le Cupole di Trinoro)는 토스카나 Val d'Orcia의 컬트 와이너리 테누타 디 트리노로(Tenuta di Trinoro)의 세컨드 와인입니다. 안드레아 프란체티(Andrea Franchetti)가 설립한 이 와이너리는 보르도 품종—특히 카베르네 프랑을 중심으로—을 토스카나의 극단적인 환경에서 재배하여 독창적인 스타일을 만들어냅니다. '쿠폴레(Cupole)'는 이탈리아어로 '돔(Dome)'을 의미하며, 피렌체 두오모의 웅장함에서 영감을 받았습니다. 2021 빈티지는 토스카나의 균형 잡힌 해로 카시스, 제비꽃, 담배, 미네랄의 복합적인 향이 우아하게 전개됩니다. 수량이 제한되고 세컨드 와인임에도 불구하고 세계적으로 인정받는 품질로 소장 가치가 높습니다.","food":["비스테카 알라 피오렌티나","양고기 안심","트러플 리조또","숙성 페코리노","그릴드 포르치니"],"df":2023,"dps":2026,"dpe":2032,"du":2037,"rank":7,"ct":"★★★★","cd":"토스카나 컬트 와이너리 테누타 디 트리노로 세컨드 와인","country":"Italy"},{"id":27,"name_en":"DADÁ Art #391 Sauvignon Blanc","name_kr":"다다 아트 #391 소비뇽 블랑","vintage":null,"region":"Argentina · Finca Las Moras (New Zealand grapes)","grape":"Sauvignon Blanc","type":"white","vivino":3.8,"vu":"https://www.vivino.com/","country":"Argentina","tasting":{"color":["밝은 레몬 연노랑","초록빛 반사"],"aroma":["자몽","패션프루트","라임","허브","흰 꽃"],"taste":["신선하고 생생한 산도","가볍고 경쾌한 바디","열대 과실의 풍성함"],"finish":["상쾌하고 깔끔한 여운","시트러스","미네랄"],"body":40,"tannin":0,"acidity":88,"alcohol":50},"story":"아르헨티나의 명가 핀카 라스 모라스(Finca Las Moras)가 선보이는 다다(DADÁ) 시리즈 중 하나입니다. 뉴질랜드 말보로산 소비뇽 블랑 포도를 사용하여 만든 이 화이트 와인은 아트 넘버 #391이라는 독창적인 이름처럼 예술적인 감각과 신선함을 담고 있습니다. 자몽, 패션프루트, 라임의 생생한 향이 매력적이며, 손가락으로 가리키는 빈티지 일러스트 레이블이 인상적입니다.","food":["굴","새우 샐러드","생선 타코","아스파라거스","프레시 치즈"],"df":2024,"dps":2025,"dpe":2027,"du":2028,"rank":27,"ct":"★★★","cd":"아르헨티나 × 뉴질랜드 크로스오버 소비뇽 블랑"},{"id":28,"name_en":"Ménage à Trois Gold Chardonnay","name_kr":"메나쥬 아 트로아 골드 샤르도네","vintage":2023,"region":"USA · California","grape":"Chardonnay","type":"white","vivino":3.9,"vu":"https://www.vivino.com/","country":"USA","tasting":{"color":["밝은 황금빛","풍성한 노란색"],"aroma":["버터스카치","바닐라","황도","파인애플","헤이즐넛"],"taste":["크리미하고 풍성한 바디","오크의 달콤함","열대 과실의 풍성함","부드러운 산도"],"finish":["길고 버터리한 여운","바닐라 크림","토스티한 오크"],"body":72,"tannin":0,"acidity":58,"alcohol":72},"story":"메나쥬 아 트로아(Ménage à Trois)는 캘리포니아의 인기 와인 브랜드로, 골드(Gold) 라인은 풍성하고 크리미한 샤르도네를 대표합니다. 2023 빈티지는 캘리포니아의 따뜻한 햇살을 받아 잘 익은 황도, 바닐라, 버터스카치의 진한 향이 특징입니다. 오크 숙성으로 완성된 크리미한 질감과 부드러운 피니시가 매력적인 캘리포니아 스타일 샤르도네의 전형입니다.","food":["크림 파스타","구운 치킨","버터 소스 해산물","브리 치즈","크림 리조또"],"df":2024,"dps":2025,"dpe":2027,"du":2028,"rank":28,"ct":"★★★","cd":"캘리포니아 크리미 샤르도네"},{"id":29,"name_en":"DADÁ Art White Malbec #391","name_kr":"다다 아트 화이트 말백 #391","vintage":2024,"region":"Argentina · San Juan","grape":"Malbec (White)","type":"white","vivino":3.8,"vu":"https://www.vivino.com/","country":"Argentina","tasting":{"color":["매우 밝은 연노랑","초록빛 하이라이트","White Malbec 특유의 청명함"],"aroma":["흰 꽃","라즈베리 (은은하게)","살구","열대 과실","허브"],"taste":["신선하고 가벼운 바디","White Malbec 특유의 과실미","은은한 붉은 과실 뉘앙스"],"finish":["상쾌하고 경쾌한 여운","꽃향기","미네랄"],"body":42,"tannin":0,"acidity":80,"alcohol":52},"story":"화이트 말백(White Malbec)은 레드 와인 품종인 말백(Malbec)의 포도즙을 껍질과 분리하여 화이트 와인처럼 양조한 혁신적인 스타일입니다. 핀카 라스 모라스(Finca Las Moras)의 다다(DADÁ) 시리즈 #391로, 아르헨티나 산후안(San Juan)의 뜨거운 태양 아래 재배된 말백이 화이트 스타일로 재탄생했습니다. 흰 꽃, 살구, 라즈베리의 은은한 향이 독특하며 라이트하고 신선합니다.","food":["스시","해산물 파스타","타파스","프레시 샐러드","화이트 피자"],"df":2025,"dps":2025,"dpe":2027,"du":2028,"rank":29,"ct":"★★★","cd":"세계 희귀 화이트 말백 — 레드 품종의 화이트 변신"},{"id":30,"name_en":"Freixenet Reserva Vintage","name_kr":"프레이스네트 레세르바 빈티지","vintage":2021,"region":"Spain · Penedès (Cava DO)","grape":"Macabeo, Parellada & Xarel·lo","type":"sparkling","vivino":3.9,"vu":"https://www.vivino.com/","country":"Spain","tasting":{"color":["밝은 황금빛","섬세하고 지속적인 기포"],"aroma":["사과","레몬","아몬드","브리오슈","흰 꽃"],"taste":["신선하고 크리미한 질감","밸런스 좋은 산도","복합적인 카바 특유의 미감"],"finish":["중간 길이의 상쾌한 여운","구운 아몬드","시트러스"],"body":50,"tannin":0,"acidity":80,"alcohol":55},"story":"프레이스네트(Freixenet)는 1861년 설립된 스페인 카탈루냐의 대표적인 카바(Cava) 생산자입니다. 레세르바 빈티지 2021은 메토도 트라디시오날(Método Tradicional), 즉 전통 방식으로 양조된 단일 빈티지 카바입니다. 마카베오, 파레야다, 사렐로 세 가지 스페인 토착 품종을 블렌딩하여 사과, 레몬, 아몬드, 브리오슈의 복합적인 향을 만들어냅니다. 샴페인과 동일한 제조 방식으로 만들어지지만 스페인 특유의 토착적인 풍미가 매력적입니다.","food":["파에야","타파스","하몽","치즈 플레이트","해산물 요리"],"df":2024,"dps":2025,"dpe":2027,"du":2029,"rank":30,"ct":"★★★","cd":"스페인 카바 명가 전통 방식 빈티지 스파클링"},{"id":31,"name_en":"Marques de Casa Concha Blue Carmenere","name_kr":"마르케스 데 카사 콘차 블루 카르메네르","vintage":2021,"region":"Chile · Peumo, Colchagua Valley","grape":"Carmenere","type":"red","vivino":4.1,"vu":"https://www.vivino.com/","country":"Chile","tasting":{"color":["짙은 루비","보라빛 테두리"],"aroma":["붉은 피망","블랙베리","제비꽃","향신료","담배"],"taste":["중간~풀바디","부드러운 탄닌","카르메네르 특유의 그린 허브 뉘앙스","과실미와 구조감의 균형"],"finish":["길고 스파이시한 여운","블랙 페퍼","미네랄","드라이 허브"],"body":75,"tannin":70,"acidity":65,"alcohol":76},"story":"콘차 이 토로(Concha y Toro)의 프리미엄 라인 마르케스 데 카사 콘차(Marques de Casa Concha)의 블루(Blue) 에디션입니다. 칠레를 대표하는 품종 카르메네르(Carmenere)를 카사블랑카와 함께 가장 적합한 테루아인 푸에우모(Peumo)에서 재배합니다. 2021 빈티지는 붉은 피망, 블랙베리, 제비꽃, 향신료가 조화를 이루며 카르메네르의 특성인 초록 허브 뉘앙스와 함께 우아한 구조감을 보여줍니다.","food":["칠레 스테이크","양꼬치","바비큐 폭립","진한 소스 파스타","체다 치즈"],"df":2024,"dps":2025,"dpe":2029,"du":2032,"rank":31,"ct":"★★★","cd":"칠레 최고급 카르메네르, 푸에우모 테루아"},{"id":32,"name_en":"Marques de Casa Concha Gold Cabernet Sauvignon","name_kr":"마르케스 데 카사 콘차 골드 카베르네 소비뇽","vintage":2022,"region":"Chile · Maipo Andes","grape":"Cabernet Sauvignon","type":"red","vivino":4.2,"vu":"https://www.vivino.com/","country":"Chile","tasting":{"color":["짙은 루비","검붉은 자주빛"],"aroma":["카시스","블랙베리","삼나무","담배","흑연","다크 초콜릿"],"taste":["풀바디","단단하고 정교한 탄닌","마이포 안데스 특유의 미네랄리티","긴 숙성 잠재력"],"finish":["길고 복합적인 여운","흑연","흙","스파이스","우아한 드라이 피니시"],"body":82,"tannin":78,"acidity":68,"alcohol":80},"story":"마르케스 데 카사 콘차 골드(Gold)는 칠레 최고의 카베르네 소비뇽 산지인 마이포 안데스(Maipo Andes)의 푸엔테 알토(Puente Alto)와 피르케(Pirque) 포도밭에서 생산됩니다. 안데스 산맥의 서늘한 기후와 자갈이 많은 토양이 카베르네 소비뇽에 탁월한 구조감과 복합성을 부여합니다. 2022 빈티지는 카시스, 삼나무, 흑연의 클래식한 향과 함께 정교한 탄닌과 긴 여운을 자랑하는 보르도 스타일의 칠레 카베르네입니다.","food":["안심 스테이크","양갈비 구이","소 갈비찜","숙성 고다 치즈","버섯 요리"],"df":2025,"dps":2026,"dpe":2032,"du":2036,"rank":32,"ct":"★★★","cd":"마이포 안데스 프리미엄 카베르네 소비뇽"},{"id":33,"name_en":"Hattingley Valley English Sparkling Wine (M&S Collection)","name_kr":"해팅글리 밸리 잉글리시 스파클링 와인","vintage":2018,"region":"England · Hampshire, Hattingley Valley","grape":"Pinot Noir, Chardonnay & Meunier","type":"sparkling","vivino":4.2,"vu":"https://www.vivino.com/","country":"UK","tasting":{"color":["밝은 황금빛","섬세하고 지속적인 기포"],"aroma":["레몬 타르트","그린 애플","흰 꽃","브리오슈","초크 미네랄"],"taste":["생생하고 긴장감 있는 산도","크리미한 질감","영국 스파클링 특유의 미네랄리티","복합적인 효모 뉘앙스"],"finish":["길고 순수한 여운","레몬 제스트","초크","짭조름한 미네랄"],"body":58,"tannin":0,"acidity":88,"alcohol":60},"story":"해팅글리 밸리(Hattingley Valley)는 잉글랜드 햄프셔(Hampshire)에 위치한 영국 최고의 스파클링 와인 생산자 중 하나입니다. M&S(Marks & Spencer) 콜렉션의 일환으로 선정된 이 와인은 '세계 유명 지역의 아이코닉 와인 중 탁월한 선별'이라는 M&S의 철학을 담고 있습니다. 2018 빈티지는 전통 방식(Traditional Method Brut)으로 양조되었으며, 영국 남부의 초크(chalk) 토양에서 자란 피노 누아, 샤르도네, 뫼니에를 블렌딩했습니다. 샴페인과 같은 제조 방식으로 만들어지나 영국 특유의 높은 산도와 미네랄리티가 독보적입니다. 최근 영국 스파클링 와인이 세계 주요 대회에서 샴페인을 누르며 급부상하고 있습니다.","food":["굴과 레몬","스모크 살몬","생선 앤 칩스","피시 파이","크림 스콘"],"df":2020,"dps":2025,"dpe":2030,"du":2033,"rank":33,"ct":"★★★★","cd":"영국 최고급 스파클링 — 샴페인에 도전하는 English Sparkling"}];
-
-// 즉시 렌더링
-document.getElementById('loading').style.display='none';
-document.getElementById('grid').style.display='grid';
-updateStats(); render();
-
-// Google Sheets 동기화 백그라운드
-syncFromSheets().then(()=>{ updateStats(); render(); }).catch(()=>{});
+WINES=[{"id":1,"name_en":"Buccella Cabernet Sauvignon","name_kr":"부켈라 카베르네 소비뇽","vintage":2018,"region":"USA · Napa Valley","grape":"Cabernet Sauvignon","type":"red","vivino":4.5,"vu":"https://www.vivino.com/en/buccella-cabernet-sauvignon/w/100715","tasting":{"color":["짙은 루비","보랏빛 테두리"],"aroma":["블랙커런트","블랙베리","모카","삼나무","바이올렛"],"taste":["풍부한 과실미","벨벳 탄닌","균형 잡힌 산도","미네랄"],"finish":["길고 우아한 여운","다크초콜릿","스파이스"],"body":85,"tannin":80,"acidity":60,"alcohol":88},"story":"부켈라는 나파 밸리에서도 가장 희귀하고 소량 생산되는 와이너리 중 하나입니다. 전통적인 와인 명가의 이름을 딴 이 와이너리는 오직 단일 포도밭에서 수확한 카베르네 소비뇽만을 사용하며, 연간 생산량이 극소량에 불과해 구하기가 매우 어렵습니다. 2018 빈티지는 나파 밸리의 훌륭한 해로, 완벽한 생장 시즌을 거쳐 카시스, 블랙베리, 삼나무, 모카의 복합적인 향을 갖춘 와인이 탄생했습니다. 풍부하고 벨벳 같은 탄닌이 우아한 피니시와 이어지는 이 와인은 앞으로 10년 이상 발전할 잠재력을 가지고 있습니다.","food":["프라임 립","숙성 스테이크","양갈비","트러플 요리"],"df":2023,"dps":2027,"dpe":2035,"du":2040,"rank":4,"ct":"★★★★★","cd":"희귀 한정 생산, 높은 소장 가치","country":"USA"},{"id":2,"name_en":"Dana Estates VASO Cabernet Sauvignon","name_kr":"다나 이스테이츠 바소 카베르네 소비뇽","vintage":2019,"region":"USA · Napa Valley","grape":"Cabernet Sauvignon","type":"red","vivino":4.2,"vu":"https://www.vivino.com/en/dana-estates-vaso-cabernet-sauvignon/w/1516693","tasting":{"color":["진한 루비","검붉은 자주빛"],"aroma":["블랙커런트","제비꽃","흑연","카카오닙스","시가박스"],"taste":["크리미한 탄닌","생동감 있는 산도","검은 과실의 집중도","미네랄리티"],"finish":["긴 여운","삼나무","토스티한 오크"],"body":82,"tannin":78,"acidity":65,"alcohol":82},"story":"다나 이스테이츠는 한국계 와인 생산자 H. W. 리(이재현)가 2004년 설립한 부티크 와이너리로, 나파 밸리의 Pritchard Hill에 위치합니다. VASO는 스페인어로 '잔'을 의미하며, 최고의 포도밭에서 엄선된 포도만을 사용합니다. 2019 빈티지는 서늘한 기후 덕분에 자연적으로 산도가 유지되어, 블랙커런트, 제비꽃, 흑연의 향이 두드러집니다.","food":["한우 채끝 스테이크","버섯 리조또","양 등심","숙성 치즈"],"df":2023,"dps":2027,"dpe":2033,"du":2038,"rank":5,"ct":"★★★★★","cd":"한국계 프리미엄 나파 부티크 와이너리","country":"USA"},{"id":3,"name_en":"Nickel & Nickel Branding Iron Cabernet Sauvignon","name_kr":"니켈 & 니켈 브랜딩 아이언","vintage":2021,"region":"USA · Napa Valley","grape":"Cabernet Sauvignon","type":"red","vivino":4.0,"vu":"https://www.vivino.com/en/nickel-nickel-branding-iron-vineyard-cabernet-sauvignon/w/5792","tasting":{"color":["진한 루비","검보라빛"],"aroma":["흑자두","모카","삼나무","약한 민트","바닐라"],"taste":["부드럽고 우아한 탄닌","세밀한 구조감","신선한 산도"],"finish":["긴 여운","다크초콜릿","스파이시한 오크"],"body":80,"tannin":75,"acidity":65,"alcohol":80},"story":"니켈 & 니켈은 나파 밸리 단일 포도밭(Single Vineyard) 카베르네 소비뇽의 선구자입니다. 브랜딩 아이언(Branding Iron) 포도밭은 오크빌(Oakville) 지역에 위치하며, 서부 나파 특유의 화산성 토양에서 자란 포도로 빚어집니다. 테루아의 순수한 표현을 추구하는 싱글 빈야드 와인의 정수입니다.","food":["그릴드 포터하우스","로스트 덕","숙성 체더 치즈","버섯 타르트"],"df":2024,"dps":2027,"dpe":2032,"du":2036,"rank":8,"ct":"★★★★","cd":"나파 싱글 빈야드, 한정 생산","country":"USA"},{"id":4,"name_en":"Torcia Red","name_kr":"토르시아 레드","vintage":2019,"region":"USA · Napa Valley","grape":"Merlot & Cabernet Sauvignon Blend","type":"red","vivino":3.8,"vu":"https://www.vivino.com/","tasting":{"color":["밝은 루비","선명한 붉은빛"],"aroma":["붉은 자두","체리","가죽","모카","약한 허브"],"taste":["부드러운 탄닌","중간 바디","과실의 풍성함","밸런스 좋은 산도"],"finish":["중간 여운","바닐라","가볍고 깔끔한 피니시"],"body":65,"tannin":58,"acidity":62,"alcohol":75},"story":"토르시아(Torcia)는 이탈리아어로 '횃불'을 의미합니다. 나파 밸리의 메를로와 카베르네 소비뇽을 블렌딩하여 만든 이 와인은 보르도 스타일의 우아함과 나파 밸리의 풍성함을 동시에 담고 있습니다. 붉은 과일과 모카, 가죽의 복합적인 향이 매력적입니다.","food":["파스타 볼로네제","리조또","쇠고기 스튜","피자"],"df":2022,"dps":2025,"dpe":2028,"du":2031,"rank":12,"ct":"★★★","cd":"나파 블렌드 데일리 드링커","country":"USA"},{"id":5,"name_en":"Penfolds Champagne Cuvée Brut","name_kr":"펜폴즈 샴페인 뀌베 브뤼","vintage":null,"region":"France · Champagne (×Thiénot)","grape":"Pinot Noir, Pinot Meunier & Chardonnay","type":"sparkling","vivino":3.9,"vu":"https://www.vivino.com/","tasting":{"color":["옅은 황금빛","가는 버블"],"aroma":["청사과","레몬","브리오슈","흰 꽃","아카시아"],"taste":["신선하고 크리미한 질감","섬세한 기포","밝은 산도","과실의 생기"],"finish":["깔끔하고 상쾌한 여운","미네랄","시트러스 피니시"],"body":45,"tannin":0,"acidity":78,"alcohol":55},"story":"호주의 와인 명가 펜폴즈(Penfolds)가 프랑스 샹파뉴 띠에노(Thiénot)와의 협업으로 선보이는 스파클링 와인입니다. 전통적인 샴페인 제조 방식을 따라 피노 누아, 피노 뫼니에, 샤르도네를 블렌딩했습니다. 섬세한 기포와 함께 사과, 시트러스, 브리오슈의 향이 어우러집니다.","food":["굴","캐비아","스시","가벼운 카나페","딸기와 크림"],"df":2024,"dps":2024,"dpe":2027,"du":2028,"rank":19,"ct":"★★★","cd":"호주 명가 × 프랑스 협업 스파클링","country":"France"},{"id":6,"name_en":"El Enemigo Malbec","name_kr":"엘 에네미고 말백","vintage":2022,"region":"Argentina · Mendoza","grape":"Malbec","type":"red","vivino":4.4,"vu":"https://www.vivino.com/en/el-enemigo-malbec/w/1185195","tasting":{"color":["불투명한 자주빛","인크처럼 짙은 퍼플"],"aroma":["짙은 자두","제비꽃","다크초콜릿","가죽","블루베리"],"taste":["풍성한 바디","부드럽고 벨벳 같은 탄닌","잘 익은 과실의 달콤함","산도와의 균형"],"finish":["길고 진한 여운","초콜릿","담배","스파이시"],"body":88,"tannin":75,"acidity":62,"alcohol":85},"story":"'적'을 의미하는 엘 에네미고(El Enemigo)는 아르헨티나 멘도사의 혁신적인 와이너리입니다. 안데스 산맥 기슭 고지대(해발 1,000m 이상)의 포도밭에서 자란 말백은 자연 발효와 최소한의 개입으로 양조됩니다. 짙은 자두, 제비꽃, 다크 초콜릿, 가죽의 향이 풍부합니다.","food":["아사도(아르헨티나 바비큐)","양고기 구이","엠파나다","매콤한 소고기 요리"],"df":2024,"dps":2025,"dpe":2029,"du":2032,"rank":15,"ct":"★★★","cd":"아르헨티나 프리미엄 말백","country":"Argentina"},{"id":7,"name_en":"Piper-Heidsieck Rare 2013","name_kr":"파이퍼 하이직 레어","vintage":2013,"region":"France · Champagne","grape":"Chardonnay","type":"sparkling","vivino":4.5,"vu":"https://www.vivino.com/en/piper-heidsieck-rare-cuvee-reservee-brut-champagne/w/1610391","tasting":{"color":["밝은 황금빛","섬세하고 지속적인 기포"],"aroma":["레몬 타르트","흰 꽃","헤이즐넛","토스트","화이트 피치"],"taste":["크리미하고 우아한 질감","생생한 산도","미네랄리티","복합적인 깊이"],"finish":["매우 길고 고급스러운 여운","시트러스 제스트","구운 아몬드"],"body":55,"tannin":0,"acidity":85,"alcohol":58},"story":"파이퍼 하이직의 프레스티지 퀴베인 'Rare(레어)'는 오직 최고의 빈티지에만 생산되는 특별한 샴페인입니다. 2013 빈티지는 서늘하고 섬세한 해로, 샤르도네의 미네랄리티와 산도가 완벽하게 표현되었습니다. 레몬 타르트, 흰 꽃, 헤이즐넛, 미묘한 토스트의 향이 층층이 전개됩니다.","food":["랍스터","관자 구이","화이트 트러플 파스타","고급 해산물 요리"],"df":2020,"dps":2025,"dpe":2032,"du":2035,"rank":3,"ct":"★★★★★","cd":"최고 빈티지에만 생산되는 프레스티지 퀴베","country":"France"},{"id":8,"name_en":"Krug Grande Cuvée 171ème Édition","name_kr":"크루그 그랑 퀴베 171 에디션","vintage":null,"region":"France · Champagne","grape":"Pinot Noir, Chardonnay & Meunier","type":"sparkling","vivino":4.5,"vu":"https://www.vivino.com/en/krug-grande-cuvee/w/2763","tasting":{"color":["깊은 황금빛","매우 섬세한 기포의 지속성"],"aroma":["구운 빵","헤이즐넛","시트러스 젤리","꿀","말린 과일","샤르퀴트리"],"taste":["크리미하고 풍성한 질감","풍부하고 복합적인 미각","높은 산도와의 완벽한 균형"],"finish":["무한히 지속되는 듯한 여운","토스티","미네랄","망고와 시트러스"],"body":70,"tannin":0,"acidity":88,"alcohol":68},"story":"크루그(Krug)의 그랑 퀴베는 샴페인의 절대 아이콘입니다. 171번째 에디션은 무려 10년 이상 다른 시기에 수확된 여러 빈티지의 와인을 블렌딩하는 독보적인 멀티-빈티지 방식으로 양조됩니다. 구운 빵, 헤이즐넛, 시트러스, 과일 젤리, 꿀의 향이 끝없이 펼쳐집니다.","food":["오마카세","캐비아와 블리니","조개찜","탁월한 미식 경험의 시작"],"df":2024,"dps":2025,"dpe":2033,"du":2036,"rank":1,"ct":"★★★★★","cd":"샴페인 아이콘, 최고의 소장 가치","country":"France"},{"id":9,"name_en":"Solaris Chikumagawa Cabernet Sauvignon","name_kr":"솔라리스 치쿠마가와 카베르네 소비뇽","vintage":2022,"region":"Japan · Nagano","grape":"Cabernet Sauvignon","type":"red","vivino":3.8,"vu":"https://www.vivino.com/","tasting":{"color":["밝은 루비","선명한 붉은 빛"],"aroma":["붉은 과일","허브","약한 후추","라즈베리","스파이스"],"taste":["섬세하고 우아한 탄닌","가벼운 바디","신선한 산도","일본 특유의 절제미"],"finish":["가볍고 깔끔한 여운","허브","미네랄"],"body":55,"tannin":52,"acidity":72,"alcohol":62},"story":"일본 나가노(長野)의 치쿠마강(千曲川) 유역에서 생산되는 솔라리스는 일본 와인의 새로운 가능성을 보여주는 와인입니다. 해발 700m 이상의 고지대 포도밭에서 일교차가 큰 기후 덕분에 향기롭고 우아한 카베르네 소비뇽이 탄생합니다.","food":["철판 와규","오리고기","가볍게 양념한 갈비","일본식 스테이크"],"df":2024,"dps":2026,"dpe":2030,"du":2033,"rank":20,"ct":"★★★","cd":"희귀 일본산 카베르네 소비뇽","country":"Japan"},{"id":10,"name_en":"Kamiju Muscat Bailey A","name_kr":"카미주 머스캣 베일리 에이","vintage":2023,"region":"Japan · Yamanashi","grape":"Muscat Bailey A","type":"red","vivino":3.8,"vu":"https://www.vivino.com/","tasting":{"color":["밝고 투명한 루비","생동감 있는 붉은빛"],"aroma":["신선한 포도","산딸기","체리","장미","약한 허브"],"taste":["가벼운 바디","부드러운 탄닌","포도 특유의 달콤한 과실미","신선한 산도"],"finish":["짧고 상쾌한 여운","붉은 베리","가볍고 경쾌한 피니시"],"body":42,"tannin":38,"acidity":68,"alcohol":48},"story":"카미주(カミジュ)는 야마나시(山梨)에 위치한 일본 와이너리로, 일본 고유 품종인 머스캣 베일리 에이(MBA)를 사용합니다. 특유의 포도 향과 산딸기, 체리의 향이 특징적입니다. 가볍게 즐기거나 일식 요리와 함께하기에 좋습니다.","food":["참치 스테이크","오리 가슴살","된장 소스 요리","가벼운 육류"],"df":2024,"dps":2024,"dpe":2026,"du":2027,"rank":23,"ct":"★★","cd":"일본 토착 품종, 지금 바로 즐기기","country":"Japan"},{"id":11,"name_en":"SALDO Red Blend","name_kr":"살도 레드 블렌드","vintage":2021,"region":"USA · California","grape":"Petite Sirah","type":"red","vivino":4.1,"vu":"https://www.vivino.com/en/saldo-red-blend/w/1381697","tasting":{"color":["불투명한 인크 퍼플","거의 검은 자주빛"],"aroma":["블랙베리","블루베리","다크초콜릿","바닐라","커피"],"taste":["풀바디","굵고 단단한 탄닌","진하고 파워풀한 과실미","높은 알코올감"],"finish":["길고 진한 여운","다크모카","후추","토스티한 오크"],"body":95,"tannin":90,"acidity":58,"alcohol":92},"story":"살도(SALDO)는 '더 프리즈너(The Prisoner)' 와이너리의 포트폴리오 중 하나로, 페티트 시라(Petite Sirah)를 중심으로 한 파워풀한 레드 블렌드입니다. 블랙베리, 블루베리, 다크 초콜릿, 바닐라의 진한 향이 폭발적으로 펼쳐집니다.","food":["BBQ 폭립","짧은 등심 브레이즈","진한 소스의 파스타","숙성 체다 치즈"],"df":2023,"dps":2025,"dpe":2029,"du":2032,"rank":13,"ct":"★★★","cd":"캘리포니아 파워풀 레드 블렌드","country":"USA"},{"id":12,"name_en":"Tolaini Chianti Classico","name_kr":"톨라이니 끼안티 클라시코","vintage":2022,"region":"Italy · Tuscany","grape":"Sangiovese","type":"red","vivino":4.0,"vu":"https://www.vivino.com/en/tolaini-chianti-classico/w/14618","tasting":{"color":["밝은 가넷","붉은 오렌지 테두리"],"aroma":["체리","붉은 자두","말린 허브","흙냄새","가죽","장미"],"taste":["산도와 탄닌의 균형","중간 바디","생생하고 活발한 구조","음식 친화적"],"finish":["중간 길이의 여운","사워체리","약한 쓴맛","미네랄"],"body":62,"tannin":68,"acidity":80,"alcohol":70},"story":"토스카나의 심장 끼안티 클라시코(Chianti Classico) DOCG 지역에서 생산되는 톨라이니는 전통과 현대를 조화롭게 담아낸 와인입니다. 체리, 붉은 자두, 말린 허브, 흙냄새, 가죽의 전형적인 끼안티 향을 완벽하게 구현합니다.","food":["비스테카 알라 피오렌티나","토마토 파스타","라자냐","이탈리안 살루미"],"df":2024,"dps":2026,"dpe":2030,"du":2033,"rank":16,"ct":"★★★","cd":"끼안티 클라시코 DOCG, 음식친화적","country":"Italy"},{"id":13,"name_en":"Terrunyo Carménère","name_kr":"떼루뇨 카르메네르","vintage":2019,"region":"Chile · Colchagua Valley","grape":"Carménère","type":"red","vivino":4.0,"vu":"https://www.vivino.com/en/terrunyo-carmenere/w/12370","tasting":{"color":["짙은 루비","보라빛 테두리"],"aroma":["붉은 피망","검은 과일","담배","향신료","인도 잉크"],"taste":["중간~풀바디","부드러운 탄닌","독특한 초록 허브의 뉘앙스","잘 익은 과실"],"finish":["긴 여운","연기","스파이스","그린 페퍼","지속적인 미네랄"],"body":72,"tannin":68,"acidity":65,"alcohol":75},"story":"떼루뇨(Terrunyo)는 꼰차 이 또로(Concha y Toro)의 테루아 탐구 시리즈입니다. 칠레의 상징적인 품종 카르메네르는 원래 프랑스 보르도의 품종이었으나 19세기 필록세라로 멸종 위기에 처했다가 칠레에서 기적적으로 살아남았습니다.","food":["그릴드 채끝","칠리 파스타","멕시칸 타코","검은콩 요리"],"df":2022,"dps":2025,"dpe":2028,"du":2031,"rank":14,"ct":"★★★","cd":"칠레 대표 품종, 희귀 카르메네르","country":"Chile"},{"id":14,"name_en":"Château Talbot","name_kr":"샤또 딸보","vintage":2021,"region":"France · Saint-Julien","grape":"Cabernet Sauvignon Blend","type":"red","vivino":4.2,"vu":"https://www.vivino.com/en/chateau-talbot/w/2512","tasting":{"color":["진한 루비","검붉은 자주빛"],"aroma":["카시스","삼나무","담배","흑연","제비꽃","블랙커런트 잎"],"taste":["우아하고 균형 잡힌 탄닌","클래식한 보르도 구조","중간~풀바디","긴 숙성 잠재력"],"finish":["매우 긴 여운","흑연","흙","미네랄","향신료"],"body":78,"tannin":82,"acidity":72,"alcohol":78},"story":"샤또 딸보(Château Talbot)는 1855년 메독 분류에서 4등급 그랑 크뤼(Grand Cru Classé)에 선정된 유서 깊은 보르도 샤또입니다. 2021 빈티지는 클래식한 보르도 스타일로 카시스, 삼나무, 담배, 흑연의 향이 두드러지며, 20년 이상 발전할 장기 숙성 잠재력을 갖추고 있습니다.","food":["소 등심 로스트","양고기 요리","트러플 버섯 리조또","숙성 콩테 치즈"],"df":2025,"dps":2030,"dpe":2040,"du":2045,"rank":9,"ct":"★★★★","cd":"보르도 4등급 그랑 크뤼, 장기 숙성형","country":"France"},{"id":15,"name_en":"Beringer Private Reserve Cabernet Sauvignon","name_kr":"베린저 프라이빗 리저브 카베르네 소비뇽","vintage":2016,"region":"USA · Napa Valley","grape":"Cabernet Sauvignon","type":"red","vivino":4.3,"vu":"https://www.vivino.com/en/beringer-private-reserve-cabernet-sauvignon/w/2464","tasting":{"color":["짙은 루비","보랏빛을 띤 자주"],"aroma":["카시스","블랙베리","바닐라","삼나무","초콜릿","체리 잼"],"taste":["풍성하고 크리미한 탄닌","나파 특유의 풍부한 과실미","균형 잡힌 산도","풀바디"],"finish":["길고 우아한 여운","카카오","달콤한 스파이스","오크"],"body":85,"tannin":78,"acidity":65,"alcohol":85},"story":"베린저(Beringer)는 1876년 설립된 나파 밸리 최고의 역사를 자랑하는 와이너리입니다. 2016 빈티지는 나파의 훌륭한 해 중 하나로, 카시스, 블랙베리, 초콜릿, 삼나무, 바닐라의 풍성한 향이 조화를 이룹니다. 현재 음용 최적기에 들어서고 있습니다.","food":["드라이 에이징 립아이","오소부코","소 안심 구이","숙성 에담 치즈"],"df":2022,"dps":2026,"dpe":2035,"du":2040,"rank":6,"ct":"★★★★★","cd":"나파 최고 명가 프리미엄 라인","country":"USA"},{"id":16,"name_en":"Robert Mondavi Maestro","name_kr":"로버트 몬다비 마에스트로","vintage":2018,"region":"USA · Napa Valley","grape":"Cabernet Sauvignon Blend","type":"red","vivino":4.1,"vu":"https://www.vivino.com/en/robert-mondavi-to-kalon-estate-maestro/w/1198011","tasting":{"color":["진한 루비","검보라빛 깊이"],"aroma":["블랙커런트","모카","흑연","향신료","삼나무","카카오"],"taste":["복합적이고 층층이 전개되는 맛","풀바디","실크 같은 탄닌","긴 숙성 잠재력"],"finish":["매우 길고 복합적인 여운","다크 베리","흙","미네랄"],"body":82,"tannin":76,"acidity":68,"alcohol":82},"story":"로버트 몬다비(Robert Mondavi)는 나파 밸리 와인 르네상스의 선구자입니다. 마에스트로는 카베르네 소비뇽을 중심으로 보르도 5대 품종을 모두 블렌딩한 완벽한 조화와 복합성을 자랑합니다.","food":["소 등심 웰링턴","오리 가슴살","야채 테린","미슐랭 정찬"],"df":2023,"dps":2027,"dpe":2033,"du":2038,"rank":7,"ct":"★★★★","cd":"나파 선구자의 걸작 보르도 블렌드","country":"USA"},{"id":17,"name_en":"Tommasi Amarone della Valpolicella Classico","name_kr":"토마시 아마로네 델라 발폴리첼라","vintage":2020,"region":"Italy · Veneto","grape":"Corvina","type":"red","vivino":4.3,"vu":"https://www.vivino.com/en/tommasi-amarone-della-valpolicella-classico/w/7103","tasting":{"color":["매우 짙은 가넷","불투명한 깊이"],"aroma":["건포도","다크초콜릿","커피","가죽","체리 잼","말린 무화과"],"taste":["풀~매우 풀바디","묵직한 탄닌","높은 알코올(14.5%+)","건조 과실의 압도적인 농도"],"finish":["매우 길고 강렬한 여운","다크초콜릿","가죽","타닉한 드라이 피니시"],"body":98,"tannin":92,"acidity":65,"alcohol":95},"story":"아마로네(Amarone)는 이탈리아 베네토 지방의 발폴리첼라에서 코르비나 등의 포도를 수개월간 건조시켜 농축한 포도즙으로 만드는 독특한 와인입니다. 토마시(Tommasi)는 1902년부터 대를 이어온 아마로네의 명가입니다. 최소 10년 이상 숙성 후 진면목이 드러납니다.","food":["브레이즈 쇠고기 뺨살","오소부코","숙성 파르미지아노","진한 초콜릿 디저트"],"df":2027,"dps":2033,"dpe":2045,"du":2050,"rank":10,"ct":"★★★★","cd":"아마로네 명가, 장기 숙성 필수","country":"Italy"},{"id":18,"name_en":"Dom Pérignon","name_kr":"돔 페리뇽","vintage":2013,"region":"France · Champagne","grape":"Pinot Noir & Chardonnay Blend","type":"sparkling","vivino":4.5,"vu":"https://www.vivino.com/en/dom-perignon-brut-champagne/w/86684","tasting":{"color":["밝고 깊은 황금빛","매우 섬세한 기포"],"aroma":["밀크초콜릿","아몬드","화이트 피치","레몬","미네랄","흰 꽃"],"taste":["크리미하고 긴장감 있는 질감","생생한 산도와 완벽한 균형","복합적이고 우아한 미감"],"finish":["매우 길고 순수한 여운","미네랄","레몬 제스트","살짝 짠맛의 미네랄리티"],"body":65,"tannin":0,"acidity":90,"alcohol":65},"story":"샴페인의 전설 돔 페리뇽(Dom Pérignon)은 모엣 에 샹동의 프레스티지 퀴베로, 오직 최고의 단일 빈티지에만 생산됩니다. 2013 빈티지는 James Suckling 98pt, Wine Spectator 96pt를 받았습니다. 밀크 초콜릿, 아몬드, 화이트 피치, 레몬의 복합적인 향이 섬세하게 전개됩니다.","food":["오마카세 초밥","생굴과 레몬","화이트 아스파라거스","랍스터 테르미도르"],"df":2020,"dps":2025,"dpe":2035,"du":2040,"rank":2,"ct":"★★★★★","cd":"샴페인의 전설, 단일 최고 빈티지","country":"France"},{"id":19,"name_en":"Eternal 8 Chenin Blanc","name_kr":"이터널 에잇 슈냉 블랑","vintage":2025,"region":"South Africa · Stellenbosch","grape":"Chenin Blanc","type":"white","vivino":3.8,"vu":"https://www.vivino.com/","tasting":{"color":["밝은 레몬 황금빛","은은한 초록빛"],"aroma":["황도","멜론","아카시아 꽃","꿀","바닐라","열대 과실"],"taste":["풍부한 과실미와 신선한 산도의 균형","중간 바디","부드럽고 라운드한 질감"],"finish":["중간 길이의 여운","꿀","살구","상쾌한 미네랄"],"body":55,"tannin":0,"acidity":72,"alcohol":60},"story":"남아프리카 스텔렌보쉬(Stellenbosch)의 이터널 에잇은 슈냉 블랑(Chenin Blanc)의 본고장인 남아프리카의 테루아를 담은 와인입니다. 2025 최신 빈티지로 황도, 멜론, 꽃향기, 약간의 꿀과 바닐라의 향이 상큼하게 어우러집니다.","food":["매운 태국 음식","미역국","어패류 파스타","프레시 치즈"],"df":2025,"dps":2025,"dpe":2027,"du":2029,"rank":22,"ct":"★★","cd":"신선한 화이트, 지금 즐기기 최적","country":"SouthAfrica"},{"id":20,"name_en":"Cinquanta Collezione +7 (1)","name_kr":"신퀀타 꼴레지오네 +7 (1번)","vintage":2019,"region":"Italy · Puglia","grape":"Primitivo & Negroamaro Blend","type":"red","vivino":4.0,"vu":"https://www.vivino.com/","tasting":{"color":["매우 짙은 루비","불투명한 가넷"],"aroma":["블랙베리 잼","말린 무화과","다크초콜릿","향신료","담배"],"taste":["풍성하고 관능적인 과실미","부드러운 탄닌","높은 당도에서 오는 바디감"],"finish":["길고 따뜻한 여운","초콜릿","커피","지중해 향신료"],"body":88,"tannin":72,"acidity":58,"alcohol":88},"story":"이탈리아 남부 풀리아(Puglia) 지방의 신퀀타 꼴레지오네 +7은 풀리아를 대표하는 두 품종 프리미티보(Primitivo)와 네그로아마로(Negroamaro)의 블렌드입니다. 블랙베리 잼, 말린 무화과, 초콜릿, 향신료의 진하고 관능적인 향이 특징입니다.","food":["오레키에테 파스타","이탈리안 소시지","그릴드 양고기","올리브 요리"],"df":2022,"dps":2025,"dpe":2028,"du":2031,"rank":17,"ct":"★★★","cd":"이탈리아 남부 풀리아 블렌드","country":"Italy"},{"id":21,"name_en":"Cinquanta Collezione +7 (2)","name_kr":"신퀀타 꼴레지오네 +7 (2번)","vintage":2019,"region":"Italy · Puglia","grape":"Primitivo & Negroamaro Blend","type":"red","vivino":4.0,"vu":"https://www.vivino.com/","tasting":{"color":["매우 짙은 루비","불투명한 가넷"],"aroma":["블랙베리 잼","말린 무화과","다크초콜릿","향신료","담배"],"taste":["풍성하고 관능적인 과실미","부드러운 탄닌","높은 당도에서 오는 바디감"],"finish":["길고 따뜻한 여운","초콜릿","커피","지중해 향신료"],"body":88,"tannin":72,"acidity":58,"alcohol":88},"story":"이탈리아 남부 풀리아(Puglia) 지방의 신퀀타 꼴레지오네 +7 동일 와인 2번째 보틀입니다. 프리미티보와 네그로아마로의 블렌드로 블랙베리 잼, 말린 무화과, 초콜릿, 향신료의 진한 향이 특징입니다.","food":["오레키에테 파스타","이탈리안 소시지","그릴드 양고기","올리브 요리"],"df":2022,"dps":2025,"dpe":2028,"du":2031,"rank":18,"ct":"★★★","cd":"이탈리아 남부 풀리아 블렌드","country":"Italy"},{"id":22,"name_en":"Rapaura Springs Classic Sauvignon Blanc","name_kr":"라파우라 스프링스 소비뇽 블랑","vintage":2024,"region":"New Zealand · Marlborough","grape":"Sauvignon Blanc","type":"white","vivino":3.9,"vu":"https://www.vivino.com/en/rapaura-springs-classic-sauvignon-blanc/w/1207337","award":"WineOrbit 93+pts ★★★★★","tasting":{"color":["매우 밝은 연노랑","초록빛 반사"],"aroma":["자몽","패션프루트","구스베리","잔디","라임","흰 꽃"],"taste":["생생하고 폭발적인 산도","가볍고 청량한 바디","열대 과실과 허브의 조화"],"finish":["상쾌하고 깔끔한 여운","시트러스","자갈 미네랄"],"body":38,"tannin":0,"acidity":92,"alcohol":52},"story":"뉴질랜드 말보로(Marlborough)는 세계에서 가장 생동감 넘치는 소비뇽 블랑의 고향입니다. 라파우라 스프링스는 말보로의 자갈이 많은 라파우라 지역에서 생산되며, 이 지역 특유의 미네랄리티를 잘 담아냅니다. WineOrbit 93+ 포인트를 수상한 검증된 품질입니다.","food":["굴","아스파라거스","생선 세비체","닭고기 레몬 버터 구이","샐러드"],"df":2024,"dps":2024,"dpe":2026,"du":2028,"rank":24,"ct":"★★","cd":"NZ 말보로 소비뇽, WineOrbit 93+","country":"NewZealand"},{"id":23,"name_en":"Penfolds Lot. 518 Spirited Wine with Baijiu","name_kr":"펜폴즈 로트 518 바이주","vintage":null,"region":"Australia · South Australia","grape":"Shiraz","type":"red","vivino":4.2,"vu":"https://www.vivino.com/en/penfolds-lot-518-spirited-wine-with-baijiu/w/7740624","tasting":{"color":["매우 짙은 루비","거의 불투명"],"aroma":["블랙베리","후추","스파이스","바이주 특유의 사탕수수향","향신료","훈연"],"taste":["와인과 증류주가 결합된 독특한 복합성","묵직하고 강렬한 바디","알코올(21.5%)의 따뜻한 감촉"],"finish":["길고 강렬한 여운","중국 향신료","스모키","달콤한 알코올"],"body":95,"tannin":75,"acidity":52,"alcohol":98},"story":"펜폴즈 로트 518은 와인과 중국 전통 백주(바이주, 白酒)를 결합한 세계 최초의 혁신적인 시도입니다. 호주 쉬라즈 와인에 마오타이로 유명한 귀주성의 소주를 더해 독특한 풍미를 만들어냈습니다. 알코올 도수 21.5%의 강렬하고 독창적인 경험입니다.","food":["베이징 덕","마라 샹궈","숙성 치즈","대담한 아시안 퓨전 요리"],"df":2024,"dps":2024,"dpe":2028,"du":2030,"rank":11,"ct":"★★★★","cd":"와인+바이주 세계 최초 혁신, 희귀 아이템","country":"Australia"},{"id":24,"name_en":"Southern Ocean Sauvignon Blanc","name_kr":"서던 오션 소비뇽 블랑","vintage":2021,"region":"South Africa · Western Cape","grape":"Sauvignon Blanc","type":"white","vivino":3.7,"vu":"https://www.vivino.com/","tasting":{"color":["밝은 연노랑","초록빛 하이라이트"],"aroma":["자몽","레몬그라스","허브","녹색 피망","라임","미네랄"],"taste":["신선하고 경쾌한 산도","가볍고 드라이한 바디","대서양 해풍의 미네랄리티"],"finish":["짧고 상쾌한 여운","시트러스","허브","소금기 있는 미네랄"],"body":40,"tannin":0,"acidity":85,"alcohol":50},"story":"남아프리카 웨스턴 케이프(Western Cape)의 서던 오션은 대서양의 시원한 해풍의 영향을 받아 생생한 산도와 신선함이 살아있는 소비뇽 블랑입니다. 자몽, 레몬그라스, 허브, 미네랄의 향이 상쾌하게 펼쳐집니다.","food":["새우 레몬 버터","굴","그릴드 생선","토마토 모차렐라 샐러드"],"df":2022,"dps":2023,"dpe":2025,"du":2026,"rank":23,"ct":"★★","cd":"남아공 화이트, 지금 바로 음용 권장","country":"SouthAfrica"},{"id":25,"name_en":"Eternal Eight Chenin Blanc 2023","name_kr":"이터널 에잇 슈냉 블랑 2023","vintage":2023,"region":"South Africa · Stellenbosch","grape":"Chenin Blanc","type":"white","vivino":3.9,"vu":"https://www.vivino.com/","tasting":{"color":["깊은 황금빛","초록빛 반사","2025보다 깊은 색"],"aroma":["잘 익은 황도","망고","아카시아 꿀","바닐라","버터스카치","구운 사과"],"taste":["2년 숙성의 풍성함","크리미하고 라운드한 질감","산도와 과실미의 균형","중간~풀바디"],"finish":["길어진 여운","꿀","살구","버터 토스트","미네랄"],"body":62,"tannin":0,"acidity":70,"alcohol":63},"story":"이터널 에잇(Eternal Eight)의 2023 슈냉 블랑은 2025 빈티지보다 2년 더 숙성된 버전으로, 남아프리카 스텔렌보쉬의 테루아가 더욱 깊이 표현됩니다. 슈냉 블랑은 남아공에서 가장 많이 재배되는 품종으로, 이 와인은 신선한 과실미에서 풍성한 꿀과 버터스카치로 발전한 복합성을 보여줍니다. 레이블의 천사 이미지는 '우리를 나누는 것보다 우리를 하나로 묶는 것이 더 위대하다'는 철학을 담고 있습니다. 현재 음용 최적기에 있으며, 2025 빈티지와 함께 버티컬 테이스팅을 즐기기에도 좋습니다.","food":["크림 파스타","꿀 드레싱 샐러드","구운 닭고기","소프트 치즈","게장"],"df":2024,"dps":2025,"dpe":2027,"du":2029,"rank":21,"ct":"★★★","cd":"2023 빈티지, 2025와 버티컬 테이스팅 추천","country":"SouthAfrica"},{"id":26,"name_en":"Le Cupole di Trinoro","name_kr":"레 쿠폴레 디 트리노로","vintage":2021,"region":"Italy · Tuscany, Val d'Orcia","grape":"Cabernet Franc, Merlot, Cabernet Sauvignon, Petit Verdot","type":"red","vivino":4.2,"vu":"https://www.vivino.com/en/le-cupole-di-trinoro/w/4534","tasting":{"color":["깊고 진한 루비","보랏빛 테두리"],"aroma":["카시스","블랙베리","제비꽃","담배","미네랄","가죽"],"taste":["우아하고 실크 같은 탄닌","중간~풀바디","생동감 있는 산도","보르도 스타일의 정제된 구조"],"finish":["길고 미네랄한 여운","흑연","삼나무","향신료","우아한 드라이 피니시"],"body":78,"tannin":74,"acidity":72,"alcohol":80},"story":"레 쿠폴레 디 트리노로(Le Cupole di Trinoro)는 토스카나 Val d'Orcia의 컬트 와이너리 테누타 디 트리노로(Tenuta di Trinoro)의 세컨드 와인입니다. 안드레아 프란체티(Andrea Franchetti)가 설립한 이 와이너리는 보르도 품종—특히 카베르네 프랑을 중심으로—을 토스카나의 극단적인 환경에서 재배하여 독창적인 스타일을 만들어냅니다. '쿠폴레(Cupole)'는 이탈리아어로 '돔(Dome)'을 의미하며, 피렌체 두오모의 웅장함에서 영감을 받았습니다. 2021 빈티지는 토스카나의 균형 잡힌 해로 카시스, 제비꽃, 담배, 미네랄의 복합적인 향이 우아하게 전개됩니다. 수량이 제한되고 세컨드 와인임에도 불구하고 세계적으로 인정받는 품질로 소장 가치가 높습니다.","food":["비스테카 알라 피오렌티나","양고기 안심","트러플 리조또","숙성 페코리노","그릴드 포르치니"],"df":2023,"dps":2026,"dpe":2032,"du":2037,"rank":7,"ct":"★★★★","cd":"토스카나 컬트 와이너리 테누타 디 트리노로 세컨드 와인","country":"Italy"},{"id":27,"name_en":"DADÁ Art #391 Sauvignon Blanc","name_kr":"다다 아트 #391 소비뇽 블랑","vintage":null,"region":"Argentina · Finca Las Moras (New Zealand grapes)","grape":"Sauvignon Blanc","type":"white","vivino":3.8,"vu":"https://www.vivino.com/","country":"Argentina","tasting":{"color":["밝은 레몬 연노랑","초록빛 반사"],"aroma":["자몽","패션프루트","라임","허브","흰 꽃"],"taste":["신선하고 생생한 산도","가볍고 경쾌한 바디","열대 과실의 풍성함"],"finish":["상쾌하고 깔끔한 여운","시트러스","미네랄"],"body":40,"tannin":0,"acidity":88,"alcohol":50},"story":"아르헨티나의 명가 핀카 라스 모라스(Finca Las Moras)가 선보이는 다다(DADÁ) 시리즈 중 하나입니다. 뉴질랜드 말보로산 소비뇽 블랑 포도를 사용하여 만든 이 화이트 와인은 아트 넘버 #391이라는 독창적인 이름처럼 예술적인 감각과 신선함을 담고 있습니다. 자몽, 패션프루트, 라임의 생생한 향이 매력적이며, 손가락으로 가리키는 빈티지 일러스트 레이블이 인상적입니다.","food":["굴","새우 샐러드","생선 타코","아스파라거스","프레시 치즈"],"df":2024,"dps":2025,"dpe":2027,"du":2028,"rank":27,"ct":"★★★","cd":"아르헨티나 × 뉴질랜드 크로스오버 소비뇽 블랑"},{"id":28,"name_en":"Ménage à Trois Gold Chardonnay","name_kr":"메나쥬 아 트로아 골드 샤르도네","vintage":2023,"region":"USA · California","grape":"Chardonnay","type":"white","vivino":3.9,"vu":"https://www.vivino.com/","country":"USA","tasting":{"color":["밝은 황금빛","풍성한 노란색"],"aroma":["버터스카치","바닐라","황도","파인애플","헤이즐넛"],"taste":["크리미하고 풍성한 바디","오크의 달콤함","열대 과실의 풍성함","부드러운 산도"],"finish":["길고 버터리한 여운","바닐라 크림","토스티한 오크"],"body":72,"tannin":0,"acidity":58,"alcohol":72},"story":"메나쥬 아 트로아(Ménage à Trois)는 캘리포니아의 인기 와인 브랜드로, 골드(Gold) 라인은 풍성하고 크리미한 샤르도네를 대표합니다. 2023 빈티지는 캘리포니아의 따뜻한 햇살을 받아 잘 익은 황도, 바닐라, 버터스카치의 진한 향이 특징입니다. 오크 숙성으로 완성된 크리미한 질감과 부드러운 피니시가 매력적인 캘리포니아 스타일 샤르도네의 전형입니다.","food":["크림 파스타","구운 치킨","버터 소스 해산물","브리 치즈","크림 리조또"],"df":2024,"dps":2025,"dpe":2027,"du":2028,"rank":28,"ct":"★★★","cd":"캘리포니아 크리미 샤르도네"},{"id":29,"name_en":"DADÁ Art White Malbec #391","name_kr":"다다 아트 화이트 말백 #391","vintage":2024,"region":"Argentina · San Juan","grape":"Malbec (White)","type":"white","vivino":3.8,"vu":"https://www.vivino.com/","country":"Argentina","tasting":{"color":["매우 밝은 연노랑","초록빛 하이라이트","White Malbec 특유의 청명함"],"aroma":["흰 꽃","라즈베리 (은은하게)","살구","열대 과실","허브"],"taste":["신선하고 가벼운 바디","White Malbec 특유의 과실미","은은한 붉은 과실 뉘앙스"],"finish":["상쾌하고 경쾌한 여운","꽃향기","미네랄"],"body":42,"tannin":0,"acidity":80,"alcohol":52},"story":"화이트 말백(White Malbec)은 레드 와인 품종인 말백(Malbec)의 포도즙을 껍질과 분리하여 화이트 와인처럼 양조한 혁신적인 스타일입니다. 핀카 라스 모라스(Finca Las Moras)의 다다(DADÁ) 시리즈 #391로, 아르헨티나 산후안(San Juan)의 뜨거운 태양 아래 재배된 말백이 화이트 스타일로 재탄생했습니다. 흰 꽃, 살구, 라즈베리의 은은한 향이 독특하며 라이트하고 신선합니다.","food":["스시","해산물 파스타","타파스","프레시 샐러드","화이트 피자"],"df":2025,"dps":2025,"dpe":2027,"du":2028,"rank":29,"ct":"★★★","cd":"세계 희귀 화이트 말백 — 레드 품종의 화이트 변신"},{"id":30,"name_en":"Freixenet Reserva Vintage","name_kr":"프레이스네트 레세르바 빈티지","vintage":2021,"region":"Spain · Penedès (Cava DO)","grape":"Macabeo, Parellada & Xarel·lo","type":"sparkling","vivino":3.9,"vu":"https://www.vivino.com/","country":"Spain","tasting":{"color":["밝은 황금빛","섬세하고 지속적인 기포"],"aroma":["사과","레몬","아몬드","브리오슈","흰 꽃"],"taste":["신선하고 크리미한 질감","밸런스 좋은 산도","복합적인 카바 특유의 미감"],"finish":["중간 길이의 상쾌한 여운","구운 아몬드","시트러스"],"body":50,"tannin":0,"acidity":80,"alcohol":55},"story":"프레이스네트(Freixenet)는 1861년 설립된 스페인 카탈루냐의 대표적인 카바(Cava) 생산자입니다. 레세르바 빈티지 2021은 메토도 트라디시오날(Método Tradicional), 즉 전통 방식으로 양조된 단일 빈티지 카바입니다. 마카베오, 파레야다, 사렐로 세 가지 스페인 토착 품종을 블렌딩하여 사과, 레몬, 아몬드, 브리오슈의 복합적인 향을 만들어냅니다. 샴페인과 동일한 제조 방식으로 만들어지지만 스페인 특유의 토착적인 풍미가 매력적입니다.","food":["파에야","타파스","하몽","치즈 플레이트","해산물 요리"],"df":2024,"dps":2025,"dpe":2027,"du":2029,"rank":30,"ct":"★★★","cd":"스페인 카바 명가 전통 방식 빈티지 스파클링"},{"id":31,"name_en":"Marques de Casa Concha Blue Carmenere","name_kr":"마르케스 데 카사 콘차 블루 카르메네르","vintage":2021,"region":"Chile · Peumo, Colchagua Valley","grape":"Carmenere","type":"red","vivino":4.1,"vu":"https://www.vivino.com/","country":"Chile","tasting":{"color":["짙은 루비","보라빛 테두리"],"aroma":["붉은 피망","블랙베리","제비꽃","향신료","담배"],"taste":["중간~풀바디","부드러운 탄닌","카르메네르 특유의 그린 허브 뉘앙스","과실미와 구조감의 균형"],"finish":["길고 스파이시한 여운","블랙 페퍼","미네랄","드라이 허브"],"body":75,"tannin":70,"acidity":65,"alcohol":76},"story":"콘차 이 토로(Concha y Toro)의 프리미엄 라인 마르케스 데 카사 콘차(Marques de Casa Concha)의 블루(Blue) 에디션입니다. 칠레를 대표하는 품종 카르메네르(Carmenere)를 카사블랑카와 함께 가장 적합한 테루아인 푸에우모(Peumo)에서 재배합니다. 2021 빈티지는 붉은 피망, 블랙베리, 제비꽃, 향신료가 조화를 이루며 카르메네르의 특성인 초록 허브 뉘앙스와 함께 우아한 구조감을 보여줍니다.","food":["칠레 스테이크","양꼬치","바비큐 폭립","진한 소스 파스타","체다 치즈"],"df":2024,"dps":2025,"dpe":2029,"du":2032,"rank":31,"ct":"★★★","cd":"칠레 최고급 카르메네르, 푸에우모 테루아"},{"id":32,"name_en":"Marques de Casa Concha Gold Cabernet Sauvignon","name_kr":"마르케스 데 카사 콘차 골드 카베르네 소비뇽","vintage":2022,"region":"Chile · Maipo Andes","grape":"Cabernet Sauvignon","type":"red","vivino":4.2,"vu":"https://www.vivino.com/","country":"Chile","tasting":{"color":["짙은 루비","검붉은 자주빛"],"aroma":["카시스","블랙베리","삼나무","담배","흑연","다크 초콜릿"],"taste":["풀바디","단단하고 정교한 탄닌","마이포 안데스 특유의 미네랄리티","긴 숙성 잠재력"],"finish":["길고 복합적인 여운","흑연","흙","스파이스","우아한 드라이 피니시"],"body":82,"tannin":78,"acidity":68,"alcohol":80},"story":"마르케스 데 카사 콘차 골드(Gold)는 칠레 최고의 카베르네 소비뇽 산지인 마이포 안데스(Maipo Andes)의 푸엔테 알토(Puente Alto)와 피르케(Pirque) 포도밭에서 생산됩니다. 안데스 산맥의 서늘한 기후와 자갈이 많은 토양이 카베르네 소비뇽에 탁월한 구조감과 복합성을 부여합니다. 2022 빈티지는 카시스, 삼나무, 흑연의 클래식한 향과 함께 정교한 탄닌과 긴 여운을 자랑하는 보르도 스타일의 칠레 카베르네입니다.","food":["안심 스테이크","양갈비 구이","소 갈비찜","숙성 고다 치즈","버섯 요리"],"df":2025,"dps":2026,"dpe":2032,"du":2036,"rank":32,"ct":"★★★","cd":"마이포 안데스 프리미엄 카베르네 소비뇽"},{"id":33,"name_en":"Hattingley Valley English Sparkling Wine (M&S Collection)","name_kr":"해팅글리 밸리 잉글리시 스파클링 와인","vintage":2018,"region":"England · Hampshire, Hattingley Valley","grape":"Pinot Noir, Chardonnay & Meunier","type":"sparkling","vivino":4.2,"vu":"https://www.vivino.com/","country":"UK","tasting":{"color":["밝은 황금빛","섬세하고 지속적인 기포"],"aroma":["레몬 타르트","그린 애플","흰 꽃","브리오슈","초크 미네랄"],"taste":["생생하고 긴장감 있는 산도","크리미한 질감","영국 스파클링 특유의 미네랄리티","복합적인 효모 뉘앙스"],"finish":["길고 순수한 여운","레몬 제스트","초크","짭조름한 미네랄"],"body":58,"tannin":0,"acidity":88,"alcohol":60},"story":"해팅글리 밸리(Hattingley Valley)는 잉글랜드 햄프셔(Hampshire)에 위치한 영국 최고의 스파클링 와인 생산자 중 하나입니다. M&S(Marks & Spencer) 콜렉션의 일환으로 선정된 이 와인은 '세계 유명 지역의 아이코닉 와인 중 탁월한 선별'이라는 M&S의 철학을 담고 있습니다. 2018 빈티지는 전통 방식(Traditional Method Brut)으로 양조되었으며, 영국 남부의 초크(chalk) 토양에서 자란 피노 누아, 샤르도네, 뫼니에를 블렌딩했습니다. 샴페인과 같은 제조 방식으로 만들어지나 영국 특유의 높은 산도와 미네랄리티가 독보적입니다. 최근 영국 스파클링 와인이 세계 주요 대회에서 샴페인을 누르며 급부상하고 있습니다.","food":["굴과 레몬","스모크 살몬","생선 앤 칩스","피시 파이","크림 스콘"],"df":2020,"dps":2025,"dpe":2030,"du":2033,"rank":33,"ct":"★★★★","cd":"영국 최고급 스파클링 — 샴페인에 도전하는 English Sparkling"}];
+document.getElementById("loading").style.display="none";
+document.getElementById("grid").style.display="grid";
+updateStats();render();
+syncFromSheets().then(function(){updateStats();render();}).catch(function(){});
 </script>
 </body>
 </html>
